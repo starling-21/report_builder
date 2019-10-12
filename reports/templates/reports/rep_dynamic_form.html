@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    TEST dynamic form
+
+    <h2>Choose report title</h2>
+      <form action="{% url 'reports:form' %}" method="POST">
+        {% csrf_token %}
+        {% for field in report_title_form %}
+
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+
+        {% endfor %}
+      <br>
+      <input type="submit" name="subm_title" value="submit title" />
+
+      <br>
+      <br>
+      <br>
+
+      {% if show_report_fields_form %}
+          <h2>Choose report fields</h2>
+          <form action="{% url 'reports:home' %}" method="POST">
+            {% csrf_token %}
+            {% for field in report_fields_form %}
+
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}
+
+            {% endfor %}
+          <br>
+          <input type="submit" name="subm_fields" value="submit fields" />
+      {% endif %}
+
+
+
+
+
+
+</body>
+</html>

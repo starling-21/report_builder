@@ -1,0 +1,4 @@
+py manage.py migrate
+py manage.py createsuperuser
+py manage.py makemigrations reports
+py manage.py migrate reports filled
