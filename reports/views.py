@@ -28,18 +28,15 @@ from time import sleep
 
 def report_home_view(request):
     body = "Reports App!"
-    body += "<br><br><br>"
+    body += "<br><br>"
     # body += "<a href='/form'>Form</a>"
     # body += "<br><br><br>"
-    # body += "<a href='/test_1'>Test page</a>"
-
-    body += "<br><br><br>"
-    body += "<a href='/users_1'>USERS</a>"
+    body += "<a href='/users'>Users</a>"
     return HttpResponse(body)
 
 
 
-def users_1_view(request):
+def users_view(request):
     """test view for showing users list. For choosing who generate report for"""
     serviceman_list = Serviceman.objects.all()
     context = {
@@ -197,7 +194,7 @@ def dyn_form_view(request):
 
 
 
-def test_form_view_1(request):
+def test_form_view(request):
     """test view"""
     if request.method == 'POST':
         form_2 = ReportForm_test1(request.POST)
@@ -205,17 +202,15 @@ def test_form_view_1(request):
             print("received:",)
             for k, v in form_2.cleaned_data.items():
                 print('{}:{}'.format(k, v))
-                # if 'date' in k:
-                #     print("new date:", v.strftime('%d/%m/%Y'))
             return HttpResponseRedirect(reverse_lazy('reports:index'))
     else:
         form_2 = ReportForm_test1()
     return render(request, 'reports/test_report_1.html', {'form': form_2})
 
 
-def report_generate_view_1(request, user_id=5):
+def generate_report_view(request, user_id=5):
     """generate test report """
-    #TESC METHOD for bulk report generation
+    #TESC BULK report generation
     # users = Serviceman.objects.filter(id__gt=1)
     # for user in users:
     #     sample_user = get_serviceman(user.id)
@@ -230,8 +225,6 @@ def report_generate_view_1(request, user_id=5):
     #     generate_report(merge_dict, template_name="template_tier_2.docx", report_name='t2')
     #     sleep(1)
 
-    # «body_tier_0»
-
 
     user_id = 5
     user = get_serviceman(user_id)
@@ -242,18 +235,15 @@ def report_generate_view_1(request, user_id=5):
         return HttpResponse("report generation (___ERROR___)!!!!")
 
     #TODO add method for report body generation
-    merge_dict.update(get_body_text())
+    merge_dict.update(get_report_body_text())
     filepath = generate_report(merge_dict, template_name="template_tier_2.docx", report_name='t2')
 
-
     # return HttpResponse("REPORT has been generated SUCCESSFULLY")
-    response = FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filepath.split('\\')[-1])
-    # response['Content-Type'] = 'application/octet-stream'
-    # response['Content-Disposition'] = 'attachment;filename="{0}"'.format(filepath.split('\\')[-1]);
-    # response['Content-Length'] = os.path.getsize(filepath)
-    return response;
+    return FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filepath.split('\\')[-1])
 
-def get_body_text():
+
+def get_report_body_text():
+    """TEST METHOD"""
     body_tier_0 = "Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 2018 "
     "рік з 25 листопада на 21 вересня 2018 року у зв’язку з сімейними обставинами."
 
@@ -393,10 +383,6 @@ def get_full_position(main_position, units_chain):
     full_position = main_position
     position_tail = ""
 
-    #check complex main_position which contais '-', which should stay on first line, then add \n
-    # if "-" in main_position:
-    #     dash_index = main_position.find('-')
-    #     full_position = main_position[:dash_index + 1] + "\n" + main_position[dash_index + 2:]
     if (len(units_chain) > 0): position_tail = units_chain[len(units_chain)-1].name
     for i in range(0, len(units_chain)-1):
         full_position = full_position + " " + units_chain[i].name

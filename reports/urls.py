@@ -24,11 +24,11 @@ urlpatterns = [
     path('', views.report_home_view, name='index'),
 
     path('form', views.dyn_form_view, name='form'),
-    path('test_1', views.test_form_view_1, name='test_page'),
-    path('generate', views.report_generate_view_1, name='generate'),
+    path('test_form', views.test_form_view, name='test_form'),
+    path('generate', views.generate_report_view, name='generate'),
 
 
-    path('users_1', views.users_1_view, name='users'),
+    path('users', views.users_view, name='users'),
     path('user_reports', views.user_reports_view, name='user_reports')
 
 ]
