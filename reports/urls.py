@@ -21,10 +21,15 @@ app_name = "reports"
 
 urlpatterns = [
 
-    path('', views.report_home, name='index'),
-    path('form', views.dyn_form, name='form'),
-    path('home', views.report_home, name='home'),
-    path('test_1', views.report_1_test),
+    path('', views.report_home_view, name='index'),
+
+    path('form', views.dyn_form_view, name='form'),
+    path('test_1', views.test_form_view_1, name='test_page'),
+    path('generate', views.report_generate_view_1, name='generate'),
+
+
+    path('users_1', views.users_1_view, name='users'),
+    path('user_reports', views.user_reports_view, name='user_reports')
 
 ]
 

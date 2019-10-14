@@ -1,0 +1,12 @@
+{% extends 'reports/base.html' %}
+{#{% load static %}#}
+
+{% block content %}
+    {% for serviceman in serviceman_list %}
+        <ul>
+            <li>
+                <a href="{% url 'reports:user_reports' %}">{{ serviceman.id }} {{ serviceman.first_name|title}} {{ serviceman.last_name|title }}</a>
+            </li>
+        </ul>
+    {% endfor %}
+{% endblock %}

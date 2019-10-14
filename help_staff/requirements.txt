@@ -1,0 +1,1 @@
+pip install django-bootstrap-datepicker-plus  -- https://django-bootstrap-datepicker-plus.readthedocs.io/en/latest/Getting_Started.html

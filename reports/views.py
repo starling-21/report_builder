@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import FileResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse, reverse_lazy
+from  django.shortcuts import redirect
 
 
 #import for tests
@@ -12,6 +14,8 @@ from django.db.models import Q
 
 
 from django import forms
+from bootstrap_datepicker_plus import DatePickerInput
+
 
 from .forms import ReportForm_test1
 from .forms import RepTitleForm, RepFieldsFrom
@@ -22,54 +26,133 @@ import json
 from time import sleep
 # Create your views here.
 
-def report_home(request):
-    print("HOME VIEW")
-    return HttpResponse("Reports App!")
+def report_home_view(request):
+    body = "Reports App!"
+    body += "<br><br><br>"
+    # body += "<a href='/form'>Form</a>"
+    # body += "<br><br><br>"
+    # body += "<a href='/test_1'>Test page</a>"
 
-#TODO test
-################################################ DYNAMIC FORM
-def dyn_form(request):
+    body += "<br><br><br>"
+    body += "<a href='/users_1'>USERS</a>"
+    return HttpResponse(body)
+
+
+
+def users_1_view(request):
+    """test view for showing users list. For choosing who generate report for"""
+    serviceman_list = Serviceman.objects.all()
+    context = {
+        'serviceman_list': serviceman_list
+    }
+    return render(request, 'reports/serviceman_list.html', context)
+
+
+def user_reports_view(request):
+    """show reports list to choose"""
+    return HttpResponse("user's report list page")
+
+
+# def parse_report_template(request):
+def parse_report_template():
+    """report parse function
+    substitutte pattern:      @_<type>_<label>@
+
+    """
+
+    input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
+    @_int_за какой год переносится отпуск@ рік з @_date_перенести с@ на @_date_перенести на@ 
+    року у зв’язку з @_str_причина_long@.
+    """
+
+    """_str_причина переноса"""
+    """_date_перенести отпуск с"""
+    """_int_за какой год переносится отпуск"""
+
+    parsed_pattern_dict = {}
+
+    counter = 0
+    for pattertline in input_str.split('@'):
+        temp = {}
+        if pattertline[0] == '_':
+            patter_list = pattertline.split('_')
+
+            temp['insert_type'] = patter_list[1]
+            temp['label'] = patter_list[2]
+            temp['begin'] = input_str.find(pattertline)
+            temp['end'] = temp['begin'] + len(pattertline)
+
+            parsed_pattern_dict[temp['insert_type'] + '_' + str(counter)] = temp
+            counter += 1
+
+    a = 0
+
+    dynamic_fields_dict = {}
+    for key, nested_dict in parsed_pattern_dict.items():
+        if nested_dict['insert_type'].startswith('int'):
+            dynamic_fields_dict[key] = forms.IntegerField(
+                label=nested_dict['label'],
+            )
+
+        elif nested_dict['insert_type'].startswith('str'):
+            dynamic_fields_dict[key] = forms.CharField(
+                label=nested_dict['label'],
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+
+        elif nested_dict['insert_type'].startswith('date'):
+            dynamic_fields_dict[key] = forms.DateField(
+                label=nested_dict['label'],
+                widget=DatePickerInput(
+                    format='%Y-%m-%d',
+                    options={
+                        "locale": "ru"
+                    }),
+            )
+    return dynamic_fields_dict
+
+
+
+
+
+
+
+
+
+
+
+
+def dyn_form_view(request):
+    """dynamyc form after user submits input"""
     context = {}
     form_content = {}
     new_fields = {}
 
-
-    if request.method == 'GET':
-        # report = Report()
-        context['show_report_fields_form'] = False
-
-
-########################################################################################################################
     if request.method == 'POST':
         context['show_report_fields_form'] = True
         report = Report()
 
-
-
-
-
-
         #received 'report_title' submit
         if 'subm_title' in request.POST:
-            report.report_title = int(request.POST['report_title'])
-            # try:
-            #     form_content = json.loads(report.report_fields)
-            # except json.JSONDecodeError:
-            #     form_content = {}
+            # report.report_title = int(request.POST['report_title'])
+            report = Report.objects.filter(report_title=int(request.POST['report_title'])).last()
+            if report is None:
+                report = Report()
+                report.report_title = int(request.POST['report_title'])
+            try:
+                form_content = json.loads(report.report_fields)
+            except json.JSONDecodeError:
+                form_content = {}
         #received 'report fields' submit
         elif 'subm_fields' in request.POST:
             report.report_title = int(request.POST['report_title'])
             for key in request.POST.keys():
-                # if (key != 'csrfmiddlewaretoken' and
-                #     key != 'subm_fields'):
-                if key != 'csrfmiddlewaretoken':
+                if key != 'csrfmiddlewaretoken' and key != 'subm_fields':
                     form_content[key] = request.POST[key]
             report.report_fields = json.dumps(form_content)
             report.save()
-            HttpResponseRedirect(reverse_lazy('reports:home'))
-            print("HEEELLLLOOOO")
-
-
+            return redirect('reports:index')
+            # return HttpResponseRedirect(reverse_lazy('reports:index'))
 
         if report.report_title == -1:
             new_fields = {}
@@ -90,16 +173,14 @@ def dyn_form(request):
         elif report.report_title == 2:
             new_fields = {
                 'start_num_1': forms.IntegerField(required=False),
-                'end___num_1': forms.IntegerField(required=False)
+                'end_num_1': forms.IntegerField(required=False)
             }
+        new_fields = parse_report_template()
 
+    elif request.method == 'GET':
+        context['show_report_fields_form'] = False
 ########################################################################################################################
-
-
-
-
     dynamicReportFieldsForm = type('RepFieldsFrom', (RepFieldsFrom,), new_fields)
-
 
     reportFieldsForm = dynamicReportFieldsForm(form_content)
     context['report_title_form'] = RepTitleForm(request.POST or None)
@@ -108,33 +189,32 @@ def dyn_form(request):
     return render(request, 'reports/rep_dynamic_form.html', context)
 
 
-def save_report(request):
-    """save report after user submits filleing the report"""
-    if request.method == 'POST':
-        report = Report()
-        report.report_title = int(request.POST['report_title'])
-        for key in request.POST.keys():
-            if key != 'csrfmiddlewaretoken':
-                form_content[key] = request.POST[key]
-        report.report_fields = json.dumps(form_content)
-        report.save()
 
 
-def report_1_test(request):
+
+
+
+
+
+
+def test_form_view_1(request):
+    """test view"""
     if request.method == 'POST':
-        form = ReportForm_test1(request.POST)
-        # return HttpResponseRedirect('/home')
-        if form.is_valid():
-            print("received :",)
-            for k,v in form.cleaned_data.items():
-                print('{}:{}'.format(k,v))
-            return HttpResponseRedirect('/home')
+        form_2 = ReportForm_test1(request.POST)
+        if form_2.is_valid():
+            print("received:",)
+            for k, v in form_2.cleaned_data.items():
+                print('{}:{}'.format(k, v))
+                # if 'date' in k:
+                #     print("new date:", v.strftime('%d/%m/%Y'))
+            return HttpResponseRedirect(reverse_lazy('reports:index'))
     else:
-        form = ReportForm_test1()
-    return render(request, 'reports/test_report_1.html', {'form':form})
+        form_2 = ReportForm_test1()
+    return render(request, 'reports/test_report_1.html', {'form': form_2})
 
 
-def test_view_1(request, user_id=5):
+def report_generate_view_1(request, user_id=5):
+    """generate test report """
     #TESC METHOD for bulk report generation
     # users = Serviceman.objects.filter(id__gt=1)
     # for user in users:
@@ -163,12 +243,15 @@ def test_view_1(request, user_id=5):
 
     #TODO add method for report body generation
     merge_dict.update(get_body_text())
-    generate_report(merge_dict, template_name="template_tier_2.docx", report_name='t2')
+    filepath = generate_report(merge_dict, template_name="template_tier_2.docx", report_name='t2')
 
-    a=1
-    ####################################################################################################################
-    return HttpResponse("REPORT has been generated SUCCESSFULLY")
 
+    # return HttpResponse("REPORT has been generated SUCCESSFULLY")
+    response = FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filepath.split('\\')[-1])
+    # response['Content-Type'] = 'application/octet-stream'
+    # response['Content-Disposition'] = 'attachment;filename="{0}"'.format(filepath.split('\\')[-1]);
+    # response['Content-Length'] = os.path.getsize(filepath)
+    return response;
 
 def get_body_text():
     body_tier_0 = "Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 2018 "
@@ -195,8 +278,8 @@ from datetime import datetime
 from mailmerge import MailMerge
 
 
-def generate_report(merge_dict, template_name="template_universal.docx", report_name=""):
-    """generate report document"""
+def generate_report(merge_dict, template_name="template_universal.docx", report_name="rep"):
+    """generate report document and return path to it"""
     template_path = os.path.join(TEMPLATES_PATH, template_name)
     document = MailMerge(template_path)
     print("Fields included in {}: {}".format(template_name, document.get_merge_fields()))
@@ -204,6 +287,7 @@ def generate_report(merge_dict, template_name="template_universal.docx", report_
     now = datetime.now()
     merged_file_path = os.path.join(OUTPUT_PATH, now.strftime("%d %H%M-%S") + '_' + report_name + '.docx')
     document.write(merged_file_path)
+    return merged_file_path
 
 
 def get_global_report_merge_dict(serviceman):
@@ -234,9 +318,9 @@ def get_global_report_merge_dict(serviceman):
 def append_to_dict_keys(dictionary, tier):
     """adds tier value to every key in a dictionary"""
     result = {}
-    for key,value in dictionary.items():
+    for key, value in dictionary.items():
         result[key + str(tier)] = value
-    return  result
+    return result
 
 
 def get_tier_users_pairs(serviceman):
@@ -357,18 +441,18 @@ def get_date_line():
     """return properly formated date line for report"""
     from datetime import datetime
     monthes = {
-        1:"січня",
-        2:"лютого",
-        3:"березня",
-        4:"квітня",
-        5:"травня",
-        6:"червня",
-        7:"липня",
-        8:"серпня",
-        9:"вересня",
-        10:"жовтня",
-        11:"листопада",
-        12:"грудня",
+        1: "січня",
+        2: "лютого",
+        3: "березня",
+        4: "квітня",
+        5: "травня",
+        6: "червня",
+        7: "липня",
+        8: "серпня",
+        9: "вересня",
+        10: "жовтня",
+        11: "листопада",
+        12: "грудня",
     }
 
     month_numb = datetime.now().month

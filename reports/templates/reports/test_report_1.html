@@ -1,20 +1,16 @@
 {% extends 'reports/base.html' %}
 
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+
 {% block content %}
+
     <form method="POST">
         {% csrf_token %}
-
         <table> {{ form.as_table }} </table>
         <input type="submit" value="Submit">
-
-        {#        {% for field in form %}#}
-        {#            <div>#}
-        {#                {% if field.help_text %}#}
-        {#                    <p class="help">{{ field.help_text|safe }}</p>#}
-        {#                {% endif %}#}
-        {#                {{ field.label_tag }} {{ field }}#}
-        {#            </div>#}
-        {#        {% endfor %}#}
-
     </form>
+
 {% endblock %}
