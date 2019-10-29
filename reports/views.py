@@ -45,10 +45,17 @@ def users_view(request):
     return render(request, 'reports/serviceman_list.html', context)
 
 
-def user_reports_view(request):
+def report_list_view(request, user_id):
     """show reports list to choose"""
-    return HttpResponse("user's report list page")
+    reports_list = Report.objects.all()
+    context = {
+        'user_id': user_id,
+        'reports_list': reports_list
+    }
+    return render(request, 'reports/reports_list.html', context)
 
+def report_view(request, user_id, report_id):
+    return HttpResponse("Report generation for user: {},  report id: {}".format(user_id, report_id))
 
 # def parse_report_template(request):
 def parse_report_template():
@@ -349,10 +356,10 @@ def get_footer_data(serviceman):
     footer_date_line = get_date_line()
 
     footer_dict = {
-        'footer_position_tier_':full_position,
-        'footer_rank_tier_':rank,
-        'footer_username_tier_':full_name,
-        'date_line_tier_':footer_date_line
+        'footer_position_tier_': full_position,
+        'footer_rank_tier_': rank,
+        'footer_username_tier_': full_name,
+        'date_line_tier_': footer_date_line
     }
 
     print_footer(footer_dict)
@@ -445,13 +452,14 @@ def get_date_line():
     year = datetime.now().year
     return '"___"' + ' ' + monthes[month_numb] + ' ' + str(year) + ' ' + 'року'
 
+
 def print_footer(footer_dict):
     print("\n\nFROM:______ %s______" % footer_dict['footer_username_tier_'])
-    for k,v in footer_dict.items():
-        print("{} : {}".format(k,v))
+    for k, v in footer_dict.items():
+        print("{} : {}".format(k, v))
 
 
 def print_header(headeer_dict):
     print("\n\nTO  :______ %s______" % headeer_dict['header_username_tier_'])
-    for k,v in headeer_dict.items():
-        print("{} : {}".format(k,v))
+    for k, v in headeer_dict.items():
+        print("{} : {}".format(k, v))

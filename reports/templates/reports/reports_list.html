@@ -1,0 +1,13 @@
+{% extends 'reports/base.html' %}
+{#{% load static %}#}
+
+{% block content %}
+    <p>Report generation for user: {{ user_id }}</p>
+    {% for report in reports_list %}
+        <ul>
+            <li>
+                <a href="{% url 'reports:report' user_id=user_id report_id=report.id %}">{{ report.id }} {{ report.title}}</a>
+            </li>
+        </ul>
+    {% endfor %}
+{% endblock %}

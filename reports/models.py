@@ -96,9 +96,9 @@ class Serviceman(models.Model):
 
 
 class Report(models.Model):
-    title = models.CharField(max_length=255)
-    body_sample = models.TextField()
-    body = models.TextField()
+    title = models.CharField(max_length=255, null=True)
+    body_sample = models.TextField(blank=True, null=True)
+    body = models.TextField(blank=True, null=True)
 
 
 

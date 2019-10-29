@@ -12,5 +12,4 @@ admin.site.register(Serviceman)
 admin.site.register(Position)
 admin.site.register(Rank)
 admin.site.register(Unit)
-
 admin.site.register(Report)

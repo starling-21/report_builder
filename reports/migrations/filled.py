@@ -336,11 +336,33 @@ def delete_serviceman(apps, schema_editor):
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 def load_reports(apps, schema_editor):
-    pass
+    Report = apps.get_model('reports', 'Report')
+
+    # Report(
+    #     title="",
+    #     body_sample = "",
+    #     body = ""
+    # ).save()
+
+    Report(
+        title="Перенесення терміну щорічної основної відпустки",
+        body_sample="""Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
+                    2019 рік з 29 жовтня на 20 грудня 2019 року у зв’язку з сiмейними обставинами.""",
+        body="""Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
+                    @_int_за какой год переносится отпуск@ рік з @_date_перенести с@ на @_date_перенести на@ 
+                    року у зв’язку з @_str_причина_long@.
+                    """,
+    ).save()
+
+    Report(
+        title="Повернення з-за меж гарнiзону",
+        body_sample="Доповiдаю, що з-за меж Киiвського гарнiзону прибув та приступив до виконання службових обов'язкiв.",
+        body="Доповiдаю, що з-за меж Киiвського гарнiзону прибув та приступив до виконання службових обов'язкiв."
+    ).save()
 
 def delete_reports(apps, schema_editor):
-    Serviceman = apps.get_model('reports', 'Serviceman')
-    Serviceman.objects.all().delete()
+    Report = apps.get_model('reports', 'Report')
+    Report.objects.all().delete()
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
@@ -353,5 +375,6 @@ class Migration(migrations.Migration):
         migrations.RunPython(load_ranks, delete_ranks),
         migrations.RunPython(load_units, delete_units),
         # migrations.RunPython(load_positions, delete_positions),
-        migrations.RunPython(load_servicemans, delete_serviceman)
+        migrations.RunPython(load_servicemans, delete_serviceman),
+        migrations.RunPython(load_reports, delete_reports)
     ]
