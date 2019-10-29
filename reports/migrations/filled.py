@@ -99,8 +99,7 @@ def load_positions(apps, schema_editor):
     units = Unit.objects.all()
     main_unit = units.filter(name='військової частини А0334')[0]
     admins_main_unit = units.filter(name='центру адміністраторів безпеки ІТС')[0]
-    admins_unit_section_1 = units.filter(name='відділу адміністраторів інформаційних систем')[0]
-    admins_unit_section_2 = units.filter(name='відділу адміністраторів захищених систем')[0]
+
 
 
 
@@ -333,6 +332,15 @@ def delete_serviceman(apps, schema_editor):
     Serviceman = apps.get_model('reports', 'Serviceman')
     Serviceman.objects.all().delete()
 
+
+#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+def load_reports(apps, schema_editor):
+    pass
+
+def delete_reports(apps, schema_editor):
+    Serviceman = apps.get_model('reports', 'Serviceman')
+    Serviceman.objects.all().delete()
 
 #$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
