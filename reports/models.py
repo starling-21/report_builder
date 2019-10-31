@@ -100,6 +100,9 @@ class Report(models.Model):
     body_sample = models.TextField(blank=True, null=True)
     body = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
 
 
     # REPORT_TITLES = (

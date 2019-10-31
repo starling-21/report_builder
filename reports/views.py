@@ -29,8 +29,6 @@ from time import sleep
 def report_home_view(request):
     body = "Reports App!"
     body += "<br><br>"
-    # body += "<a href='/form'>Form</a>"
-    # body += "<br><br><br>"
     body += "<a href='/users'>Users</a>"
     return HttpResponse(body)
 
@@ -47,73 +45,78 @@ def users_view(request):
 
 def report_list_view(request, user_id):
     """show reports list to choose"""
+    user = Serviceman.objects.filter(id=user_id).first().get_full_name()
     reports_list = Report.objects.all()
     context = {
         'user_id': user_id,
+        'user': user,
         'reports_list': reports_list
     }
     return render(request, 'reports/reports_list.html', context)
 
 def report_view(request, user_id, report_id):
+    """final report generation"""
+    report = Report.objects.get(pk=report_id)
     return HttpResponse("Report generation for user: {},  report id: {}".format(user_id, report_id))
 
-# def parse_report_template(request):
-def parse_report_template():
-    """report parse function
-    substitutte pattern:      @_<type>_<label>@
 
-    """
-
-    input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
-    @_int_за какой год переносится отпуск@ рік з @_date_перенести с@ на @_date_перенести на@ 
-    року у зв’язку з @_str_причина_long@.
-    """
-
-    """_str_причина переноса"""
-    """_date_перенести отпуск с"""
-    """_int_за какой год переносится отпуск"""
-
-    parsed_pattern_dict = {}
-
-    counter = 0
-    for pattertline in input_str.split('@'):
-        temp = {}
-        if pattertline[0] == '_':
-            patter_list = pattertline.split('_')
-
-            temp['insert_type'] = patter_list[1]
-            temp['label'] = patter_list[2]
-            temp['begin'] = input_str.find(pattertline)
-            temp['end'] = temp['begin'] + len(pattertline)
-
-            parsed_pattern_dict[temp['insert_type'] + '_' + str(counter)] = temp
-            counter += 1
-
-    a = 0
-
-    dynamic_fields_dict = {}
-    for key, nested_dict in parsed_pattern_dict.items():
-        if nested_dict['insert_type'].startswith('int'):
-            dynamic_fields_dict[key] = forms.IntegerField(
-                label=nested_dict['label'],
-            )
-
-        elif nested_dict['insert_type'].startswith('str'):
-            dynamic_fields_dict[key] = forms.CharField(
-                label=nested_dict['label'],
-                widget=forms.TextInput(attrs={"class": "form-control"})
-            )
-
-        elif nested_dict['insert_type'].startswith('date'):
-            dynamic_fields_dict[key] = forms.DateField(
-                label=nested_dict['label'],
-                widget=DatePickerInput(
-                    format='%Y-%m-%d',
-                    options={
-                        "locale": "ru"
-                    }),
-            )
-    return dynamic_fields_dict
+# # def parse_report_template(request):
+# def parse_report_template():
+#     """report parse function
+#     substitutte pattern:      @_<type>_<label>@
+#
+#     """
+#
+#     input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за
+#     @_int_за какой год переносится отпуск@ рік з @_date_перенести с@ на @_date_перенести на@
+#     року у зв’язку з @_str_причина_long@.
+#     """
+#
+#     """_str_причина переноса"""
+#     """_date_перенести отпуск с"""
+#     """_int_за какой год переносится отпуск"""
+#
+#     parsed_pattern_dict = {}
+#
+#     counter = 0
+#     for pattertline in input_str.split('@'):
+#         temp = {}
+#         if pattertline[0] == '_':
+#             patter_list = pattertline.split('_')
+#
+#             temp['insert_type'] = patter_list[1]
+#             temp['label'] = patter_list[2]
+#             temp['begin'] = input_str.find(pattertline)
+#             temp['end'] = temp['begin'] + len(pattertline)
+#
+#             parsed_pattern_dict[temp['insert_type'] + '_' + str(counter)] = temp
+#             counter += 1
+#
+#     a = 0
+#
+#     dynamic_fields_dict = {}
+#     for key, nested_dict in parsed_pattern_dict.items():
+#         if nested_dict['insert_type'].startswith('int'):
+#             dynamic_fields_dict[key] = forms.IntegerField(
+#                 label=nested_dict['label'],
+#             )
+#
+#         elif nested_dict['insert_type'].startswith('str'):
+#             dynamic_fields_dict[key] = forms.CharField(
+#                 label=nested_dict['label'],
+#                 widget=forms.TextInput(attrs={"class": "form-control"})
+#             )
+#
+#         elif nested_dict['insert_type'].startswith('date'):
+#             dynamic_fields_dict[key] = forms.DateField(
+#                 label=nested_dict['label'],
+#                 widget=DatePickerInput(
+#                     format='%Y-%m-%d',
+#                     options={
+#                         "locale": "ru"
+#                     }),
+#             )
+#     return dynamic_fields_dict
 
 
 
