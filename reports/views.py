@@ -21,13 +21,17 @@ from .forms import ReportForm_test1
 from .forms import RepTitleForm, RepFieldsFrom
 
 from .models import Report
+from .models import TestReport
 
 import json
+from .report_form_factory import get_form_context
 from time import sleep
 # Create your views here.
 
 def report_home_view(request):
     body = "Reports App!"
+    body += "<br><br>"
+    body += "<a href='/form'>Test form</a>"
     body += "<br><br>"
     body += "<a href='/users'>Users</a>"
     return HttpResponse(body)
@@ -57,68 +61,9 @@ def report_list_view(request, user_id):
 def report_view(request, user_id, report_id):
     """final report generation"""
     report = Report.objects.get(pk=report_id)
-    return HttpResponse("Report generation for user: {},  report id: {}".format(user_id, report_id))
-
-
-# # def parse_report_template(request):
-# def parse_report_template():
-#     """report parse function
-#     substitutte pattern:      @_<type>_<label>@
-#
-#     """
-#
-#     input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за
-#     @_int_за какой год переносится отпуск@ рік з @_date_перенести с@ на @_date_перенести на@
-#     року у зв’язку з @_str_причина_long@.
-#     """
-#
-#     """_str_причина переноса"""
-#     """_date_перенести отпуск с"""
-#     """_int_за какой год переносится отпуск"""
-#
-#     parsed_pattern_dict = {}
-#
-#     counter = 0
-#     for pattertline in input_str.split('@'):
-#         temp = {}
-#         if pattertline[0] == '_':
-#             patter_list = pattertline.split('_')
-#
-#             temp['insert_type'] = patter_list[1]
-#             temp['label'] = patter_list[2]
-#             temp['begin'] = input_str.find(pattertline)
-#             temp['end'] = temp['begin'] + len(pattertline)
-#
-#             parsed_pattern_dict[temp['insert_type'] + '_' + str(counter)] = temp
-#             counter += 1
-#
-#     a = 0
-#
-#     dynamic_fields_dict = {}
-#     for key, nested_dict in parsed_pattern_dict.items():
-#         if nested_dict['insert_type'].startswith('int'):
-#             dynamic_fields_dict[key] = forms.IntegerField(
-#                 label=nested_dict['label'],
-#             )
-#
-#         elif nested_dict['insert_type'].startswith('str'):
-#             dynamic_fields_dict[key] = forms.CharField(
-#                 label=nested_dict['label'],
-#                 widget=forms.TextInput(attrs={"class": "form-control"})
-#             )
-#
-#         elif nested_dict['insert_type'].startswith('date'):
-#             dynamic_fields_dict[key] = forms.DateField(
-#                 label=nested_dict['label'],
-#                 widget=DatePickerInput(
-#                     format='%Y-%m-%d',
-#                     options={
-#                         "locale": "ru"
-#                     }),
-#             )
-#     return dynamic_fields_dict
-
-
+    context = get_form_context(request, report.id)
+    # return HttpResponse("Report generation for user: {},  report id: {}".format(user_id, report_id))
+    return render(request, 'reports/report_filling.html', context)
 
 
 
@@ -137,14 +82,14 @@ def dyn_form_view(request):
 
     if request.method == 'POST':
         context['show_report_fields_form'] = True
-        report = Report()
+        report = TestReport()
 
         #received 'report_title' submit
         if 'subm_title' in request.POST:
             # report.report_title = int(request.POST['report_title'])
-            report = Report.objects.filter(report_title=int(request.POST['report_title'])).last()
+            report = TestReport.objects.filter(report_title=int(request.POST['report_title'])).last()
             if report is None:
-                report = Report()
+                report = TestReport()
                 report.report_title = int(request.POST['report_title'])
             try:
                 form_content = json.loads(report.report_fields)
@@ -160,6 +105,7 @@ def dyn_form_view(request):
             report.save()
             return redirect('reports:index')
             # return HttpResponseRedirect(reverse_lazy('reports:index'))
+
 
         if report.report_title == -1:
             new_fields = {}
@@ -182,7 +128,7 @@ def dyn_form_view(request):
                 'start_num_1': forms.IntegerField(required=False),
                 'end_num_1': forms.IntegerField(required=False)
             }
-        new_fields = parse_report_template()
+        # new_fields = parse_report_template()
 
     elif request.method == 'GET':
         context['show_report_fields_form'] = False

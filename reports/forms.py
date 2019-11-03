@@ -2,8 +2,11 @@ from django import forms
 
 from bootstrap_datepicker_plus import DatePickerInput
 
-from .models import Report
+from .models import TestReport
 
+
+class ReportFillingForm(forms.Form):
+    pass
 
 class ReportForm_test1(forms.Form):
 
@@ -34,7 +37,7 @@ class ReportForm_test1(forms.Form):
 
 class RepTitleForm(forms.ModelForm):
     class Meta:
-        model = Report
+        model = TestReport
         exclude = ['report_fields']
 
 

@@ -104,16 +104,17 @@ class Report(models.Model):
         return self.title
 
 
+class TestReport(models.Model):
 
-    # REPORT_TITLES = (
-    #     (0, 'Report_1'),
-    #     (1, 'Report_2'),
-    #     (2, 'Report_3')
-    # )
-    # report_title = models.IntegerField(default=-1, choices=REPORT_TITLES)
-    # # report_title = models.IntegerField(default=0, choices=REPORT_TITLES)
-    # report_fields = models.CharField(max_length=1024)
-    #
-    # def __str__(self):
-    #     return self.REPORT_TITLES[self.report_title][1] + " " + self.report_fields
+    REPORT_TITLES = (
+        (0, 'Report_1'),
+        (1, 'Report_2'),
+        (2, 'Report_3')
+    )
+    report_title = models.IntegerField(default=-1, choices=REPORT_TITLES)
+    # report_title = models.IntegerField(default=0, choices=REPORT_TITLES)
+    report_fields = models.CharField(max_length=1024)
+
+    def __str__(self):
+        return self.REPORT_TITLES[self.report_title][1] + " " + self.report_fields
 

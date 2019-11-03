@@ -1,23 +1,9 @@
-# from .models import Report
-# from django import forms
+from bootstrap_datepicker_plus import DatePickerInput
+
+from .models import Report
+from django import forms
+from .forms import ReportFillingForm
 import json
-
-
-
-
-def get_form(report_id):
-    report = Report.objects.get(pk=report_id)
-    context = {
-       'title': report.title,
-        'body_sample': report.body_sample,
-
-    }
-
-    # title = models.CharField(max_length=255, null=True)
-    # body_sample = models.TextField(blank=True, null=True)
-    # body = models.TextField(blank=True, null=True)
-
-
 
 
 def parse_report_body_template(text, decoder=json.JSONDecoder()):
@@ -28,6 +14,22 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
     {
         "type": "label",
         "title": "User text to print",
+    }
+    {
+        "type": "int",
+        "title": "за який рiк переноситься вiдпустка"
+    }
+    {
+        "type": "date",
+        "title": "з якой дати"
+    }
+    {
+        "type": "str",
+        "title": "причина переносу_1"
+    }
+    {
+        "type": "text",
+        "title": "причина переносу_2"
     }
     """
     parsed_dict = {}
@@ -69,9 +71,52 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
     return parsed_dict
 
 
+def get_raw_form_fields(parts_dict):
+    """iterate throught dict and prepare django form for user"""
+    form_content_dict = {}
+    for key, field_dict in parts_dict.items():
+
+        if field_dict['type'] == "label":
+            form_content_dict[key] = forms.CharField(
+                label=field_dict['title']
+            )
+        elif field_dict['type'] == "int":
+            form_content_dict[key] = forms.IntegerField(
+            # form_content_dict[key] = forms.IntegerField(
+                label=field_dict['title'],
+            )
+        elif field_dict['type'] == "date":
+            form_content_dict[key] = forms.DateField(
+            # form_content_dict[key] = forms.DateField(
+                label=field_dict['title'],
+                widget=DatePickerInput(
+                    format='%Y-%m-%d',
+                    options={
+                        "locale": "ru"
+                    }),
+            )
+        elif field_dict['type'] == "str":
+            form_content_dict[key] = forms.CharField(
+            # form_content_dict[key] = forms.CharField(
+                label=field_dict['title'],
+                widget=forms.TextInput(attrs={"class": "form-control"})
+            )
+        elif field_dict['type'] == "text":
+            form_content_dict[key] = forms.CharField(
+            # form_content_dict[key] = forms.CharField(
+                label=field_dict['title'],
+                widget=forms.CharField(widget=forms.Textarea)
+            )
+    return form_content_dict
 
 
-input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
+def get_form_context(request, report_id):
+    """parse report template, generate form fields and passes it to template context
+    return context for template"""
+    report = Report.objects.get(pk=report_id)
+
+    # TODO test string
+    report.body = input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
         {
             "title": "за який рiк переноситься вiдпустка",
             "type": "int"
@@ -98,72 +143,57 @@ input_str = """Прошу Вашого клопотання про перене�
         }
         до пасхи
         """
-def main_test():
-    parse_report_body_template(text=input_str)
+    report_template_parsed_dict = parse_report_body_template(report.body)
+    report_form_fields = get_raw_form_fields(report_template_parsed_dict)
 
-main_test()
+    dynamic_fields = {}
+    dynamicReportFillingForm = type('ReportFillingForm', (ReportFillingForm, ), dynamic_fields)
+    # dynamicReportFillingForm = type('ReportFillingForm', (ReportFillingForm, ), report_form_fields)
+    report_form = dynamicReportFillingForm(report_form_fields)
+
+    context = {
+        'title': report.title,
+        'body_sample': report.body_sample,
+        # 'report_form_fields': report_form
+        'report_form_fields': report_form
+    }
+    return context
 
 
 
 
+# input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за
+#         {
+#             "title": "за який рiк переноситься вiдпустка",
+#             "type": "int"
+#         }
+#         рік з
+#         {
+#             "title": "з якой дати",
+#             "type": "date",
+#         }
+#         на
+#         {
+#             "title": "на яку дату",
+#             "type": "date"
+#         }
+#         року у зв’язку з
+#         {
+#             "title": "причина переносу_1",
+#             "type": "str"
+#         }
+#         або у зв’язку з
+#         {
+#             "title": "причина переносу_2",
+#             "type": "text"
+#         }
+#         до пасхи
+#         """
+#
+# input_str_2 = """Я повернувся з-за меж та приступив до виконання завдань"""
 
-#
-#
-#
-# def parse_report_template(request):
-# def parse_report_template():
-#     """report parse function
-#     substitutte pattern:      @_<type>_<label>@
-#
-#     """
-#
-#     input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за
-#     @_int_за какой год переносится отпуск@ рік з @_date_перенести с@ на @_date_перенести на@
-#     року у зв’язку з @_str_причина_long@.
-#     """
-#
-#     """_str_причина переноса"""
-#     """_date_перенести отпуск с"""
-#     """_int_за какой год переносится отпуск"""
-#
-#     parsed_pattern_dict = {}
-#
-#     counter = 0
-#     for pattertline in input_str.split('@'):
-#         temp = {}
-#         if pattertline[0] == '_':
-#             patter_list = pattertline.split('_')
-#
-#             temp['insert_type'] = patter_list[1]
-#             temp['label'] = patter_list[2]
-#             temp['begin'] = input_str.find(pattertline)
-#             temp['end'] = temp['begin'] + len(pattertline)
-#
-#             parsed_pattern_dict[temp['insert_type'] + '_' + str(counter)] = temp
-#             counter += 1
-#
-#     a = 0
-#
-#     dynamic_fields_dict = {}
-#     for key, nested_dict in parsed_pattern_dict.items():
-#         if nested_dict['insert_type'].startswith('int'):
-#             dynamic_fields_dict[key] = forms.IntegerField(
-#                 label=nested_dict['label'],
-#             )
-#
-#         elif nested_dict['insert_type'].startswith('str'):
-#             dynamic_fields_dict[key] = forms.CharField(
-#                 label=nested_dict['label'],
-#                 widget=forms.TextInput(attrs={"class": "form-control"})
-#             )
-#
-#         elif nested_dict['insert_type'].startswith('date'):
-#             dynamic_fields_dict[key] = forms.DateField(
-#                 label=nested_dict['label'],
-#                 widget=DatePickerInput(
-#                     format='%Y-%m-%d',
-#                     options={
-#                         "locale": "ru"
-#                     }),
-#             )
-#     return dynamic_fields_dict
+# def main_test():
+#     parse_report_body_template(text=input_str)
+#     parse_report_body_template(text=input_str_2)
+
+# main_test()
