@@ -1,7 +1,9 @@
 {% extends 'reports/base.html' %}
+{% include "django/forms/widgets/input.html" %}
 {% block extra_head %}
-    {{ report_form_fields.media }}
+    {{ report_fields_form.media }}
 {% endblock %}
+
 
 {% block content %}
     <h2>Report filling form</h2>
@@ -9,12 +11,16 @@
 {#    <form action="{% url 'reports:report' %}" method="POST">#}
     <form method="POST">
         {% csrf_token %}
-        {% for field in report_form_fields %}
+        {% for field in report_fields_form %}
 
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            <br>
+{#            <label for="{{ field.id_for_label }}">{{ field.label }}</label>#}
+
+            Label: {{ field.label }}<br>widget.input_type: {{ field.field.widget.input_type }}
+            <br>-------------------------------<br>
+
+
         {% endfor %}
+
         <br>
-        <input type="submit" name="subm_fields" value="submit fields"/>
+        <input type="submit" name="submit_form" value="Submit"/>
 {% endblock %}

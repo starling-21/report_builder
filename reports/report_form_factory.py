@@ -66,8 +66,6 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
         except ValueError:
             pos = match_start + 1
 
-    for item in parsed_dict.items():
-        print(item)
     return parsed_dict
 
 
@@ -78,7 +76,8 @@ def get_raw_form_fields(parts_dict):
 
         if field_dict['type'] == "label":
             form_content_dict[key] = forms.CharField(
-                label=field_dict['title']
+                label=field_dict['title'],
+                # widget=PlainTextWidget
             )
         elif field_dict['type'] == "int":
             form_content_dict[key] = forms.IntegerField(
@@ -116,12 +115,12 @@ def get_form_context(request, report_id):
     report = Report.objects.get(pk=report_id)
 
     # TODO test string
-    report.body = input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
+    report.body = input_str = """Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за
         {
             "title": "за який рiк переноситься вiдпустка",
             "type": "int"
         }
-        рік з 
+        рік з
         {
             "title": "з якой дати",
             "type": "date",
@@ -131,31 +130,28 @@ def get_form_context(request, report_id):
             "title": "на яку дату",
             "type": "date"
         }
-        року у зв’язку з 
+        року у зв’язку з
         {
             "title": "причина переносу_1",
             "type": "str"
         }
-        або у зв’язку з
-        {
-            "title": "причина переносу_2",
-            "type": "text"
-        }
-        до пасхи
+        # або у зв’язку з
+        # {
+        #     "title": "причина переносу_2",
+        #     "type": "text"
+        # }
+        # до пасхи
         """
     report_template_parsed_dict = parse_report_body_template(report.body)
     report_form_fields = get_raw_form_fields(report_template_parsed_dict)
 
-    dynamic_fields = {}
-    dynamicReportFillingForm = type('ReportFillingForm', (ReportFillingForm, ), dynamic_fields)
-    # dynamicReportFillingForm = type('ReportFillingForm', (ReportFillingForm, ), report_form_fields)
-    report_form = dynamicReportFillingForm(report_form_fields)
+    dynamicReportFillingForm = type('ReportFillingForm', (ReportFillingForm, ), report_form_fields)
+
 
     context = {
         'title': report.title,
         'body_sample': report.body_sample,
-        # 'report_form_fields': report_form
-        'report_form_fields': report_form
+        'report_fields_form': dynamicReportFillingForm
     }
     return context
 
