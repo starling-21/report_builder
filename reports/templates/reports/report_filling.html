@@ -8,15 +8,21 @@
 {% block content %}
     <h2>Report filling form</h2>
 
-{#    <form action="{% url 'reports:report' %}" method="POST">#}
-    <form method="POST">
+    <form action="" method="POST">
         {% csrf_token %}
+        <hr>
+        Зразок:  <b>{{ body_sample }}</b>
+        <hr>
         {% for field in report_fields_form %}
 
-{#            <label for="{{ field.id_for_label }}">{{ field.label }}</label>#}
+            {{ field.label }}
+            {% if field.help_text != "" %}
+                <br>{{ field }}
+            {% else %}
+                {{ field }}
+            {% endif %}
+            <br>
 
-            Label: {{ field.label }}<br>widget.input_type: {{ field.field.widget.input_type }}
-            <br>-------------------------------<br>
 
 
         {% endfor %}

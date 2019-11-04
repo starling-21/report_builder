@@ -33,8 +33,7 @@ class ReportForm_test1(forms.Form):
 
 
 
-
-
+#TEST CASE section
 class RepTitleForm(forms.ModelForm):
     class Meta:
         model = TestReport

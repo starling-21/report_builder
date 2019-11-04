@@ -58,12 +58,26 @@ def report_list_view(request, user_id):
     }
     return render(request, 'reports/reports_list.html', context)
 
+
 def report_view(request, user_id, report_id):
     """final report generation"""
     report = Report.objects.get(pk=report_id)
     context = get_form_context(request, report.id)
     # return HttpResponse("Report generation for user: {},  report id: {}".format(user_id, report_id))
     return render(request, 'reports/report_filling.html', context)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -162,6 +176,16 @@ def test_form_view(request):
     else:
         form_2 = ReportForm_test1()
     return render(request, 'reports/test_report_1.html', {'form': form_2})
+
+
+
+
+
+
+
+
+
+
 
 
 def generate_report_view(request, user_id=5):
