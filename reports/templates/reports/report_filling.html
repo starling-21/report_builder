@@ -6,27 +6,20 @@
 
 
 {% block content %}
-    <h2>Report filling form</h2>
-
     <form action="" method="POST">
-        {% csrf_token %}
-        <hr>
-        Зразок:  <b>{{ body_sample }}</b>
-        <hr>
-        {% for field in report_fields_form %}
-
+    {% csrf_token %}
+    <hr>
+    Зразок:  <b>{{ body_sample }}</b>
+    <hr>
+    {% for field in report_fields_form %}
+        <div class="report_input_form" style="display: inline-flex; margin: 4px">
             {{ field.label }}
-            {% if field.help_text != "" %}
-                <br>{{ field }}
-            {% else %}
-                {{ field }}
-            {% endif %}
-            <br>
+            {{ field }}
+        </div>
+    {% endfor %}
 
-
-
-        {% endfor %}
-
-        <br>
-        <input type="submit" name="submit_form" value="Submit"/>
+    <hr>
+    <input type="submit" class="btn btn-info" name="submit_form" value="Create report"/>
 {% endblock %}
+
+<h2>Report filling form</h2>

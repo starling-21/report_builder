@@ -24,7 +24,7 @@ from .models import Report
 from .models import TestReport
 
 import json
-from .report_form_factory import get_form_context
+from .report_form_factory import get_report_filling_form
 from time import sleep
 # Create your views here.
 
@@ -47,8 +47,8 @@ def users_view(request):
     return render(request, 'reports/serviceman_list.html', context)
 
 
-def report_list_view(request, user_id):
-    """show reports list to choose"""
+def reports_list_view(request, user_id):
+    """show reports titles list to choose"""
     user = Serviceman.objects.filter(id=user_id).first().get_full_name()
     reports_list = Report.objects.all()
     context = {
@@ -59,11 +59,20 @@ def report_list_view(request, user_id):
     return render(request, 'reports/reports_list.html', context)
 
 
-def report_view(request, user_id, report_id):
-    """final report generation"""
+def report_filling_view(request, user_id, report_id):
+    """report filling form view"""
+    if request.method == 'POST':
+        # TODO part
+        #  1) redirect
+        #  2) nessesary dictionary for report
+        #  3) reight view and method for report generation
+        # generate_report_view(request)
+        # return HttpResponseRedirect(redirect('reports.views.generate_report_view'))
+        return redirect('reports:generate')
+
+
     report = Report.objects.get(pk=report_id)
-    context = get_form_context(request, report.id)
-    # return HttpResponse("Report generation for user: {},  report id: {}".format(user_id, report_id))
+    context = get_report_filling_form(request, report.id)
     return render(request, 'reports/report_filling.html', context)
 
 
