@@ -1,4 +1,7 @@
-"""generate django forms for reports"""
+"""
+generate django.form to build html report filling form.
+--> return context dictionary for template renderer
+"""
 
 from bootstrap_datepicker_plus import DatePickerInput
 
@@ -7,7 +10,7 @@ from django import forms
 from .forms import ReportFillingForm
 import json
 
-def get_report_filling_form(request, report_id):
+def get_report_filling_form(report_id):
     """parse report template, generate form fields. Return context for html template"""
     report = Report.objects.get(pk=report_id)
     report_template_parsed_dict = parse_report_body_template(report.body)
@@ -27,7 +30,8 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
     """Parse report body template for substution patterns
        Split all parts into dictionaries for future form creation
 
-    there are few json types to return
+    BODY TEMPLATE EXAMPLE:
+    there are few json types except regular text inside template to return
     {
         "type": "label",
         "title": "User text to print",
