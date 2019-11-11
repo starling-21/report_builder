@@ -62,6 +62,13 @@ def reports_list_view(request, user_id):
 def report_filling_view(request, user_id, report_id):
     """report filling form view"""
     if request.method == 'POST':
+        data = request.POST.copy()
+        result_str = ""
+        form_fields_amount = data.get('fields_counter')
+        for i in range(0, 10):
+        # for i in range(0, int(form_fields_amount)):
+            result_str += data.get(str(i))
+            print(result_str)
         # TODO part
         #  1) redirect
         #  2) nessesary dictionary for report

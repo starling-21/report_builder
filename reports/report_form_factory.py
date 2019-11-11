@@ -86,12 +86,14 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
 def get_raw_form_fields(parts_dict):
     """iterate throught dict and prepare django form for user"""
     form_content_dict = {}
+
     for key, field_dict in parts_dict.items():
 
         if field_dict['type'] == "label":
             form_content_dict[key] = forms.CharField(
                 label=field_dict['title'],
                 widget=forms.HiddenInput(),
+                initial=field_dict['title']
             )
         elif field_dict['type'] == "int":
             form_content_dict[key] = forms.CharField(
@@ -122,6 +124,14 @@ def get_raw_form_fields(parts_dict):
                 help_text=field_dict['title'],
                 widget=forms.Textarea(attrs={"cols": 120, "rows": 4, "wrap": "hard"})
             )
+
+        #fields conter
+        form_content_dict['fields_counter'] = forms.IntegerField(
+            label="",
+            widget=forms.HiddenInput(),
+            initial=len(parts_dict) - 1
+        )
+
     return form_content_dict
 
 
