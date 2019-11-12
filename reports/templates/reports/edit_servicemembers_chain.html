@@ -1,0 +1,14 @@
+{% extends 'reports/base.html' %}
+
+{% block content %}
+    <p>Edit servicemembers chain:</p>
+{#    {% for servicemember in serviceman_chain %}#}
+    {% for tier, servicemember in serviceman_chain.items %}
+        <ul>
+            <li>
+{#                {{ tier }}{{ servicemember.rank }} {{ servicemember.first_name }} {{ servicemember.last_name }}#}
+                id:{{ tier }} {{ servicemember }}
+            </li>
+        </ul>
+    {% endfor %}
+{% endblock %}

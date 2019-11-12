@@ -1,19 +1,12 @@
-import json
-
-from django import forms
-from django.http import FileResponse
 from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
 from django.shortcuts import render
-from django.urls import reverse_lazy
 
 # import for tests
 from reports.models import Serviceman
-from .forms import RepTitleForm, RepFieldsFrom
-from .forms import ReportForm_test1
+from . import report_content_util
+# from .forms import RepTitleForm, RepFieldsFrom
+# from .forms import ReportForm_test1
 from .models import Report
-from .models import TestReport
 from .report_form_util import get_report_filling_form
 
 
@@ -21,8 +14,6 @@ from .report_form_util import get_report_filling_form
 
 def report_home_view(request):
     body = "Reports App!"
-    body += "<br><br>"
-    body += "<a href='/form'>Test form</a>"
     body += "<br><br>"
     body += "<a href='/users'>Users</a>"
     return HttpResponse(body)
@@ -37,123 +28,131 @@ def users_view(request):
     return render(request, 'reports/serviceman_list.html', context)
 
 
-def reports_list_view(request, user_id):
+def edit_servicemembers_chain_view(request, serviceman_id):
+    """change servicemen chain if needed"""
+    if request.method == 'POST':
+        #TODO pass serviceman_id, servicemen_chain further to report list view
+        pass
+
+    serviceman = Serviceman.objects.get(id=serviceman_id)
+    # serviceman_chain = report_content_util.get_servicemen_chain_as_list(serviceman)
+    serviceman_chain = report_content_util.get_servicemen_chain_as_dict(serviceman)
+    # TODO new template
+    context = {
+        'serviceman_id': serviceman_id,
+        'serviceman_chain': serviceman_chain,
+    }
+    return render(request, 'reports/edit_servicemembers_chain.html', context)
+
+
+def reports_list_view(request, serviceman_id):
     """show reports titles list to choose"""
-    user = Serviceman.objects.filter(id=user_id).first().get_full_name()
+    serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name()
     reports_list = Report.objects.all()
     context = {
-        'user_id': user_id,
-        'user': user,
+        'user_id': serviceman_id,
+        'user': serviceman,
         'reports_list': reports_list
     }
     return render(request, 'reports/reports_list.html', context)
 
 
-def report_filling_view(request, user_id, report_id):
+def report_filling_view(request, serviceman_id, report_id):
     """report filling form view"""
     if request.method == 'POST':
-        data = request.POST.copy()
-        result_str = ""
-        form_fields_amount = data.get('fields_counter')
-        for i in range(0, 10):
-            # for i in range(0, int(form_fields_amount)):
-            result_str += data.get(str(i))
-            print(result_str)
-        # TODO part
-        #  1) redirect
-        #  2) nessesary dictionary for report
-        #  3) reight view and method for report generation
-        # generate_report_view(request)
-        # return HttpResponseRedirect(redirect('reports.views.generate_report_view'))
-        return redirect('reports:generate')
+        input_form_data = request.POST.copy()
 
-    report = Report.objects.get(pk=report_id)
-    context = get_report_filling_form(request, report.id)
+
+    context = get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
 
 
+    # generate_report_view(request)
+    # return HttpResponseRedirect(redirect('reports.views.generate_report_view'))
+    # return redirect('reports:generate')
+
 #=======================================================================================================================
 #=======================================================================================================================
 #=======================================================================================================================
-def dyn_form_view(request):
-    """dynamyc form after user submits input"""
-    context = {}
-    form_content = {}
-    new_fields = {}
+# def dyn_form_view(request):
+#     """dynamyc form after user submits input"""
+#     context = {}
+#     form_content = {}
+#     new_fields = {}
+#
+#     if request.method == 'POST':
+#         context['show_report_fields_form'] = True
+#         report = TestReport()
+#
+#         # received 'report_title' submit
+#         if 'subm_title' in request.POST:
+#             # report.report_title = int(request.POST['report_title'])
+#             report = TestReport.objects.filter(report_title=int(request.POST['report_title'])).last()
+#             if report is None:
+#                 report = TestReport()
+#                 report.report_title = int(request.POST['report_title'])
+#             try:
+#                 form_content = json.loads(report.report_fields)
+#             except json.JSONDecodeError:
+#                 form_content = {}
+#         # received 'report fields' submit
+#         elif 'subm_fields' in request.POST:
+#             report.report_title = int(request.POST['report_title'])
+#             for key in request.POST.keys():
+#                 if key != 'csrfmiddlewaretoken' and key != 'subm_fields':
+#                     form_content[key] = request.POST[key]
+#             report.report_fields = json.dumps(form_content)
+#             report.save()
+#             return redirect('reports:index')
+#             # return HttpResponseRedirect(reverse_lazy('reports:index'))
+#
+#         if report.report_title == -1:
+#             new_fields = {}
+#         elif report.report_title == 0:
+#             new_fields = {
+#                 'date_1': forms.DateField(
+#                     required=False,
+#                     label='Введіть дату!'
+#                 ),
+#                 'int_1': forms.IntegerField(required=False)
+#             }
+#         elif report.report_title == 1:
+#             new_fields = {
+#                 'int_1': forms.IntegerField(required=False),
+#                 'date_1': forms.DateField(required=False),
+#                 'int_2': forms.IntegerField(required=False)
+#             }
+#         elif report.report_title == 2:
+#             new_fields = {
+#                 'start_num_1': forms.IntegerField(required=False),
+#                 'end_num_1': forms.IntegerField(required=False)
+#             }
+#         # new_fields = parse_report_template()
+#
+#     elif request.method == 'GET':
+#         context['show_report_fields_form'] = False
+#     ########################################################################################################################
+#     dynamicReportFieldsForm = type('RepFieldsFrom', (RepFieldsFrom,), new_fields)
+#
+#     reportFieldsForm = dynamicReportFieldsForm(form_content)
+#     context['report_title_form'] = RepTitleForm(request.POST or None)
+#     context['report_fields_form'] = reportFieldsForm
+#
+#     return render(request, 'reports/rep_dynamic_form.html', context)
 
-    if request.method == 'POST':
-        context['show_report_fields_form'] = True
-        report = TestReport()
 
-        # received 'report_title' submit
-        if 'subm_title' in request.POST:
-            # report.report_title = int(request.POST['report_title'])
-            report = TestReport.objects.filter(report_title=int(request.POST['report_title'])).last()
-            if report is None:
-                report = TestReport()
-                report.report_title = int(request.POST['report_title'])
-            try:
-                form_content = json.loads(report.report_fields)
-            except json.JSONDecodeError:
-                form_content = {}
-        # received 'report fields' submit
-        elif 'subm_fields' in request.POST:
-            report.report_title = int(request.POST['report_title'])
-            for key in request.POST.keys():
-                if key != 'csrfmiddlewaretoken' and key != 'subm_fields':
-                    form_content[key] = request.POST[key]
-            report.report_fields = json.dumps(form_content)
-            report.save()
-            return redirect('reports:index')
-            # return HttpResponseRedirect(reverse_lazy('reports:index'))
-
-        if report.report_title == -1:
-            new_fields = {}
-        elif report.report_title == 0:
-            new_fields = {
-                'date_1': forms.DateField(
-                    required=False,
-                    label='Введіть дату!'
-                ),
-                'int_1': forms.IntegerField(required=False)
-            }
-        elif report.report_title == 1:
-            new_fields = {
-                'int_1': forms.IntegerField(required=False),
-                'date_1': forms.DateField(required=False),
-                'int_2': forms.IntegerField(required=False)
-            }
-        elif report.report_title == 2:
-            new_fields = {
-                'start_num_1': forms.IntegerField(required=False),
-                'end_num_1': forms.IntegerField(required=False)
-            }
-        # new_fields = parse_report_template()
-
-    elif request.method == 'GET':
-        context['show_report_fields_form'] = False
-    ########################################################################################################################
-    dynamicReportFieldsForm = type('RepFieldsFrom', (RepFieldsFrom,), new_fields)
-
-    reportFieldsForm = dynamicReportFieldsForm(form_content)
-    context['report_title_form'] = RepTitleForm(request.POST or None)
-    context['report_fields_form'] = reportFieldsForm
-
-    return render(request, 'reports/rep_dynamic_form.html', context)
-
-
-def test_form_view(request):
-    """test view"""
-    if request.method == 'POST':
-        form_2 = ReportForm_test1(request.POST)
-        if form_2.is_valid():
-            print("received:", )
-            for k, v in form_2.cleaned_data.items():
-                print('{}:{}'.format(k, v))
-            return HttpResponseRedirect(reverse_lazy('reports:index'))
-    else:
-        form_2 = ReportForm_test1()
-    return render(request, 'reports/test_report_1.html', {'form': form_2})
+# def test_form_view(request):
+#     """test view"""
+#     if request.method == 'POST':
+#         form_2 = ReportForm_test1(request.POST)
+#         if form_2.is_valid():
+#             print("received:", )
+#             for k, v in form_2.cleaned_data.items():
+#                 print('{}:{}'.format(k, v))
+#             return HttpResponseRedirect(reverse_lazy('reports:index'))
+#     else:
+#         form_2 = ReportForm_test1()
+#     return render(request, 'reports/test_report_1.html', {'form': form_2})
 
 
 #=======================================================================================================================

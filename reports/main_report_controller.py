@@ -7,5 +7,15 @@ handle main process for report creation
 - report content data preparations
 - report document generation
 """
+from .models import Serviceman
 
-# //TODO impolemen main methods
+from . import report_content_util as content_util
+from . import report_form_util as form_util
+
+
+def proceed_report_generation(serviceman_id, report_id, users_tier_chain=None):
+        serviceman = Serviceman.objects.get(id=serviceman_id)
+
+        if users_tier_chain is None:
+            users_tier_chain = content_util.get_servicemen_chain_as_list(serviceman)
+

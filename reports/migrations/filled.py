@@ -30,7 +30,6 @@ def load_ranks(apps, schema_editor):
         ['полковник', 'полковнику', 'полковника'],
     ]
 
-
     for rank_pair in ranks_list:
         record = Rank(name=rank_pair[0], to_name=rank_pair[1], for_name=rank_pair[2])
         record.save()
@@ -41,15 +40,7 @@ def delete_ranks(apps, schema_editor):
     Rank.objects.all().delete()
 
 
-
-
-
-
-
-
-
-
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 def load_units(apps, schema_editor):
     Unit = apps.get_model('reports', 'Unit')
@@ -81,15 +72,7 @@ def delete_units(apps, schema_editor):
     Unit.objects.all().delete()
 
 
-
-
-
-
-
-
-
-
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 def load_positions(apps, schema_editor):
     """currently not in use"""
@@ -100,15 +83,11 @@ def load_positions(apps, schema_editor):
     main_unit = units.filter(name='військової частини А0334')[0]
     admins_main_unit = units.filter(name='центру адміністраторів безпеки ІТС')[0]
 
-
-
-
     Position(position_title='командир',
              unit=main_unit,
              position_tail='',
              temp_supervisor=True
              ).save()
-
 
     Position(position_title='начальник',
              unit=admins_main_unit,
@@ -117,16 +96,9 @@ def load_positions(apps, schema_editor):
              ).save()
 
 
-
 def delete_positions(apps, schema_editor):
     Position = apps.get_model('reports', 'Position')
     Position.objects.all().delete()
-
-
-
-
-
-
 
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
@@ -137,7 +109,6 @@ def load_servicemans(apps, schema_editor):
     Unit = apps.get_model('reports', 'Unit')
     Position = apps.get_model('reports', 'Position')
 
-
     ranks = Rank.objects.all()
     jun_lt_rank = ranks.filter(name='молодший лейтенант').first()
     lt_rank = ranks.filter(name='лейтенант').first()
@@ -147,21 +118,19 @@ def load_servicemans(apps, schema_editor):
     lt_col_rank = ranks.filter(name='підполковник').first()
     col_rank = ranks.filter(name='полковник').first()
 
-
     units = Unit.objects.all()
     main_unit = units.filter(name='військової частини А0334')[0]
     admins_main_unit = units.filter(name='центру адміністраторів безпеки ІТС')[0]
     admins_unit_section_1 = units.filter(name='відділу адміністраторів інформаційних систем')[0]
     admins_unit_section_2 = units.filter(name='відділу адміністраторів захищених систем')[0]
 
-
-#####################################################################################
+    #####################################################################################
 
     pos_main_unit_commander = Position(position_title='командир',
                                        unit=main_unit,
                                        position_tail='',
                                        supervisor=True,
-                                       temp_supervisor = False
+                                       temp_supervisor=False
                                        )
     pos_main_unit_commander.save()
 
@@ -217,7 +186,7 @@ def load_servicemans(apps, schema_editor):
                                                  )
     pos_admins_unit_section_2_officer.save()
 
-#####################################################################################
+    #####################################################################################
 
     Serviceman(first_name='Руслан',
                last_name='Денесюк',
@@ -254,9 +223,6 @@ def load_servicemans(apps, schema_editor):
                unit=admins_unit_section_2,
                position=pos_admins_unit_section_2_boss
                ).save()
-
-
-
 
     Serviceman(first_name='Василь',
                last_name='Шпак',
@@ -313,7 +279,6 @@ def load_servicemans(apps, schema_editor):
                position=pos_admins_unit_section_1_officer
                ).save()
 
-
     Serviceman(first_name='Вадим',
                last_name='Єфіменко',
                to_first_name='Вадиму',
@@ -326,14 +291,12 @@ def load_servicemans(apps, schema_editor):
                ).save()
 
 
-
-
 def delete_serviceman(apps, schema_editor):
     Serviceman = apps.get_model('reports', 'Serviceman')
     Serviceman.objects.all().delete()
 
 
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 def load_reports(apps, schema_editor):
     Report = apps.get_model('reports', 'Report')
@@ -348,10 +311,22 @@ def load_reports(apps, schema_editor):
         title="Перенесення терміну щорічної основної відпустки",
         body_sample="""Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
                     2019 рік з 29 жовтня на 20 грудня 2019 року у зв’язку з сiмейними обставинами.""",
-        body="""Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
-                    @_int_за какой год переносится отпуск@ рік з @_date_перенести с@ на @_date_перенести на@ 
-                    року у зв’язку з @_str_причина_long@.
-                    """,
+        body="""Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за {
+                    "title": "за який рiк переноситься вiдпустка",
+                    "type": "int"
+                } рік з {
+                    "title": "з якой дати",
+                    "type": "date"
+                } на {
+                    "title": "на яку дату",
+                    "type": "date"
+                } року у зв’язку з {
+                    "title": "причина переносу_1",
+                    "type": "str"
+                } або у зв’язку з {
+                    "title": "причина переносу_2",
+                    "type": "text"
+                }.""",
     ).save()
 
     Report(
@@ -360,11 +335,13 @@ def load_reports(apps, schema_editor):
         body="Доповiдаю, що з-за меж Киiвського гарнiзону прибув та приступив до виконання службових обов'язкiв."
     ).save()
 
+
 def delete_reports(apps, schema_editor):
     Report = apps.get_model('reports', 'Report')
     Report.objects.all().delete()
 
-#$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+# $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 class Migration(migrations.Migration):
     dependencies = [

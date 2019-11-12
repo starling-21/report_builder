@@ -5,7 +5,8 @@
     {% for serviceman in serviceman_list %}
         <ul>
             <li>
-                <a href="{% url 'reports:reports_list' user_id=serviceman.id %}">{{ serviceman.id }} {{ serviceman.first_name|title}} {{ serviceman.last_name|title }}</a>
+{#                <a href="{% url 'reports:reports_list' user_id=serviceman.id %}">{{ serviceman.id }} {{ serviceman.first_name|title}} {{ serviceman.last_name|title }}</a>#}
+                <a href="{% url 'reports:edit_servicemembers_chain' serviceman_id=serviceman.id %}">{{ serviceman.id }} {{ serviceman.first_name|title}} {{ serviceman.last_name|title }}</a>
             </li>
         </ul>
     {% endfor %}

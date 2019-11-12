@@ -10,6 +10,7 @@ from django import forms
 from .forms import ReportFillingForm
 import json
 
+
 def get_report_filling_form(report_id):
     """parse report template, generate form fields. Return context for html template"""
     report = Report.objects.get(pk=report_id)
@@ -103,7 +104,8 @@ def get_raw_form_fields(parts_dict):
             form_content_dict[key] = forms.CharField(
                 label="",
                 # error_messages={"mst1": field_dict['title']},
-                widget=forms.TextInput(attrs={"class": "form-control", 'size': 3})
+                widget=forms.TextInput(attrs={"class": "form-control", 'size': 3}),
+                initial=777
             )
         elif field_dict['type'] == "date":
             form_content_dict[key] = forms.DateField(
@@ -114,22 +116,25 @@ def get_raw_form_fields(parts_dict):
                     options={
                         "locale": "ru",
                     },
-                )
+                ),
+                initial="2019-11-25"
             )
         elif field_dict['type'] == "str":
             form_content_dict[key] = forms.CharField(
                 label="",
                 help_text=field_dict['title'],
-                widget=forms.TextInput(attrs={"class": "form-control", 'size': 100})
+                widget=forms.TextInput(attrs={"class": "form-control", 'size': 100}),
+                initial="--тестовая строка--"
             )
         elif field_dict['type'] == "text":
             form_content_dict[key] = forms.CharField(
                 label="",
                 help_text=field_dict['title'],
-                widget=forms.Textarea(attrs={"cols": 120, "rows": 4, "wrap": "hard"})
+                widget=forms.Textarea(attrs={"cols": 120, "rows": 4, "wrap": "hard"}),
+                initial="--тестовая текстовка--"
             )
 
-        #fields conter
+        # extra field (conter for labels and input fields in form)
         form_content_dict['fields_counter'] = forms.IntegerField(
             label="",
             widget=forms.HiddenInput(),
@@ -137,5 +142,3 @@ def get_raw_form_fields(parts_dict):
         )
 
     return form_content_dict
-
-

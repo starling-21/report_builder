@@ -1,1 +1,6 @@
 1) check report output dir creation if no exists
+2) dates rage and according formatting for this
+
+
+11 Nov: get_tier_users_pairs -- returns dict
+        get_servicemen_chain -- returns list

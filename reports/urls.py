@@ -22,15 +22,15 @@ app_name = "reports"
 urlpatterns = [
 
     path('', views.report_home_view, name='index'),
-
-    path('form', views.dyn_form_view, name='form'),
-    path('test_form', views.test_form_view, name='test_form'),
-    path('generate', views.generate_report_view, name='generate'),
-
-
     path('users', views.users_view, name='users'),
+    path('edit_chain/<int:serviceman_id>', views.edit_servicemembers_chain_view, name='edit_servicemembers_chain'),
     path('reports_list/<int:user_id>/', views.reports_list_view, name='reports_list'),
     path('report_filling/<int:user_id>/<int:report_id>/', views.report_filling_view, name='report_filling'),
+
+    # path('generate_report', views.generate_report_view, name='generate_report'),
+
+    # path('form', views.dyn_form_view, name='form'),
+    # path('test_form', views.test_form_view, name='test_form'),
 
 ]
 

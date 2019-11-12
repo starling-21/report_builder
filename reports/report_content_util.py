@@ -23,11 +23,12 @@ OUPUT DATA:
 
 from reports.models import Serviceman
 from reports.models import Position
+from reports.models import Report
 from django.db.models import Q
+from datetime import datetime
 
 
-
-def get_global_report_merge_dict(serviceman):
+def get_global_report_merge_dict_test_1(serviceman):
     """iterate throught tier's user pairs (if serviceman has a supervisor) and return data for global_merge_dict
         Format: {tier:{report dict}}
     """
@@ -51,6 +52,31 @@ def get_global_report_merge_dict(serviceman):
         return global_merge_dict
 
 
+def get_report_body(input_form_data):
+    """
+    parse submitted form data, transferred here as POST request
+    returns report body text as string.
+    """
+    report_body = ""
+    form_fields_amount = int(input_form_data.get('fields_counter'))
+    for i in range(0, form_fields_amount + 1):
+        try:
+            test_date_conversion = datetime.strptime(input_form_data.get(str(i)), "%Y-%m-%d").date()
+            report_body += datetime_as_day_month_year(input_form_data.get(str(i)))
+        except ValueError:
+            report_body += input_form_data.get(str(i))
+    print("REPORT BODY:", report_body)
+    return report_body
+
+
+def get_report_body_template(serviceman_id):
+    """returns report body template like this:
+        Клопочу по суті рапорту полковника Степана Колотило.
+    """
+    serviceman = Serviceman.objects.get(id=serviceman_id)
+    return "Клопочу по суті рапорту " + serviceman.rank.for_name + " " + serviceman.get_full_name_for() + "."
+
+
 def append_to_dict_keys(dictionary, tier):
     """adds tier value to every key in a dictionary"""
     result = {}
@@ -61,7 +87,7 @@ def append_to_dict_keys(dictionary, tier):
 
 def get_tier_users_pairs(serviceman):
     """returns dictionary of paired users for report. {tier:(FROM_user, TO_user),....} or NONE"""
-    users_chain = get_servicemen_chain(serviceman)
+    users_chain = get_servicemen_chain_as_list(serviceman)
     tiers_dict = {}
     if len(users_chain) < 2:
         return None
@@ -73,7 +99,7 @@ def get_tier_users_pairs(serviceman):
     return tiers_dict
 
 
-def get_servicemen_chain(serviceman):
+def get_servicemen_chain_as_list(serviceman):
     """return service members chain from initiator too the top level supervisor
        RECURSIVE METHOD, be carefull :)
     """
@@ -81,8 +107,20 @@ def get_servicemen_chain(serviceman):
     users_list.append(serviceman)
     next_supervisor = get_supervisor_for(serviceman)
     if next_supervisor is not None:
-        users_list.extend(get_servicemen_chain(next_supervisor))
+        users_list.extend(get_servicemen_chain_as_list(next_supervisor))
     return users_list
+
+
+def get_servicemen_chain_as_dict(serviceman):
+    """return service members chain from initiator too the top level supervisor
+       RECURSIVE METHOD, be carefull :)
+    """
+    users_dict = {}
+    users_dict[serviceman.id] = serviceman
+    next_supervisor = get_supervisor_for(serviceman)
+    if next_supervisor is not None:
+        users_dict.update(get_servicemen_chain_as_dict(next_supervisor))
+    return users_dict
 
 
 def get_footer_data(serviceman):
@@ -94,7 +132,7 @@ def get_footer_data(serviceman):
     full_name = serviceman.get_full_name()
 
     full_position = get_full_position(position.__str__(), units_chain)
-    footer_date_line = get_date_line()
+    footer_date_line = get_current_date_line()
 
     footer_dict = {
         'footer_position_tier_': full_position,
@@ -171,9 +209,8 @@ def get_report_tiers_count(serviceman):
     return tiers_counter
 
 
-def get_date_line():
+def get_current_date_line():
     """return properly formated date line for report"""
-    from datetime import datetime
     monthes = {
         1: "січня",
         2: "лютого",
@@ -192,6 +229,32 @@ def get_date_line():
     month_numb = datetime.now().month
     year = datetime.now().year
     return '"___"' + ' ' + monthes[month_numb] + ' ' + str(year) + ' ' + 'року'
+
+
+def datetime_as_day_month_year(date_str, with_no_year=False):
+    """return properly formated date line for report"""
+    temp_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+
+    monthes = {
+        1: "січня",
+        2: "лютого",
+        3: "березня",
+        4: "квітня",
+        5: "травня",
+        6: "червня",
+        7: "липня",
+        8: "серпня",
+        9: "вересня",
+        10: "жовтня",
+        11: "листопада",
+        12: "грудня",
+    }
+    day_numb = temp_date.day
+    month_numb = temp_date.month
+    year = temp_date.year
+    if with_no_year:
+        return str(day_numb) + ' ' + monthes[month_numb]
+    return str(day_numb) + ' ' + monthes[month_numb] + ' ' + str(year)
 
 
 def print_footer(footer_dict):
