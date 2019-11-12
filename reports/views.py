@@ -28,7 +28,7 @@ def users_view(request):
     return render(request, 'reports/serviceman_list.html', context)
 
 
-def edit_servicemembers_chain_view(request, serviceman_id):
+def edit_service_members_chain_view(request, serviceman_id):
     """change servicemen chain if needed"""
     if request.method == 'POST':
         #TODO pass serviceman_id, servicemen_chain further to report list view
@@ -36,13 +36,15 @@ def edit_servicemembers_chain_view(request, serviceman_id):
 
     serviceman = Serviceman.objects.get(id=serviceman_id)
     # serviceman_chain = report_content_util.get_servicemen_chain_as_list(serviceman)
-    serviceman_chain = report_content_util.get_servicemen_chain_as_dict(serviceman)
-    # TODO new template
+    serviceman_chain_temp = report_content_util.get_servicemen_chain_as_dict(serviceman)
+    serviceman_chain_for_template = {}
+    for k, v in serviceman_chain_temp.items():
+        serviceman_chain_for_template[k] = v.rank.name + " " + v.__str__()
     context = {
         'serviceman_id': serviceman_id,
-        'serviceman_chain': serviceman_chain,
+        'serviceman_chain': serviceman_chain_for_template,
     }
-    return render(request, 'reports/edit_servicemembers_chain.html', context)
+    return render(request, 'reports/edit_service_members_chain.html', context)
 
 
 def reports_list_view(request, serviceman_id):

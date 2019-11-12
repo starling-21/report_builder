@@ -17,5 +17,5 @@ def proceed_report_generation(serviceman_id, report_id, users_tier_chain=None):
         serviceman = Serviceman.objects.get(id=serviceman_id)
 
         if users_tier_chain is None:
-            users_tier_chain = content_util.get_servicemen_chain_as_list(serviceman)
+            users_tier_chain = content_util.get_servicemen_chain_as_dict(serviceman)
 
