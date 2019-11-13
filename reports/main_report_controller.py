@@ -10,7 +10,7 @@ handle main process for report creation
 from .models import Serviceman
 
 from . import report_content_util as content_util
-from . import report_form_util as form_util
+from . import report_forms_util as form_util
 
 
 def proceed_report_generation(serviceman_id, report_id, users_tier_chain=None):

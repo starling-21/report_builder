@@ -1,14 +1,26 @@
 {% extends 'reports/base.html' %}
 
+{#TEST include#}
+{% include "django/forms/widgets/input.html" %}
+
 {% block content %}
     <p>Edit servicemembers chain:</p>
-{#    {% for servicemember in serviceman_chain %}#}
-    {% for tier, servicemember in serviceman_chain.items %}
-        <ul>
-            <li>
-{#                {{ tier }}{{ servicemember.rank }} {{ servicemember.first_name }} {{ servicemember.last_name }}#}
-                id:{{ tier }} {{ servicemember }}
-            </li>
-        </ul>
-    {% endfor %}
+
+    <form method="POST">{% csrf_token %}
+        {% for id, servicemember in serviceman_chain.items %}
+            <input id="edit_{{ id }}" type="submit" class="btn btn-light btn-sm" name="{{ id }}" value="edit"/>{{ servicemember }}<br>
+        {% endfor %}
+
+        <input type="submit" class="btn btn-info" name="submit_chain_editting" value="Next"/>
+    </form>
+
+
+{#        {% for field in form %}#}
+{#            <input type="submit" class="btn btn-light btn-sm" name="edit_member_id_" value="edit"/>#}
+{#            {{ field.label }}#}
+{#            <br>#}
+{#        {% endfor %}#}
+{#        <input type="submit" class="btn btn-info" name="submit_chain_editting" value="Next"/>#}
+{#    </form>#}
+
 {% endblock %}

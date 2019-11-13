@@ -4,6 +4,8 @@ from bootstrap_datepicker_plus import DatePickerInput
 
 from .models import TestReport
 
+class ServiceMembersChainEditForm(forms.Form):
+    pass
 
 class ReportFillingForm(forms.Form):
     pass

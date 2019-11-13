@@ -8,6 +8,7 @@ from bootstrap_datepicker_plus import DatePickerInput
 from .models import Report
 from django import forms
 from .forms import ReportFillingForm
+from .forms import ServiceMembersChainEditForm
 import json
 
 
@@ -25,6 +26,22 @@ def get_report_filling_form(report_id):
         'report_fields_form': dynamicReportFillingForm
     }
     return context
+
+
+# def get_service_members_chain_edit_form(service_members_chain_dict):
+#     """return html django form for service members chain editing"""
+#     form_content_dict = {}
+#
+#     for member_id, member in service_members_chain_dict.items():
+#         form_content_dict['edit_member_' + str(member_id)] = forms.CharField(
+#             # label=member,
+#             label=member.rank.name + " " + member.__str__(),
+#             widget=forms.HiddenInput()
+#         )
+#
+#     dynamicServiceMembersChainEditForm = type('ServiceMembersChainEditForm', (ServiceMembersChainEditForm,),
+#                                               form_content_dict)
+#     return dynamicServiceMembersChainEditForm
 
 
 def parse_report_body_template(text, decoder=json.JSONDecoder()):

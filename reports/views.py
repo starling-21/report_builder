@@ -1,13 +1,12 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-# import for tests
 from reports.models import Serviceman
 from . import report_content_util
-# from .forms import RepTitleForm, RepFieldsFrom
-# from .forms import ReportForm_test1
+from . import report_forms_util
 from .models import Report
-from .report_form_util import get_report_filling_form
+
+from .forms import ServiceMembersChainEditForm
 
 
 # Create your views here.
@@ -15,11 +14,12 @@ from .report_form_util import get_report_filling_form
 def report_home_view(request):
     body = "Reports App!"
     body += "<br><br>"
-    body += "<a href='/users'>Users</a>"
+    body += "<a href='/serviceman_list'>Users</a>"
+    request.session['test_dict_cookie'] = {1: 'a', 2: [2, 3, 4], 3: {'obj3': "value3", "obj4": 3}}
     return HttpResponse(body)
 
 
-def users_view(request):
+def serviceman_list_view(request):
     """test view for showing users list. For choosing who generate report for"""
     serviceman_list = Serviceman.objects.all()
     context = {
@@ -31,23 +31,39 @@ def users_view(request):
 def edit_service_members_chain_view(request, serviceman_id):
     """change servicemen chain if needed"""
     if request.method == 'POST':
-        #TODO pass serviceman_id, servicemen_chain further to report list view
-        pass
+        if "edit" in request.POST:
+            print("edit_member_ ---> id:", request.POST.get('edit'))
+            # del request.session['test_dict_cookie']
+            print("test_dict_cookie has been delted")
+        elif "submit_chain_editting" in request.POST:
+            print("submit_chain_editting ---> reports list redirect")
+            a= request.session['test_dict_cookie']
+            print("A", a)
+
+        # TODO pass serviceman_id, servicemen_chain further to report list view
+        print("POST from ServiceMembersChainEditForm")
+        form = ServiceMembersChainEditForm(request)
+
+        for k, v in request.POST.items():
+            print("{}:{}".format(k, v))
+
+        # return render(request, 'reports/edit_service_members_chain.html', form)
+        # return HttpResponse()
 
     serviceman = Serviceman.objects.get(id=serviceman_id)
-    # serviceman_chain = report_content_util.get_servicemen_chain_as_list(serviceman)
-    serviceman_chain_temp = report_content_util.get_servicemen_chain_as_dict(serviceman)
+    serviceman_chain = report_content_util.get_servicemen_chain_as_dict(serviceman)
     serviceman_chain_for_template = {}
-    for k, v in serviceman_chain_temp.items():
+    for k, v in serviceman_chain.items():
         serviceman_chain_for_template[k] = v.rank.name + " " + v.__str__()
+
     context = {
-        'serviceman_id': serviceman_id,
         'serviceman_chain': serviceman_chain_for_template,
+        'test_dict': serviceman_chain
     }
     return render(request, 'reports/edit_service_members_chain.html', context)
 
 
-def reports_list_view(request, serviceman_id):
+def reports_list_view(request, serviceman_id, service_members_chain_dict=None):
     """show reports titles list to choose"""
     serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name()
     reports_list = Report.objects.all()
@@ -63,19 +79,19 @@ def report_filling_view(request, serviceman_id, report_id):
     """report filling form view"""
     if request.method == 'POST':
         input_form_data = request.POST.copy()
+        # TODO proceed filled in data
 
-
-    context = get_report_filling_form(report_id)
+    context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
-
 
     # generate_report_view(request)
     # return HttpResponseRedirect(redirect('reports.views.generate_report_view'))
     # return redirect('reports:generate')
 
-#=======================================================================================================================
-#=======================================================================================================================
-#=======================================================================================================================
+
+# =======================================================================================================================
+# =======================================================================================================================
+# =======================================================================================================================
 # def dyn_form_view(request):
 #     """dynamyc form after user submits input"""
 #     context = {}
@@ -157,45 +173,45 @@ def report_filling_view(request, serviceman_id, report_id):
 #     return render(request, 'reports/test_report_1.html', {'form': form_2})
 
 
-#=======================================================================================================================
-#=======================================================================================================================
-#=======================================================================================================================
+# =======================================================================================================================
+# =======================================================================================================================
+# =======================================================================================================================
 # def generate_report_view(request, user_id=5):
 #     """generate test report """
-    #----
-    # TESC BULK report generation
-    # users = Serviceman.objects.filter(id__gt=1)
-    # for user in users:
-    #     sample_user = get_serviceman(user.id)
-    #     # GET ALL Footers and Headers REPORT CHAIN
-    #     merge_dict = get_global_report_merge_dict(sample_user)
-    #
-    #     if merge_dict is None:
-    #         return HttpResponse("report generation (___ERROR___)!!!!")
-    #
-    #     # TODO add method for report body generation
-    #     merge_dict.update(get_body_text())
-    #     generate_report(merge_dict, template_name="template_tier_2.docx", report_name='t2')
-    #     sleep(1)
-    #----
+# ----
+# TESC BULK report generation
+# users = Serviceman.objects.filter(id__gt=1)
+# for user in users:
+#     sample_user = get_serviceman(user.id)
+#     # GET ALL Footers and Headers REPORT CHAIN
+#     merge_dict = get_global_report_merge_dict(sample_user)
+#
+#     if merge_dict is None:
+#         return HttpResponse("report generation (___ERROR___)!!!!")
+#
+#     # TODO add method for report body generation
+#     merge_dict.update(get_body_text())
+#     generate_report(merge_dict, template_name="template_tier_2.docx", report_name='t2')
+#     sleep(1)
+# ----
 
 
-    #---***
-    # user_id = 5
-    # user = get_serviceman(user_id)
-    # # GET ALL Footers and Headers REPORT CHAIN
-    # merge_dict = get_global_report_merge_dict(user)
-    #
-    # if merge_dict is None:
-    #     return HttpResponse("report generation (___ERROR___)!!!!")
-    #
-    # # TODO add method for report body generation
-    # merge_dict.update(get_report_body_text())
-    # filepath = generate_report(merge_dict, template_name="template_tier_2.docx", report_name='t2')
-    #
-    # # return HttpResponse("REPORT has been generated SUCCESSFULLY")
-    # return FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filepath.split('\\')[-1])
-    #---***
+# ---***
+# user_id = 5
+# user = get_serviceman(user_id)
+# # GET ALL Footers and Headers REPORT CHAIN
+# merge_dict = get_global_report_merge_dict(user)
+#
+# if merge_dict is None:
+#     return HttpResponse("report generation (___ERROR___)!!!!")
+#
+# # TODO add method for report body generation
+# merge_dict.update(get_report_body_text())
+# filepath = generate_report(merge_dict, template_name="template_tier_2.docx", report_name='t2')
+#
+# # return HttpResponse("REPORT has been generated SUCCESSFULLY")
+# return FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filepath.split('\\')[-1])
+# ---***
 
 
 def get_report_body_text():
@@ -233,7 +249,6 @@ def generate_report(merge_dict, template_name="template_universal.docx", report_
     merged_file_path = os.path.join(OUTPUT_PATH, now.strftime("%d %H%M-%S") + '_' + report_name + '.docx')
     document.write(merged_file_path)
     return merged_file_path
-
 
 # def get_global_report_merge_dict(serviceman):
 #     """iterate throught tier's user pairs (if serviceman has a supervisor) and return data for global_merge_dict
