@@ -7,20 +7,20 @@
     <p>Edit servicemembers chain:</p>
 
     <form method="POST">{% csrf_token %}
+
         {% for id, servicemember in serviceman_chain.items %}
-            <input id="edit_{{ id }}" type="submit" class="btn btn-light btn-sm" name="{{ id }}" value="edit"/>{{ servicemember }}<br>
+            <input id="edit_{{ id }}" type="submit" class="btn btn-light btn-sm" name="{{ id }}" value="edit"/>
+            {{ servicemember.rank.name }} {{ servicemember }}
+
+            {% if swap_id is not None and swap_id == id %}
+                <input id="input_for_edit_{{ id }}">
+                <input type="submit" class="btn btn-light btn-sm" name="{{ id }}" value="Ok"/>
+            {% endif %}
+            <hr>
         {% endfor %}
 
         <input type="submit" class="btn btn-info" name="submit_chain_editting" value="Next"/>
     </form>
 
-
-{#        {% for field in form %}#}
-{#            <input type="submit" class="btn btn-light btn-sm" name="edit_member_id_" value="edit"/>#}
-{#            {{ field.label }}#}
-{#            <br>#}
-{#        {% endfor %}#}
-{#        <input type="submit" class="btn btn-info" name="submit_chain_editting" value="Next"/>#}
-{#    </form>#}
 
 {% endblock %}

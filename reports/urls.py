@@ -21,10 +21,11 @@ app_name = "reports"
 
 urlpatterns = [
 
-    path('', views.report_home_view, name='index'),
+    # path('', views.report_home_view, name='index'),
+    path('', views.serviceman_list_view, name='users'),
     path('serviceman_list', views.serviceman_list_view, name='users'),
     path('edit_chain/<int:serviceman_id>', views.edit_service_members_chain_view, name='edit_service_members_chain'),
-    path('reports_list/<int:user_id>/', views.reports_list_view, name='reports_list'),
+    path('reports_list/<int:serviceman_id>/', views.reports_list_view, name='reports_list'),
     path('report_filling/<int:user_id>/<int:report_id>/', views.report_filling_view, name='report_filling'),
 
     # path('generate_report', views.generate_report_view, name='generate_report'),

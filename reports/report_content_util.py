@@ -99,6 +99,20 @@ def get_tier_users_pairs(serviceman):
     return tiers_dict
 
 
+def convert_dict_to_tier_users_pairs(users_chain_dict):
+    """convert members chain dic to tier users pairs """
+    tiers_dict = {}
+    users_chain = list(users_chain_dict.values())
+    if len(users_chain) < 2:
+        return None
+    elif len(users_chain) == 2:
+        tiers_dict[0] = (users_chain[0], users_chain[1])
+    elif len(users_chain) > 2:
+        for i in range(0, len(users_chain) - 1):
+            tiers_dict[i] = (users_chain[i], users_chain[i + 1])
+    return tiers_dict
+
+
 def get_servicemen_chain_as_list(serviceman):
     """return service members chain from initiator too the top level supervisor
        RECURSIVE METHOD, be carefull :)
@@ -181,7 +195,6 @@ def get_full_position(main_position, units_chain):
 
 def get_supervisor_for(serviceman):
     """return supervisor for certain user"""
-    # serviceman = serviceman
     is_supervisor = serviceman.position.supervisor or serviceman.position.temp_supervisor
     if is_supervisor:
         unit_supervisor_position = Position.objects.filter(Q(unit=serviceman.unit.parent_unit),

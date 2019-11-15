@@ -1,5 +1,6 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render, redirect, reverse
+
 
 from reports.models import Serviceman
 from . import report_content_util
@@ -15,7 +16,6 @@ def report_home_view(request):
     body = "Reports App!"
     body += "<br><br>"
     body += "<a href='/serviceman_list'>Users</a>"
-    request.session['test_dict_cookie'] = {1: 'a', 2: [2, 3, 4], 3: {'obj3': "value3", "obj4": 3}}
     return HttpResponse(body)
 
 
@@ -30,40 +30,43 @@ def serviceman_list_view(request):
 
 def edit_service_members_chain_view(request, serviceman_id):
     """change servicemen chain if needed"""
+    swap_id = None
     if request.method == 'POST':
         if "edit" in request.POST:
             print("edit_member_ ---> id:", request.POST.get('edit'))
-            # del request.session['test_dict_cookie']
-            print("test_dict_cookie has been delted")
         elif "submit_chain_editting" in request.POST:
             print("submit_chain_editting ---> reports list redirect")
-            a= request.session['test_dict_cookie']
-            print("A", a)
+
 
         # TODO pass serviceman_id, servicemen_chain further to report list view
         print("POST from ServiceMembersChainEditForm")
-        form = ServiceMembersChainEditForm(request)
 
         for k, v in request.POST.items():
-            print("{}:{}".format(k, v))
+            if "edit" in v:
+                print("Editin user with id:", k)
+                swap_id = int(k)
+        serviceman = Serviceman.objects.get(id=serviceman_id)
+        serviceman_chain = report_content_util.get_servicemen_chain_as_dict(serviceman)
 
-        # return render(request, 'reports/edit_service_members_chain.html', form)
-        # return HttpResponse()
+        tier_members_pairs = report_content_util.convert_dict_to_tier_users_pairs(serviceman_chain)
+        # request.session['tier_members_pairs'] = tier_members_pairs
+
+        return HttpResponseRedirect(redirect('reports_list', kwargs={'serviceman_id': serviceman_id}))  # does not work
+        #TODO redirects
+        # return HttpResponseRedirect(reverse('reports:reports_list', kwargs={'serviceman_id':serviceman_id}))  #OK
+        # return HttpResponseRedirect(reverse('reports:reports_list', args=(serviceman_id,))) #OK
 
     serviceman = Serviceman.objects.get(id=serviceman_id)
     serviceman_chain = report_content_util.get_servicemen_chain_as_dict(serviceman)
-    serviceman_chain_for_template = {}
-    for k, v in serviceman_chain.items():
-        serviceman_chain_for_template[k] = v.rank.name + " " + v.__str__()
 
     context = {
-        'serviceman_chain': serviceman_chain_for_template,
-        'test_dict': serviceman_chain
+        'serviceman_chain': serviceman_chain,
+        'swap_id': swap_id
     }
     return render(request, 'reports/edit_service_members_chain.html', context)
 
 
-def reports_list_view(request, serviceman_id, service_members_chain_dict=None):
+def reports_list_view(request, serviceman_id):
     """show reports titles list to choose"""
     serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name()
     reports_list = Report.objects.all()
@@ -84,9 +87,6 @@ def report_filling_view(request, serviceman_id, report_id):
     context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
 
-    # generate_report_view(request)
-    # return HttpResponseRedirect(redirect('reports.views.generate_report_view'))
-    # return redirect('reports:generate')
 
 
 # =======================================================================================================================
