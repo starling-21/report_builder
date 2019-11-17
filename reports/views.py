@@ -6,6 +6,7 @@ from reports.models import Serviceman
 from . import report_content_util
 from . import report_forms_util
 from .models import Report
+import json
 
 from .forms import ServiceMembersChainEditForm
 
@@ -32,32 +33,46 @@ def edit_service_members_chain_view(request, serviceman_id):
     """change servicemen chain if needed"""
     swap_id = None
     if request.method == 'POST':
-        if "edit" in request.POST:
-            print("edit_member_ ---> id:", request.POST.get('edit'))
-        elif "submit_chain_editting" in request.POST:
-            print("submit_chain_editting ---> reports list redirect")
-
-
-        # TODO pass serviceman_id, servicemen_chain further to report list view
-        print("POST from ServiceMembersChainEditForm")
-
+        print("POST from edit_service_members_chain.html")
         for k, v in request.POST.items():
-            if "edit" in v:
-                print("Editin user with id:", k)
-                swap_id = int(k)
-        serviceman = Serviceman.objects.get(id=serviceman_id)
-        serviceman_chain = report_content_util.get_servicemen_chain_as_dict(serviceman)
+            print('{}:{}'.format(k, v))
 
-        tier_members_pairs = report_content_util.convert_dict_to_tier_users_pairs(serviceman_chain)
+        if 'submit_chain_editting' in request.POST:
+            print("submit_chain_editting ---> reports list redirect")
+            return redirect(reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id}))
+        elif 'ok' in request.POST:
+            # TODO change swap id in list
+            # TODO save id's list and chang if modified
+            # for k, v in request.POST.items():
+            #     if "edit" in v:
+            #         print("Editin user with id:", k)
+            #         swap_id = int(k)
+            old_id = request.POST.get('Ok')
+            swap_id = request.POST.get('swap_id')
+            print('old id:', old_id)
+            print('swaped id:', swap_id)
+
+        else:
+            print('Editing_member')
+            for k, v in request.POST.items():
+                if "edit" in v:
+                    print("Editin user with id:", k)
+                    swap_id = int(k)
+
+        # serviceman = Serviceman.objects.get(id=serviceman_id)
+        # serviceman_chain = report_content_util.get_servicemen_chain_dict(serviceman)
+
+        # a = json.dumps(serviceman)
         # request.session['tier_members_pairs'] = tier_members_pairs
+        a=1
 
-        return HttpResponseRedirect(redirect('reports_list', kwargs={'serviceman_id': serviceman_id}))  # does not work
-        #TODO redirects
-        # return HttpResponseRedirect(reverse('reports:reports_list', kwargs={'serviceman_id':serviceman_id}))  #OK
-        # return HttpResponseRedirect(reverse('reports:reports_list', args=(serviceman_id,))) #OK
 
     serviceman = Serviceman.objects.get(id=serviceman_id)
-    serviceman_chain = report_content_util.get_servicemen_chain_as_dict(serviceman)
+    # serviceman_chain = report_content_util.get_servicemen_chain_dict(serviceman)
+    serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
+
+    # serviceman_chain_pairs = report_content_util.get_tier_users_pairs(serviceman_id)
+    # serviceman_chain_id = report_content_util.get_servicemen_chain_id_list(serviceman_id)
 
     context = {
         'serviceman_chain': serviceman_chain,
@@ -68,30 +83,29 @@ def edit_service_members_chain_view(request, serviceman_id):
 
 def reports_list_view(request, serviceman_id):
     """show reports titles list to choose"""
-    serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name()
+    # serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name()
     reports_list = Report.objects.all()
     context = {
-        'user_id': serviceman_id,
-        'user': serviceman,
         'reports_list': reports_list
     }
     return render(request, 'reports/reports_list.html', context)
 
 
-def report_filling_view(request, serviceman_id, report_id):
+def report_filling_view(request, report_id):
     """report filling form view"""
     if request.method == 'POST':
-        input_form_data = request.POST.copy()
         # TODO proceed filled in data
+        pass
+        print("Processing form filled in data:")
 
     context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
 
 
 
-# =======================================================================================================================
-# =======================================================================================================================
-# =======================================================================================================================
+# ======================================================================================================================
+# ======================================================================================================================
+# ======================================================================================================================
 # def dyn_form_view(request):
 #     """dynamyc form after user submits input"""
 #     context = {}

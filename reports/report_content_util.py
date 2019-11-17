@@ -85,47 +85,87 @@ def append_to_dict_keys(dictionary, tier):
     return result
 
 
-def get_tier_users_pairs(serviceman):
-    """returns dictionary of paired users for report. {tier:(FROM_user, TO_user),....} or NONE"""
-    users_chain = get_servicemen_chain_as_list(serviceman)
+def get_tier_users_pairs(serviceman_id, chain_id_list=None):
+    """returns dictionary of paired users lists for report.
+    returns {tier:[FROM_user, TO_user],....} or NONE"""
+    serviceman = Serviceman.objects.get(id=serviceman_id)
+    users_chain = []
+    if chain_id_list is None:
+        users_chain = get_servicemen_chain_list(serviceman)
+    else:
+        for id in chain_id_list:
+            users_chain.append(Serviceman.objects.get(id=id))
     tiers_dict = {}
     if len(users_chain) < 2:
         return None
     elif len(users_chain) == 2:
-        tiers_dict[0] = (users_chain[0], users_chain[1])
+        tiers_dict[0] = [users_chain[0], users_chain[1]]
     elif len(users_chain) > 2:
         for i in range(0, len(users_chain) - 1):
-            tiers_dict[i] = (users_chain[i], users_chain[i + 1])
+            tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
     return tiers_dict
 
+# def get_tier_users_pairs(users_chain_id_list):
+#     """users_chain_id_list - users_chain identifiers list.
+#     returns dictionary of paired users for report tiers. {tier:[FROM_user, TO_user],....} or NONE"""
+#     users_chain = []
+#     for id in users_chain_id_list:
+#         users_chain.append(Serviceman.objects.get(id))
+#
+#     tiers_dict = {}
+#     if len(users_chain) < 2:
+#         return None
+#     elif len(users_chain) == 2:
+#         tiers_dict[0] = [users_chain[0], users_chain[1]]
+#     elif len(users_chain) > 2:
+#         for i in range(0, len(users_chain) - 1):
+#             tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
+#     return tiers_dict
 
-def convert_dict_to_tier_users_pairs(users_chain_dict):
-    """convert members chain dic to tier users pairs """
-    tiers_dict = {}
-    users_chain = list(users_chain_dict.values())
-    if len(users_chain) < 2:
-        return None
-    elif len(users_chain) == 2:
-        tiers_dict[0] = (users_chain[0], users_chain[1])
-    elif len(users_chain) > 2:
-        for i in range(0, len(users_chain) - 1):
-            tiers_dict[i] = (users_chain[i], users_chain[i + 1])
-    return tiers_dict
+
+# def convert_dict_to_tier_users_pairs(users_chain_dict):
+#     """convert members chain dic to tier users pairs """
+#     tiers_dict = {}
+#     users_chain = list(users_chain_dict.values())
+#     if len(users_chain) < 2:
+#         return None
+#     elif len(users_chain) == 2:
+#         tiers_dict[0] = [users_chain[0], users_chain[1]]
+#     elif len(users_chain) > 2:
+#         for i in range(0, len(users_chain) - 1):
+#             tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
+#     return tiers_dict
 
 
-def get_servicemen_chain_as_list(serviceman):
+def get_servicemen_chain_list(serviceman):
     """return service members chain from initiator too the top level supervisor
        RECURSIVE METHOD, be carefull :)
+       return identifiers list like [33,12,5,1]
     """
     users_list = []
+    # serviceman = Serviceman.objects.get(id=serviceman_id)
     users_list.append(serviceman)
     next_supervisor = get_supervisor_for(serviceman)
     if next_supervisor is not None:
-        users_list.extend(get_servicemen_chain_as_list(next_supervisor))
+        users_list.extend(get_servicemen_chain_list(next_supervisor))
     return users_list
 
 
-def get_servicemen_chain_as_dict(serviceman):
+def get_servicemen_chain_id_list(serviceman_id):
+    """return service members chain identifiers list from initiator too the top level supervisor
+       RECURSIVE METHOD, be carefull :)
+       returns [55,21,5,1]
+    """
+    users_chain_id_list = []
+    serviceman = Serviceman.objects.get(id=serviceman_id)
+    users_chain_id_list.append(serviceman_id)
+    next_supervisor = get_supervisor_for(serviceman)
+    if next_supervisor is not None:
+        users_chain_id_list.extend(get_servicemen_chain_id_list(next_supervisor.id))
+    return users_chain_id_list
+
+
+def get_servicemen_chain_dict(serviceman):
     """return service members chain from initiator too the top level supervisor
        RECURSIVE METHOD, be carefull :)
     """
@@ -133,8 +173,9 @@ def get_servicemen_chain_as_dict(serviceman):
     users_dict[serviceman.id] = serviceman
     next_supervisor = get_supervisor_for(serviceman)
     if next_supervisor is not None:
-        users_dict.update(get_servicemen_chain_as_dict(next_supervisor))
+        users_dict.update(get_servicemen_chain_dict(next_supervisor))
     return users_dict
+
 
 
 def get_footer_data(serviceman):
