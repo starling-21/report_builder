@@ -36,25 +36,31 @@ def edit_service_members_chain_view(request, serviceman_id):
         print("POST from edit_service_members_chain.html")
         for k, v in request.POST.items():
             print('{}:{}'.format(k, v))
+        print("")
 
-        if 'submit_chain_editting' in request.POST:
+        if 'edit_chain_id' in request.POST:
+            print("Editing_member with id:", request.POST.get('edit_chain_id'))
+            swap_id = int(request.POST.get('edit_chain_id'))
+
+        elif 'submit_swap_id' in request.POST:
+            print("Finishing member editing")
+            old_id = request.POST.get('old_id')
+            swap_id = request.POST.get('swap_id')
+            print('swap id: {} -> {}'.format(old_id, swap_id))
+            print('serviceman chain list:', request.session['serviceman_chain_id_list'])
+            replace_index = request.session['serviceman_chain_id_list'].index(int(old_id))
+            request.session['serviceman_chain_id_list'][replace_index] = swap_id
+            request.session.modified = True
+            print('serviceman chain list:', request.session['serviceman_chain_id_list'])
+
+
+        elif 'submit_chain_editting' in request.POST:
             print("submit_chain_editting ---> reports list redirect")
             return redirect(reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id}))
-        elif 'ok' in request.POST:
-            old_id = request.POST.get('Ok')
-            swap_id = request.POST.get('swap_id')
-            print('old id:', old_id)
-            print('swaped id:', swap_id)
-            print('serviceman chain list:', request.session['serviceman_chain_id_list'])
-            request.session['serviceman_chain_id_list'][old_id] = swap_id
-            request.session.modified = True
 
         else:
-            print('Editing_member')
-            for k, v in request.POST.items():
-                if "edit" in v:
-                    print("Editin user with id:", k)
-                    swap_id = int(k)
+            print('further post processing')
+
 
         # serviceman = Serviceman.objects.get(id=serviceman_id)
         # serviceman_chain = report_content_util.get_servicemen_chain_dict(serviceman)

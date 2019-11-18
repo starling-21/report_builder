@@ -3,10 +3,7 @@
 
 {% block content %}
     {% for serviceman in serviceman_list %}
-        <ul>
-            <li>
-                <a href="{% url 'reports:edit_service_members_chain' serviceman_id=serviceman.id %}">{{ serviceman.id }} {{ serviceman.first_name|title}} {{ serviceman.last_name|title }}</a>
-            </li>
-        </ul>
+        <hr>
+        <a href="{% url 'reports:edit_service_members_chain' serviceman_id=serviceman.id %}">{{ serviceman.id }} {{ serviceman.first_name|title }} {{ serviceman.last_name|title }}</a>
     {% endfor %}
 {% endblock %}
