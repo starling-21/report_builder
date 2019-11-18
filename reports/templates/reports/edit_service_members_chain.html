@@ -9,17 +9,21 @@
     <form method="POST">{% csrf_token %}
 
         {% for servicemember in serviceman_chain %}
-            <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id" value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button> {#OK#}
-
-            {{ servicemember.rank.name }} {{ servicemember }}
+{#            <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id" value="{{ servicemember.id }}">#}
+{#                <span class="fas fa-edit"></span></button>{{ servicemember.rank.name }} {{ servicemember }}#}
 
             {% if swap_id is not None and swap_id == servicemember.id %}
-                <label><span i class="fas fa-forward"></span></label> {#OK#}
+                {# show input for new chain member in line #}
+                <label><span class="fas fa-forward"></span></label> {# arrow --> #}
                 <input name="swap_id">
                 <input type="hidden" name="old_id" value="{{ servicemember.id }}"/>
 
-                <button type="submit" class="btn btn-light btn-sm" name="submit_swap_id" value="{{ servicemember.id }}"><span class="fas fa-check-square"></span></button> {#OK#}
-{#                <input type="submit" class="btn btn-light btn-sm" name="{{ servicemember.id }}" value="Ok"/>#}
+                <button type="submit" class="btn btn-light btn-sm" name="submit_swap_id" value="{{ servicemember.id }}">
+                    <span class="fas fa-check-square"></span></button> {#OK#}
+            {% else %}
+                {# show normal chain member line with edit button#}
+                <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id" value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button>
+                {{ servicemember.rank.name }} {{ servicemember }}
             {% endif %}
             <hr>
         {% endfor %}

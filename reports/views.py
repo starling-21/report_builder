@@ -1,7 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, reverse
 
-
 from reports.models import Serviceman
 from . import report_content_util
 from . import report_forms_util
@@ -49,7 +48,9 @@ def edit_service_members_chain_view(request, serviceman_id):
             print('swap id: {} -> {}'.format(old_id, swap_id))
             print('serviceman chain list:', request.session['serviceman_chain_id_list'])
             replace_index = request.session['serviceman_chain_id_list'].index(int(old_id))
-            request.session['serviceman_chain_id_list'][replace_index] = swap_id
+            request.session['serviceman_chain_id_list'][replace_index] = int(swap_id)
+            # swap_id = None
+            # del request.POST['swap_id']
             request.session.modified = True
             print('serviceman chain list:', request.session['serviceman_chain_id_list'])
 
@@ -60,20 +61,14 @@ def edit_service_members_chain_view(request, serviceman_id):
 
         else:
             print('further post processing')
-
-
-        # serviceman = Serviceman.objects.get(id=serviceman_id)
-        # serviceman_chain = report_content_util.get_servicemen_chain_dict(serviceman)
-
-        # a = json.dumps(serviceman)
-        # request.session['tier_members_pairs'] = tier_members_pairs
-
+            # reder form with current id chain
+            # TODO fill chain and pass to template
 
     serviceman = Serviceman.objects.get(id=serviceman_id)
     serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
     serviceman_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
 
-    request.session['serviceman_chain_id_list']=serviceman_chain_id_list
+    request.session['serviceman_chain_id_list'] = serviceman_chain_id_list
     request.session.modified = True
 
     context = {
@@ -102,7 +97,6 @@ def report_filling_view(request, report_id):
 
     context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
-
 
 
 # ======================================================================================================================
