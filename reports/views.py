@@ -41,16 +41,13 @@ def edit_service_members_chain_view(request, serviceman_id):
             print("submit_chain_editting ---> reports list redirect")
             return redirect(reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id}))
         elif 'ok' in request.POST:
-            # TODO change swap id in list
-            # TODO save id's list and chang if modified
-            # for k, v in request.POST.items():
-            #     if "edit" in v:
-            #         print("Editin user with id:", k)
-            #         swap_id = int(k)
             old_id = request.POST.get('Ok')
             swap_id = request.POST.get('swap_id')
             print('old id:', old_id)
             print('swaped id:', swap_id)
+            print('serviceman chain list:', request.session['serviceman_chain_id_list'])
+            request.session['serviceman_chain_id_list'][old_id] = swap_id
+            request.session.modified = True
 
         else:
             print('Editing_member')
@@ -64,15 +61,14 @@ def edit_service_members_chain_view(request, serviceman_id):
 
         # a = json.dumps(serviceman)
         # request.session['tier_members_pairs'] = tier_members_pairs
-        a=1
 
 
     serviceman = Serviceman.objects.get(id=serviceman_id)
-    # serviceman_chain = report_content_util.get_servicemen_chain_dict(serviceman)
     serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
+    serviceman_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
 
-    # serviceman_chain_pairs = report_content_util.get_tier_users_pairs(serviceman_id)
-    # serviceman_chain_id = report_content_util.get_servicemen_chain_id_list(serviceman_id)
+    request.session['serviceman_chain_id_list']=serviceman_chain_id_list
+    request.session.modified = True
 
     context = {
         'serviceman_chain': serviceman_chain,
@@ -96,7 +92,7 @@ def report_filling_view(request, report_id):
     if request.method == 'POST':
         # TODO proceed filled in data
         pass
-        print("Processing form filled in data:")
+        print("Processing report filling form data:")
 
     context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
