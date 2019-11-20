@@ -8,11 +8,11 @@
 INPUT DATA:
 
 1st OPTION:
-accept user id (based on incoming user_id generates service_men chain to the top supervisor)
+accept: request,  user id (based on incoming user_id generates service_men chain to the top supervisor)
 --> returns it for user modifications //TODO chose best data representation to fill in this data into html form
 
 2nd OPTION:
-accept user id, report id and service_members chain (optional)
+accept: request, user id, report id and service_members chain (optional)
 --> generate final data content dictionary for report's document generator
 
 
@@ -28,72 +28,102 @@ from django.db.models import Q
 from datetime import datetime
 
 
-def get_global_report_merge_dict_test_1(serviceman):
-    """iterate throught tier's user pairs (if serviceman has a supervisor) and return data for global_merge_dict
-        Format: {tier:{report dict}}
+def get_report_merge_dict(request, serviceman_id, members_chain_id_list=None):
+    """
+    creates user pairs dictionary for every report tier --> {tier:[footer_user, header_user]}
+    iterate throught tiers dict and put data to global_merge_dict, by changing merge dict keys like {key_<tier_number>:value_to_merge}
+
+    :param request: post request from filled form
+    :param serviceman_id:
+    :param members_chain_id_list:
+    :return:
     """
     try:
         global_merge_dict = {}
-        user_pairs_dict = get_tier_users_pairs(serviceman)
+        serviceman = Serviceman.objects.get(serviceman_id)
+        user_pairs_dict = get_tier_users_pairs(serviceman_id, members_chain_id_list)
         for tier, users in user_pairs_dict.items():
             from_user = users[0]
             to_user = users[1]
 
+            #footer prep
             footer_dict = get_footer_data(from_user)
             footer_dict = append_to_dict_keys(footer_dict, tier)
             global_merge_dict.update(footer_dict)
 
+            #header prep
             header_dict = get_header_data(to_user)
             header_dict = append_to_dict_keys(header_dict, tier)
             global_merge_dict.update(header_dict)
+
+            #body prep
+            if tier == 0:
+                report_body_dict = get_main_report_body(request)
+            elif tier >= 1:
+                report_body_dict = get_secondary_report_body(serviceman_id)
+            report_body_dict = append_to_dict_keys(report_body_dict, tier)
+            global_merge_dict.update(report_body_dict)
     except:
         global_merge_dict = None
     finally:
         return global_merge_dict
 
 
-def get_report_body(input_form_data):
+def get_main_report_body(input_form_data_dict):
     """
     parse submitted form data, transferred here as POST request
     returns report body text as string.
+
+    fields_counter - POST request field contains amount of fields to collect together
     """
-    report_body = ""
-    form_fields_amount = int(input_form_data.get('fields_counter'))
+    report_body_dict = {}
+    report_body_text = ""
+    form_fields_amount = int(input_form_data_dict.get('fields_counter'))
     for i in range(0, form_fields_amount + 1):
         try:
-            test_date_conversion = datetime.strptime(input_form_data.get(str(i)), "%Y-%m-%d").date()
-            report_body += datetime_as_day_month_year(input_form_data.get(str(i)))
+            #TODO kostul, needs refactoring
+            test_date_conversion_error = datetime.strptime(input_form_data_dict.get(str(i)), "%Y-%m-%d").date() #DO nOt delete
+            report_body_text += datetime_as_day_month_year(input_form_data_dict.get(str(i)))
         except ValueError:
-            report_body += input_form_data.get(str(i))
-    print("REPORT BODY:", report_body)
-    return report_body
+            report_body_text += input_form_data_dict.get(str(i))
+    print("REPORT BODY:", report_body_dict)
+    report_body_dict['body_tier'] = report_body_text
+    return report_body_dict
 
 
-def get_report_body_template(serviceman_id):
-    """returns report body template like this:
+def get_secondary_report_body(serviceman_id):
+    """returns report dictionary contains next body template like this:
         Клопочу по суті рапорту полковника Степана Колотило.
+        :return dict {merger_key: value}
     """
+    report_body_dict = {}
+    report_body_text = ""
     serviceman = Serviceman.objects.get(id=serviceman_id)
-    return "Клопочу по суті рапорту " + serviceman.rank.for_name + " " + serviceman.get_full_name_for() + "."
+    report_body_text += "Клопочу по суті рапорту " + serviceman.rank.for_name + " " + serviceman.get_full_name_for() + "."
+    report_body_dict['body_tier'] = report_body_text
+    return report_body_dict['body_tier']
 
 
 def append_to_dict_keys(dictionary, tier):
     """adds tier value to every key in a dictionary"""
     result = {}
     for key, value in dictionary.items():
-        result[key + str(tier)] = value
+        result[key + '_' + str(tier)] = value
     return result
 
 
-def get_tier_users_pairs(serviceman_id, chain_id_list=None):
-    """returns dictionary of paired users lists for report.
-    returns {tier:[FROM_user, TO_user],....} or NONE"""
+def get_tier_users_pairs(serviceman_id, members_chain_id_list=None):
+    """
+    create dictionary of paired users lists for report.
+    :param serviceman_id:
+    :param members_chain_id_list:
+    returns {tier:[FROM_user, TO_user],....} or NONE    """
     serviceman = Serviceman.objects.get(id=serviceman_id)
     users_chain = []
-    if chain_id_list is None:
+    if members_chain_id_list is None:
         users_chain = get_servicemen_chain_list(serviceman)
     else:
-        for id in chain_id_list:
+        for id in members_chain_id_list:
             users_chain.append(Serviceman.objects.get(id=id))
     tiers_dict = {}
     if len(users_chain) < 2:
@@ -104,6 +134,7 @@ def get_tier_users_pairs(serviceman_id, chain_id_list=None):
         for i in range(0, len(users_chain) - 1):
             tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
     return tiers_dict
+
 
 # def get_tier_users_pairs(users_chain_id_list):
 #     """users_chain_id_list - users_chain identifiers list.
@@ -165,17 +196,16 @@ def get_servicemen_chain_id_list(serviceman_id):
     return users_chain_id_list
 
 
-def get_servicemen_chain_dict(serviceman):
-    """return service members chain from initiator too the top level supervisor
-       RECURSIVE METHOD, be carefull :)
-    """
-    users_dict = {}
-    users_dict[serviceman.id] = serviceman
-    next_supervisor = get_supervisor_for(serviceman)
-    if next_supervisor is not None:
-        users_dict.update(get_servicemen_chain_dict(next_supervisor))
-    return users_dict
-
+# def get_servicemen_chain_dict(serviceman):
+#     """return service members chain from initiator too the top level supervisor
+#        RECURSIVE METHOD, be carefull :)
+#     """
+#     users_dict = {}
+#     users_dict[serviceman.id] = serviceman
+#     next_supervisor = get_supervisor_for(serviceman)
+#     if next_supervisor is not None:
+#         users_dict.update(get_servicemen_chain_dict(next_supervisor))
+#     return users_dict
 
 
 def get_footer_data(serviceman):
@@ -190,10 +220,10 @@ def get_footer_data(serviceman):
     footer_date_line = get_current_date_line()
 
     footer_dict = {
-        'footer_position_tier_': full_position,
-        'footer_rank_tier_': rank,
-        'footer_username_tier_': full_name,
-        'date_line_tier_': footer_date_line
+        'footer_position_tier': full_position,
+        'footer_rank_tier': rank,
+        'footer_username_tier': full_name,
+        'date_line_tier': footer_date_line
     }
 
     # print_footer(footer_dict)
@@ -211,9 +241,9 @@ def get_header_data(serviceman):
     full_position = get_full_position(position, units_chain)
 
     header_dict = {
-        'header_position_tier_': full_position,
-        'header_rank_tier_': rank,
-        'header_username_tier_': full_name,
+        'header_position_tier': full_position,
+        'header_rank_tier': rank,
+        'header_username_tier': full_name,
     }
 
     # print_header(header_dict)

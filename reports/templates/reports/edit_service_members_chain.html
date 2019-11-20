@@ -12,6 +12,7 @@
 
             {% if swap_id is not None and swap_id == servicemember.id %}
                 {# editing, show input for new chain member in line #}
+                <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button>
                 <input required name="swap_id">
                 <input type="hidden" name="old_id" value="{{ servicemember.id }}"/>
 
@@ -19,8 +20,7 @@
                     <span class="fas fa-check-square"></span> Ok</button> {#OK#}
             {% else %}
                 {# show normal chain member line with edit button#}
-                <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id" value="{{ servicemember.id }}">
-                    <span class="fas fa-edit"></span></button>
+                <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id" value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button>
                 {{ servicemember.rank.name }} {{ servicemember }}
             {% endif %}
             <hr>

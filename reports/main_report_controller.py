@@ -9,13 +9,27 @@ handle main process for report creation
 """
 from .models import Serviceman
 
-from . import report_content_util as content_util
-from . import report_forms_util as form_util
+from . import report_content_util
+from . import report_forms_util
 
 
-def proceed_report_generation(serviceman_id, report_id, users_tier_chain=None):
-        serviceman = Serviceman.objects.get(id=serviceman_id)
+def generate_report(request, serviceman_id, report_id, members_chain_id_list=None):
+    """
+    Generate report file filled by prepared dict
+    :param serviceman_id:
+    :param report_id:
+    :param members_chain_id_list: serviceman identifiers list
+    :return:
+    """
+    global_merge_dict = {}
 
-        if users_tier_chain is None:
-            users_tier_chain = content_util.get_servicemen_chain_dict(serviceman)
+    serviceman = Serviceman.objects.get(id=serviceman_id)
+
+    if members_chain_id_list is None:
+        members_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
+
+
+
+
+
 
