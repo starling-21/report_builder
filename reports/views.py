@@ -41,7 +41,7 @@ def edit_service_members_chain_view(request, serviceman_id):
             print("Editing_member with id:", request.POST.get('edit_chain_id'))
             swap_id = int(request.POST.get('edit_chain_id'))
 
-        elif 'submit_swap_id' in request.POST:
+        elif 'submit_new_id' in request.POST:
             print("Finishing member editing")
             old_id = request.POST.get('old_id')
             swap_id = request.POST.get('swap_id')
