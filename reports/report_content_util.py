@@ -40,49 +40,51 @@ def get_report_merge_dict(request, serviceman_id, members_chain_id_list=None):
     """
     try:
         global_merge_dict = {}
-        serviceman = Serviceman.objects.get(serviceman_id)
+
+        # creates dictionary of users pairs placed into list of two elements for every report tier
+        # --> {tier:[footer_user, header_user]}
         user_pairs_dict = get_tier_users_pairs(serviceman_id, members_chain_id_list)
         for tier, users in user_pairs_dict.items():
             from_user = users[0]
             to_user = users[1]
 
-            #footer prep
+            # footer preparation
             footer_dict = get_footer_data(from_user)
             footer_dict = append_to_dict_keys(footer_dict, tier)
             global_merge_dict.update(footer_dict)
 
-            #header prep
+            # header preparation
             header_dict = get_header_data(to_user)
             header_dict = append_to_dict_keys(header_dict, tier)
             global_merge_dict.update(header_dict)
 
-            #body prep
+            # report body text preparation
             if tier == 0:
-                report_body_dict = get_main_report_body(request)
+                report_body_dict = compose_main_report_body_from_post_request(request)
             elif tier >= 1:
                 report_body_dict = get_secondary_report_body(serviceman_id)
             report_body_dict = append_to_dict_keys(report_body_dict, tier)
             global_merge_dict.update(report_body_dict)
     except:
-        global_merge_dict = None
+        global_merge_dict = {}
     finally:
         return global_merge_dict
 
 
-def get_main_report_body(input_form_data_dict):
+def compose_main_report_body_from_post_request(input_form_data_dict):
     """
     parse submitted form data, transferred here as POST request
-    returns report body text as string.
-
-    fields_counter - POST request field contains amount of fields to collect together
+    :param input_form_data_dict: POST request field contains amount of fields to collect together
+    :return: returns report body text as dictionary with hard_coded key - "body_tier".
     """
     report_body_dict = {}
     report_body_text = ""
     form_fields_amount = int(input_form_data_dict.get('fields_counter'))
     for i in range(0, form_fields_amount + 1):
         try:
-            #TODO kostul, needs refactoring
-            test_date_conversion_error = datetime.strptime(input_form_data_dict.get(str(i)), "%Y-%m-%d").date() #DO nOt delete
+            # TODO kostul, needs refactoring
+            test_date_conversion_error = datetime.strptime(input_form_data_dict.get(str(i)),
+                                                           "%Y-%m-%d").date()  # DO nOt delete
             report_body_text += datetime_as_day_month_year(input_form_data_dict.get(str(i)))
         except ValueError:
             report_body_text += input_form_data_dict.get(str(i))
@@ -105,7 +107,10 @@ def get_secondary_report_body(serviceman_id):
 
 
 def append_to_dict_keys(dictionary, tier):
-    """adds tier value to every key in a dictionary"""
+    """
+    adds tier value to every key in a dictionary
+    example: key=abc, tier=2 --> abc_2
+    """
     result = {}
     for key, value in dictionary.items():
         result[key + '_' + str(tier)] = value

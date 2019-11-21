@@ -21,6 +21,11 @@ def generate_report(request, serviceman_id, report_id, members_chain_id_list=Non
     :param members_chain_id_list: serviceman identifiers list
     :return:
     """
+    #TODO's
+    # 1) prepare merge dictionary for report
+    # 2) figure out template name
+    # 3) create document by merging
+
     global_merge_dict = {}
 
     serviceman = Serviceman.objects.get(id=serviceman_id)
@@ -28,8 +33,11 @@ def generate_report(request, serviceman_id, report_id, members_chain_id_list=Non
     if members_chain_id_list is None:
         members_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
 
+    global_merge_dict = report_content_util.get_report_merge_dict(request, serviceman_id, members_chain_id_list)
+    print("GLOBAL MERGE DICT:", global_merge_dict)
 
-
+    #TODO impolementaion required
+    return ""
 
 
 

@@ -8,6 +8,7 @@ from .models import Report
 import json
 
 from .forms import ServiceMembersChainEditForm
+from . import main_report_controller as report_controller
 
 
 # Create your views here.
@@ -34,35 +35,36 @@ def edit_service_members_chain_view(request, serviceman_id):
     if request.method == 'POST':
         print("POST from edit_service_members_chain.html")
         for k, v in request.POST.items():
-            print('{}:{}'.format(k, v))
-        print("")
+            print('\n{}:{}'.format(k, v))
 
         if 'edit_chain_id' in request.POST:
             print("Editing_member with id:", request.POST.get('edit_chain_id'))
             swap_id = int(request.POST.get('edit_chain_id'))
 
         elif 'submit_new_id' in request.POST:
-            print("Finishing member editing")
             old_id = request.POST.get('old_id')
             swap_id = request.POST.get('swap_id')
+            print("Finishing member editing")
             print('swap id: {} -> {}'.format(old_id, swap_id))
             print('serviceman chain list:', request.session['serviceman_chain_id_list'])
             replace_index = request.session['serviceman_chain_id_list'].index(int(old_id))
             request.session['serviceman_chain_id_list'][replace_index] = int(swap_id)
-            # swap_id = None
-            # del request.POST['swap_id']
             request.session.modified = True
             print('serviceman chain list:', request.session['serviceman_chain_id_list'])
 
 
         elif 'submit_chain_editting' in request.POST:
             print("submit_chain_editting ---> reports list redirect")
+            #TODO
+            # 1)check if chain edited, then put chain id list in cookiesk
+            # 2)
+
+            print("Session data:")
+            for k, v in request.session.items():
+                print("{}:{}".format(k, v))
             return redirect(reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id}))
 
-        else:
-            print('further post processing')
-            # reder form with current id chain
-            # TODO fill chain and pass to template
+
 
     serviceman = Serviceman.objects.get(id=serviceman_id)
     serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
@@ -94,6 +96,7 @@ def report_filling_view(request, report_id):
         # TODO proceed filled in data
         pass
         print("Processing report filling form data:")
+        # return redirect()
 
     context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)

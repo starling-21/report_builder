@@ -14,9 +14,8 @@
 
 
 
-    {% block extra_head %}
+    {% block extra_head %}{% endblock %}
 
-    {% endblock %}
     {{ form.media }}
 
 </head>
@@ -25,5 +24,7 @@
     {% block content %}
     {% endblock %}
 </div>
+
+{% block js_scripts %}{% endblock %}
 </body>
 </html>
