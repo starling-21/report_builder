@@ -33,35 +33,25 @@ def edit_service_members_chain_view(request, serviceman_id):
     """change servicemen chain if needed"""
     swap_id = None
     if request.method == 'POST':
-        print("POST from edit_service_members_chain.html")
-        for k, v in request.POST.items():
-            print('\n{}:{}'.format(k, v))
-
         if 'edit_chain_id' in request.POST:
             print("Editing_member with id:", request.POST.get('edit_chain_id'))
             swap_id = int(request.POST.get('edit_chain_id'))
-
         elif 'submit_new_id' in request.POST:
             old_id = request.POST.get('old_id')
             swap_id = request.POST.get('swap_id')
-            print("Finishing member editing")
+            print("submit one member editing")
             print('swap id: {} -> {}'.format(old_id, swap_id))
-            print('serviceman chain list:', request.session['serviceman_chain_id_list'])
+            print('old serviceman chain list:', request.session['serviceman_chain_id_list'])
             replace_index = request.session['serviceman_chain_id_list'].index(int(old_id))
             request.session['serviceman_chain_id_list'][replace_index] = int(swap_id)
             request.session.modified = True
-            print('serviceman chain list:', request.session['serviceman_chain_id_list'])
-
-
+            print('updated serviceman chain list:', request.session['serviceman_chain_id_list'])
         elif 'submit_chain_editting' in request.POST:
-            print("submit_chain_editting ---> reports list redirect")
-            #TODO
-            # 1)check if chain edited, then put chain id list in cookiesk
-            # 2)
-
-            print("Session data:")
-            for k, v in request.session.items():
-                print("{}:{}".format(k, v))
+            print("submit_chain_editting")
+            # print("Session data:")
+            # for k, v in request.session.items():
+            #     print("{}:{}".format(k, v))
+            print('serviceman chain list:', request.session['serviceman_chain_id_list'])
             return redirect(reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id}))
 
 
@@ -93,10 +83,14 @@ def reports_list_view(request, serviceman_id):
 def report_filling_view(request, report_id):
     """report filling form view"""
     if request.method == 'POST':
-        # TODO proceed filled in data
-        pass
-        print("Processing report filling form data:")
-        # return redirect()
+        print("Processing filled in report form data:")
+        print("Session data:")
+        for k, v in request.session.items():
+            print("{}:{}".format(k, v))
+        serviceman_id = request.session['serviceman_chain_id_list'][0]
+        serviceman_chain_id_list = request.session['serviceman_chain_id_list']
+        final_dict = report_controller.generate_report(request, serviceman_id, report_id, serviceman_chain_id_list)
+        a = 1
 
     context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)

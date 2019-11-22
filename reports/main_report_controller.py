@@ -37,7 +37,7 @@ def generate_report(request, serviceman_id, report_id, members_chain_id_list=Non
     print("GLOBAL MERGE DICT:", global_merge_dict)
 
     #TODO impolementaion required
-    return ""
+    return global_merge_dict
 
 
 

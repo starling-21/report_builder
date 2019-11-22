@@ -60,13 +60,13 @@ def get_report_merge_dict(request, serviceman_id, members_chain_id_list=None):
 
             # report body text preparation
             if tier == 0:
-                report_body_dict = compose_main_report_body_from_post_request(request)
+                report_body_dict = compose_main_report_body_from_post_request(request.POST.copy())
             elif tier >= 1:
                 report_body_dict = get_secondary_report_body(serviceman_id)
             report_body_dict = append_to_dict_keys(report_body_dict, tier)
             global_merge_dict.update(report_body_dict)
     except:
-        global_merge_dict = {}
+        global_merge_dict = {'error':'report_content_util->get_report_merge_dict'}
     finally:
         return global_merge_dict
 
@@ -103,7 +103,7 @@ def get_secondary_report_body(serviceman_id):
     serviceman = Serviceman.objects.get(id=serviceman_id)
     report_body_text += "Клопочу по суті рапорту " + serviceman.rank.for_name + " " + serviceman.get_full_name_for() + "."
     report_body_dict['body_tier'] = report_body_text
-    return report_body_dict['body_tier']
+    return report_body_dict
 
 
 def append_to_dict_keys(dictionary, tier):
