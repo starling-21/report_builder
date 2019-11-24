@@ -10,34 +10,30 @@ handle main process for report creation
 from .models import Serviceman
 
 from . import report_content_util
-from . import report_forms_util
+from . import document_generator
 
-
-def generate_report(request, serviceman_id, report_id, members_chain_id_list=None):
+def generate_report(request, serviceman_id, members_chain_id_list=None):
     """
-    Generate report file filled by prepared dict
+    Generate report file filled by merge dict based on input params
     :param serviceman_id:
     :param report_id:
     :param members_chain_id_list: serviceman identifiers list
-    :return:
+    :return: report file path
     """
-    #TODO's
-    # 1) prepare merge dictionary for report
-    # 2) figure out template name
-    # 3) create document by merging
-
-    global_merge_dict = {}
-
+    report_merge_dict = {}
     serviceman = Serviceman.objects.get(id=serviceman_id)
 
     if members_chain_id_list is None:
         members_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
 
-    global_merge_dict = report_content_util.get_report_merge_dict(request, serviceman_id, members_chain_id_list)
-    print("GLOBAL MERGE DICT:", global_merge_dict)
+    report_merge_dict = report_content_util.get_report_merge_dict(request, serviceman_id, members_chain_id_list)
 
-    #TODO impolementaion required
-    return global_merge_dict
+    # print("GLOBAL MERGE DICT:", global_merge_dict)
+    for k, v in report_merge_dict.items():
+        print("{} : {}".format(k, v))
 
+    report_filepath = document_generator.create_docx_document(report_merge_dict)
+
+    return report_filepath
 
 

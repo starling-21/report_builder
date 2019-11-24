@@ -124,4 +124,4 @@ dmypy.json
 
 # End of https://www.gitignore.io/api/django
 ### user_generated content reports ###
-/output_reports/
+output_reports/
