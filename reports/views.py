@@ -5,6 +5,7 @@ from reports.models import Serviceman
 from . import report_content_util
 from . import report_forms_util
 from .models import Report
+from .models import Position
 import json
 
 from .forms import ServiceMembersChainEditForm
@@ -32,40 +33,71 @@ def serviceman_list_view(request):
 def edit_service_members_chain_view(request, serviceman_id):
     """change servicemen chain if needed"""
     swap_id = None
+    swap_position_id = None
     if request.method == 'POST':
+        serviceman_chain = request.session['serviceman_chain']
         if 'edit_chain_id' in request.POST:
             print("Editing_member with id:", request.POST.get('edit_chain_id'))
             swap_id = int(request.POST.get('edit_chain_id'))
+        elif 'edit_position_id' in request.POST:
+            print("Editing_member_position with id:", request.POST.get('edit_position_id'))
+            swap_position_id = int(request.POST.get('edit_position_id'))
         elif 'submit_new_id' in request.POST:
-            old_id = request.POST.get('old_id')
+            # old_id = request.POST.get('old_id')
+            old_id = request.POST.get('submit_new_id')
             swap_id = request.POST.get('swap_id')
             print("submit one member editing")
             print('swap id: {} -> {}'.format(old_id, swap_id))
-            print('old serviceman chain list:', request.session['serviceman_chain_id_list'])
-            replace_index = request.session['serviceman_chain_id_list'].index(int(old_id))
-            request.session['serviceman_chain_id_list'][replace_index] = int(swap_id)
+            # print('old serviceman chain list:', request.session['serviceman_chain_id_list'])
+            # replace_index = request.session['serviceman_chain_id_list'].index(int(old_id))
+            # request.session['serviceman_chain_id_list'][replace_index] = int(swap_id)
+            # request.session.modified = True
+            # print('updated serviceman chain list:', request.session['serviceman_chain_id_list'])
+            for member in serviceman_chain:
+                if member.id == int(old_id):
+                    replace_index = serviceman_chain.index(member)
+            new_serviceman = Serviceman.objects.get(id=int(swap_id))
+            serviceman_chain[replace_index] = new_serviceman
+            request.session['serviceman_chain'] = serviceman_chain
             request.session.modified = True
-            print('updated serviceman chain list:', request.session['serviceman_chain_id_list'])
-        elif 'submit_chain_editting' in request.POST:
+        elif 'submit_new_position_id' in request.POST:
+            old_position_id = request.POST.get('submit_new_position_id')
+            swap_position_id = request.POST.get('swap_position_id')
+            is_temp = request.POST.getlist('temporary')
+            print("TEMP:", request.POST.get('temporary'))
+            print("TEMP_list:", request.POST.getlist('temporary'))
+            for member in serviceman_chain:
+                if member.position.id == int(old_position_id):
+                    new_position = Position.objects.get(id=swap_position_id)
+                    member.position = new_position
+                    print("position changed from {} to {}".format(old_position_id, new_position.id))
+        elif 'remove_chain_id' in request.POST:
+            remove_id = request.POST.get('remove_chain_id')
+            for member in serviceman_chain:
+                if member.id == int(remove_id):
+                    replace_index = serviceman_chain.remove(member)
+            request.session['serviceman_chain'] = serviceman_chain
+            request.session.modified = True
+        elif 'submit_chain_editing' in request.POST:
             print("submit_chain_editting")
-            # print("Session data:")
-            # for k, v in request.session.items():
-            #     print("{}:{}".format(k, v))
-            print('serviceman chain list:', request.session['serviceman_chain_id_list'])
+
+            # print('serviceman chain list:', request.session['serviceman_chain_id_list'])
             return redirect(reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id}))
 
+    elif request.method == 'GET':
+        serviceman = Serviceman.objects.get(id=serviceman_id)
+        serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
+        # serviceman_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
+        # request.session['serviceman_chain_id_list'] = serviceman_chain_id_list
 
+        request.session['serviceman_chain'] = serviceman_chain
+        request.session.modified = True
 
-    serviceman = Serviceman.objects.get(id=serviceman_id)
-    serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
-    serviceman_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
-
-    request.session['serviceman_chain_id_list'] = serviceman_chain_id_list
-    request.session.modified = True
-
+    serviceman_chain = request.session['serviceman_chain']
     context = {
         'serviceman_chain': serviceman_chain,
-        'swap_id': swap_id
+        'swap_id': swap_id,
+        'swap_position_id': swap_position_id
     }
     return render(request, 'reports/edit_service_members_chain.html', context)
 
@@ -87,12 +119,14 @@ def report_filling_view(request, report_id):
         print("Session data:")
         for k, v in request.session.items():
             print("{}:{}".format(k, v))
-        serviceman_id = request.session['serviceman_chain_id_list'][0]
-        serviceman_chain_id_list = request.session['serviceman_chain_id_list']
-        report_filepath = report_controller.generate_report(request, serviceman_id, serviceman_chain_id_list)
+        # serviceman_chain = request.session['serviceman_chain']
+        # report_filepath = report_controller.generate_report(request, serviceman_id, serviceman_chain_id_list)
+
+        report_filepath = report_controller.generate_report(request)
         a = 1
         #TODO return document in new tab after redirect
 
+    # print(request.session['serviceman_chain'])
     context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
 
@@ -181,42 +215,10 @@ def report_filling_view(request, report_id):
 #     return render(request, 'reports/test_report_1.html', {'form': form_2})
 
 
-# =======================================================================================================================
-# =======================================================================================================================
-# =======================================================================================================================
-# def generate_report_view(request, user_id=5):
-#     """generate test report """
-# ----
-# TESC BULK report generation
-# users = Serviceman.objects.filter(id__gt=1)
-# for user in users:
-#     sample_user = get_serviceman(user.id)
-#     # GET ALL Footers and Headers REPORT CHAIN
-#     merge_dict = get_global_report_merge_dict(sample_user)
-#
-#     if merge_dict is None:
-#         return HttpResponse("report generation (___ERROR___)!!!!")
-#
-#     # TODO add method for report body generation
-#     merge_dict.update(get_body_text())
-#     generate_report(merge_dict, template_name="template_universal.docx", report_name='t2')
-#     sleep(1)
-# ----
-
-
-# ---***
-# user_id = 5
-# user = get_serviceman(user_id)
-# # GET ALL Footers and Headers REPORT CHAIN
-# merge_dict = get_global_report_merge_dict(user)
-#
-# if merge_dict is None:
-#     return HttpResponse("report generation (___ERROR___)!!!!")
-#
-# # TODO add method for report body generation
-# merge_dict.update(get_report_body_text())
-# filepath = generate_report(merge_dict, template_name="template_universal.docx", report_name='t2')
-#
-# # return HttpResponse("REPORT has been generated SUCCESSFULLY")
-# return FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filepath.split('\\')[-1])
-# ---***
+#DOCX GENERATION
+# return HttpResponse("REPORT has been generated SUCCESSFULLY")
+#     response = FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filepath.split('\\')[-1])
+#     # response['Content-Type'] = 'application/octet-stream'
+#     # response['Content-Disposition'] = 'attachment;filename="{0}"'.format(filepath.split('\\')[-1]);
+#     # response['Content-Length'] = os.path.getsize(filepath)
+#     return response;

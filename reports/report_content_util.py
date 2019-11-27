@@ -28,22 +28,22 @@ from django.db.models import Q
 from datetime import datetime
 
 
-def get_report_merge_dict(request, serviceman_id, members_chain_id_list=None):
+def get_report_merge_dict(request):
     """
     creates user pairs dictionary for every report tier --> {tier:[footer_user, header_user]}
     iterate throught tiers dict and put data to global_merge_dict, by changing merge dict keys like {key_<tier_number>:value_to_merge}
 
     :param request: post request from filled form
-    :param serviceman_id:
-    :param members_chain_id_list:
-    :return:
+    :return: global merge dictionary
     """
     try:
         global_merge_dict = {}
 
-        # creates dictionary of users pairs placed into list of two elements for every report tier
-        # --> {tier:[footer_user, header_user]}
-        user_pairs_dict = get_tier_users_pairs(serviceman_id, members_chain_id_list)
+        serviceman_chain = request.session['serviceman_chain']
+        serviceman_id = serviceman_chain[0].id
+
+        # user_pairs_dict = get_tier_users_pairs(serviceman_id, members_chain_id_list)
+        user_pairs_dict = convert_members_chain_to_pairs_dict(serviceman_chain)
         for tier, users in user_pairs_dict.items():
             from_user = users[0]
             to_user = users[1]
@@ -130,16 +130,34 @@ def get_tier_users_pairs(serviceman_id, members_chain_id_list=None):
     else:
         for id in members_chain_id_list:
             users_chain.append(Serviceman.objects.get(id=id))
-    tiers_dict = {}
-    if len(users_chain) < 2:
-        return None
-    elif len(users_chain) == 2:
-        tiers_dict[0] = [users_chain[0], users_chain[1]]
-    elif len(users_chain) > 2:
-        for i in range(0, len(users_chain) - 1):
-            tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
-    return tiers_dict
 
+    return convert_members_chain_to_pairs_dict(users_chain)
+    # tiers_dict = {}
+    # if len(users_chain) < 2:
+    #     return None
+    # elif len(users_chain) == 2:
+    #     tiers_dict[0] = [users_chain[0], users_chain[1]]
+    # elif len(users_chain) > 2:
+    #     for i in range(0, len(users_chain) - 1):
+    #         tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
+    # return tiers_dict
+
+
+def convert_members_chain_to_pairs_dict(servicemen_chain_list):
+    """
+    convert members list to chain member pairs
+    :param servicemen_chain_list: users objects list
+    :return: servicemen tiers chain dictionary {'report tier number':[users pair]}
+    """
+    tiers_dict = {}
+    if len(servicemen_chain_list) < 2:
+        return None
+    elif len(servicemen_chain_list) == 2:
+        tiers_dict[0] = [servicemen_chain_list[0], servicemen_chain_list[1]]
+    elif len(servicemen_chain_list) > 2:
+        for i in range(0, len(servicemen_chain_list) - 1):
+            tiers_dict[i] = [servicemen_chain_list[i], servicemen_chain_list[i + 1]]
+    return tiers_dict
 
 # def get_tier_users_pairs(users_chain_id_list):
 #     """users_chain_id_list - users_chain identifiers list.
@@ -176,7 +194,7 @@ def get_tier_users_pairs(serviceman_id, members_chain_id_list=None):
 def get_servicemen_chain_list(serviceman):
     """return service members chain from initiator too the top level supervisor
        RECURSIVE METHOD, be carefull :)
-       return identifiers list like [33,12,5,1]
+       return servicemen objects list
     """
     users_list = []
     # serviceman = Serviceman.objects.get(id=serviceman_id)

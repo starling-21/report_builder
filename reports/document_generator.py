@@ -17,6 +17,13 @@ def create_docx_document(merge_dict):
     """
 
     template_name = UNIVERSAL_TEMPLATE_NAME
+    if not os.path.exists(OUTPUT_REPORTS_DIR):
+        try:
+            os.mkdir(OUTPUT_REPORTS_DIR)
+        except OSError:
+            print("Creation of the directory %s failed" % OUTPUT_REPORTS_DIR)
+        else:
+            print("Successfully created the directory %s " % OUTPUT_REPORTS_DIR)
     template_path = os.path.join(REPORT_TEMPLATES_DIR, template_name)
     document = MailMerge(template_path)
     print("Merge fields at {} document: {}".format(template_name, document.get_merge_fields()))
@@ -25,16 +32,3 @@ def create_docx_document(merge_dict):
     merged_file_path = os.path.join(OUTPUT_REPORTS_DIR, now.strftime("%d %H_%M_%S") + '_report.docx')
     document.write(merged_file_path)
     return merged_file_path
-
-
-#
-# def generate_report(merge_dict, template_name="template_universal.docx", report_name="rep"):
-#     """generate report document and return path to it"""
-#     template_path = os.path.join(REPORT_TEMPLATES_DIR, template_name)
-#     document = MailMerge(template_path)
-#     print("Fields included in {}: {}".format(template_name, document.get_merge_fields()))
-#     document.merge(**merge_dict)
-#     now = datetime.now()
-#     merged_file_path = os.path.join(OUTPUT_REPORTS_DIR, now.strftime("%d %H%M-%S") + '_' + report_name + '.docx')
-#     document.write(merged_file_path)
-#     return merged_file_path
