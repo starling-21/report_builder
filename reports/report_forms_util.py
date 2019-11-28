@@ -120,7 +120,6 @@ def get_raw_form_fields(parts_dict):
         elif field_dict['type'] == "int":
             form_content_dict[key] = forms.CharField(
                 label="",
-                # error_messages={"mst1": field_dict['title']},
                 widget=forms.TextInput(attrs={"class": "form-control", 'size': 3}),
                 initial=777
             )

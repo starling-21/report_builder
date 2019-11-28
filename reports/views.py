@@ -46,14 +46,19 @@ def edit_service_members_chain_view(request, serviceman_id):
             old_id = request.POST.get('submit_new_id')
             swap_id = request.POST.get('swap_id')
             print('id swap: {} -> {}'.format(old_id, swap_id))
-            current_position = Serviceman.objects.get(id=swap_id).position
-            temp_position = current_position.temp_supervisor = True
             for member in serviceman_chain:
                 if member.id == int(old_id):
                     replace_index = serviceman_chain.index(member)
+            #update position as temp
+            positions_list = request.session['positions_list']
+            current_position = positions_list[replace_index]
+            current_position.temp_supervisor = True
+            updated_position = current_position
+            #replace member in chain
             new_serviceman = Serviceman.objects.get(id=int(swap_id))
-            new_serviceman.position = temp_position
+            new_serviceman.position = updated_position
             serviceman_chain[replace_index] = new_serviceman
+
             request.session['serviceman_chain'] = serviceman_chain
             request.session.modified = True
         elif 'submit_new_position_id' in request.POST:
@@ -87,11 +92,13 @@ def edit_service_members_chain_view(request, serviceman_id):
         serviceman = Serviceman.objects.get(id=serviceman_id)
         serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
 
+        positions_list = [member.position for member in serviceman_chain]
+        request.session['positions_list'] = positions_list
         request.session['serviceman_chain'] = serviceman_chain
         request.session.modified = True
 
-    positions_list = [member.position.id for member in serviceman_chain]
-    print("positions:", positions_list)
+    # positions_list = [member.position.id for member in serviceman_chain]
+    # print("positions:", positions_list)
     serviceman_chain = request.session['serviceman_chain']
     context = {
         'serviceman_chain': serviceman_chain,
