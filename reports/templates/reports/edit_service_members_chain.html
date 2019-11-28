@@ -12,23 +12,22 @@
             {# editing chain member id, show input field for new chain member in chain members line #}
             {% if swap_id == servicemember.id %}
 {#                <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button> {#chain editing button#}
-                New servicemember:
+                New servicemember:<br>
                 <input name="swap_id">
-{#                <input type="hidden" name="old_id" value="{{ servicemember.id }}"/>#}
-
                 <button type="submit" class="btn btn-light btn-sm" name="submit_new_id" value="{{ servicemember.id }}">
                     <span class="fas fa-check-square"></span> Ok</button> {#submit chain member id editing button#}
+
             {% elif swap_position_id == servicemember.position.id %}
                 New servicemember position:
-                <input type="checkbox" name="temporary" value="AAA">TBO<br>
+                <input type="checkbox" name="temporary" value="True">TBO<br>
                 <input name="swap_position_id">
                 <button type="submit" class="btn btn-light btn-sm" name="submit_new_position_id" value="{{ servicemember.position.id }}">
                     <span class="fas fa-check-square"></span> Ok</button> {#submit new position id button#}
 
             {% else %}
                 {# --------------------------------------------- #}
-                {# show normal chain member line with edit button#}
-                <button disabled type="submit" class="btn btn-light btn-sm" name="remove_chain_id" value="{{ servicemember.id }}"><span class="far fa-trash-alt"></span></button>
+                {# show NORMAL CHAIN member line #}
+{#                <button disabled type="submit" class="btn btn-light btn-sm" name="remove_chain_id" value="{{ servicemember.id }}"><span class="far fa-trash-alt"></span></button>#}
                 <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id" value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button>
                 {{ servicemember.rank.name }} {{ servicemember }} : <br>
                 <button type="submit" class="btn btn-light btn-sm" name="edit_position_id" value="{{ servicemember.position.id }}"><span class="fas fa-edit"></span></button>

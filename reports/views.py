@@ -43,20 +43,16 @@ def edit_service_members_chain_view(request, serviceman_id):
             print("Editing_member_position with id:", request.POST.get('edit_position_id'))
             swap_position_id = int(request.POST.get('edit_position_id'))
         elif 'submit_new_id' in request.POST:
-            # old_id = request.POST.get('old_id')
             old_id = request.POST.get('submit_new_id')
             swap_id = request.POST.get('swap_id')
-            print("submit one member editing")
-            print('swap id: {} -> {}'.format(old_id, swap_id))
-            # print('old serviceman chain list:', request.session['serviceman_chain_id_list'])
-            # replace_index = request.session['serviceman_chain_id_list'].index(int(old_id))
-            # request.session['serviceman_chain_id_list'][replace_index] = int(swap_id)
-            # request.session.modified = True
-            # print('updated serviceman chain list:', request.session['serviceman_chain_id_list'])
+            print('id swap: {} -> {}'.format(old_id, swap_id))
+            current_position = Serviceman.objects.get(id=swap_id).position
+            temp_position = current_position.temp_supervisor = True
             for member in serviceman_chain:
                 if member.id == int(old_id):
                     replace_index = serviceman_chain.index(member)
             new_serviceman = Serviceman.objects.get(id=int(swap_id))
+            new_serviceman.position = temp_position
             serviceman_chain[replace_index] = new_serviceman
             request.session['serviceman_chain'] = serviceman_chain
             request.session.modified = True
@@ -64,6 +60,7 @@ def edit_service_members_chain_view(request, serviceman_id):
             old_position_id = request.POST.get('submit_new_position_id')
             swap_position_id = request.POST.get('swap_position_id')
             is_temp = request.POST.getlist('temporary')
+            print("position swap: {} --> {}".format(old_position_id, swap_position_id))
             print("TEMP:", request.POST.get('temporary'))
             print("TEMP_list:", request.POST.getlist('temporary'))
             for member in serviceman_chain:
@@ -71,6 +68,8 @@ def edit_service_members_chain_view(request, serviceman_id):
                     new_position = Position.objects.get(id=swap_position_id)
                     member.position = new_position
                     print("position changed from {} to {}".format(old_position_id, new_position.id))
+            request.session['serviceman_chain'] = serviceman_chain
+            request.session.modified = True
         elif 'remove_chain_id' in request.POST:
             remove_id = request.POST.get('remove_chain_id')
             for member in serviceman_chain:
@@ -87,12 +86,12 @@ def edit_service_members_chain_view(request, serviceman_id):
     elif request.method == 'GET':
         serviceman = Serviceman.objects.get(id=serviceman_id)
         serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
-        # serviceman_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
-        # request.session['serviceman_chain_id_list'] = serviceman_chain_id_list
 
         request.session['serviceman_chain'] = serviceman_chain
         request.session.modified = True
 
+    positions_list = [member.position.id for member in serviceman_chain]
+    print("positions:", positions_list)
     serviceman_chain = request.session['serviceman_chain']
     context = {
         'serviceman_chain': serviceman_chain,
