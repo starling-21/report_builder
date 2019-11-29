@@ -20,12 +20,6 @@ def generate_report(request):
     :return: report file path
     """
     report_merge_dict = {}
-
-    # if members_chain_id_list is None:
-    #     members_chain_id_list = report_content_util.get_servicemen_chain_id_list(serviceman_id)
-
-    # report_merge_dict = report_content_util.get_report_merge_dict(request, serviceman_id, members_chain_id_list)
-
     report_merge_dict = report_content_util.get_report_merge_dict(request)
 
     # print("GLOBAL MERGE DICT:", global_merge_dict)

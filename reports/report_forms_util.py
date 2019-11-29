@@ -121,7 +121,7 @@ def get_raw_form_fields(parts_dict):
             form_content_dict[key] = forms.CharField(
                 label="",
                 widget=forms.TextInput(attrs={"class": "form-control", 'size': 3}),
-                initial=777
+                initial=2019
             )
         elif field_dict['type'] == "date":
             form_content_dict[key] = forms.DateField(
@@ -140,14 +140,14 @@ def get_raw_form_fields(parts_dict):
                 label="",
                 help_text=field_dict['title'],
                 widget=forms.TextInput(attrs={"class": "form-control", 'size': 100}),
-                initial="--тестовая строка--"
+                initial="сімейними обставинами"
             )
         elif field_dict['type'] == "text":
             form_content_dict[key] = forms.CharField(
                 label="",
                 help_text=field_dict['title'],
                 widget=forms.Textarea(attrs={"cols": 120, "rows": 4, "wrap": "hard"}),
-                initial="--тестовая текстовка--"
+                initial="сімейними обставинами"
             )
 
         # extra field (conter for labels and input fields in form)

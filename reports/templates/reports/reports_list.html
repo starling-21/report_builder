@@ -2,7 +2,8 @@
 {#{% load static %}#}
 
 {% block content %}
-    <p>Report generation for user: {{ user }}</p>
+    <p>Оберіть тематику рапорту: user: {{ user }}</p>
+    <hr>
     {% for report in reports_list %}
         <ul>
             <li>
@@ -10,4 +11,5 @@
             </li>
         </ul>
     {% endfor %}
+    <hr>
 {% endblock %}

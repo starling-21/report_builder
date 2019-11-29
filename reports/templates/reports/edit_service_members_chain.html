@@ -4,40 +4,42 @@
 {% include "django/forms/widgets/input.html" %}
 
 {% block content %}
-    <p>Edit servicemembers chain:</p>
+    <p><u><i>Всі "посередники":</i></u></p>
 
     <form method="POST">{% csrf_token %}
+        <hr>
+        <hr>
         {% for servicemember in serviceman_chain %}
-
             {# editing chain member id, show input field for new chain member in chain members line #}
             {% if swap_id == servicemember.id %}
-{#                <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button> {#chain editing button#}
-                New servicemember:<br>
-                <input name="swap_id">
+                {#                <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button> {#chain editing button#}
+                New servicemember:
+                <br><input name="swap_id">
                 <button type="submit" class="btn btn-light btn-sm" name="submit_new_id" value="{{ servicemember.id }}">
-                    <span class="fas fa-check-square"></span> Ok</button> {#submit chain member id editing button#}
-
-            {% elif swap_position_id == servicemember.position.id %}
-                New servicemember position:
-                <input type="checkbox" name="temporary" value="True">TBO<br>
-                <input name="swap_position_id">
-                <button type="submit" class="btn btn-light btn-sm" name="submit_new_position_id" value="{{ servicemember.position.id }}">
-                    <span class="fas fa-check-square"></span> Ok</button> {#submit new position id button#}
+                    <span class="fas fa-check-square"></span> Ok
+                </button> {#submit chain member id editing button#}
 
             {% else %}
-                {# --------------------------------------------- #}
                 {# show NORMAL CHAIN member line #}
-{#                <button disabled type="submit" class="btn btn-light btn-sm" name="remove_chain_id" value="{{ servicemember.id }}"><span class="far fa-trash-alt"></span></button>#}
-                <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id" value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button>
-                {{ servicemember.rank.name }} {{ servicemember }} : <br>
-                <button type="submit" class="btn btn-light btn-sm" name="edit_position_id" value="{{ servicemember.position.id }}"><span class="fas fa-edit"></span></button>
-                {{ servicemember.position }} <br>
+                {{ servicemember.rank.name }} {{ servicemember }}
+                <br>{{ servicemember.position }}
+                <br>
+                {% if not forloop.first %}
+                    <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id"
+                            value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button>
+                {% endif %}
+                {% if not forloop.first and not forloop.last %}
+                    <button type="submit" class="btn btn-light btn-sm" name="remove_chain_id"
+                            value="{{ servicemember.id }}"><span class="far fa-trash-alt"></span></button>
+                {% endif %}
+
             {% endif %}
             <hr>
             <hr>
         {% endfor %}
 
-        <input type="submit" class="btn btn-info" name="submit_chain_editing" value="Next"/>
+
+        <input type="submit" class="btn btn-info" name="submit_chain_editing" value="Далі"/>
     </form>
 
 

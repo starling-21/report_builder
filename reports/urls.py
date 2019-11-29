@@ -20,18 +20,15 @@ from . import views
 app_name = "reports"
 
 urlpatterns = [
-
     # path('', views.report_home_view, name='index'),
     path('', views.serviceman_list_view, name='users'),
     path('serviceman_list', views.serviceman_list_view, name='users'),
     path('edit_chain/<int:serviceman_id>', views.edit_service_members_chain_view, name='edit_service_members_chain'),
-    path('reports_list/<int:serviceman_id>/', views.reports_list_view, name='reports_list'),
-    path('report_filling/<int:report_id>/', views.report_filling_view, name='report_filling'),
+    path('reports_list/<int:serviceman_id>', views.reports_list_view, name='reports_list'),
+    path('report_filling/<int:report_id>', views.report_filling_view, name='report_filling'),
+    path('final_report', views.return_report_document_view, name='final_report'),
 
-    # path('generate_report', views.generate_report_view, name='generate_report'),
-
-    # path('form', views.dyn_form_view, name='form'),
-    # path('test_form', views.test_form_view, name='test_form'),
+    path('test_view_for_redirect/', views.test_view_1, name='test_view_1')
+    # path('test_view_for_redirect/', views.test_view_1, name='test_view')
 
 ]
-
