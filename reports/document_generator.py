@@ -22,11 +22,11 @@ def create_docx_document(merge_dict):
             os.mkdir(OUTPUT_REPORTS_DIR)
         except OSError:
             print("Creation of the directory %s failed" % OUTPUT_REPORTS_DIR)
-        else:
-            print("Successfully created the directory %s " % OUTPUT_REPORTS_DIR)
+        # else:
+            # print("Successfully created the directory %s " % OUTPUT_REPORTS_DIR)
     template_path = os.path.join(REPORT_TEMPLATES_DIR, template_name)
     document = MailMerge(template_path)
-    print("Merge fields at {} document: {}".format(template_name, document.get_merge_fields()))
+    # print("Merge fields at {} document: {}".format(template_name, document.get_merge_fields()))
     document.merge(**merge_dict)
     now = datetime.now()
     merged_file_path = os.path.join(OUTPUT_REPORTS_DIR, now.strftime("%d %H_%M_%S") + '_report.docx')

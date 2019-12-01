@@ -1,18 +1,16 @@
-from django.http import HttpResponse, HttpResponseRedirect
+import os
+import datetime
+from django.contrib import messages
 from django.http import FileResponse
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, reverse
 
-
-
 from reports.models import Serviceman
+from .models import Report
+
+from . import main_report_controller as report_controller
 from . import report_content_util
 from . import report_forms_util
-from .models import Report
-from .models import Position
-import json
-
-from .forms import ServiceMembersChainEditForm
-from . import main_report_controller as report_controller
 
 
 # Create your views here.
@@ -36,15 +34,12 @@ def serviceman_list_view(request):
 def edit_service_members_chain_view(request, serviceman_id):
     """change servicemen chain if needed"""
     swap_id = None
-    swap_position_id = None
     if request.method == 'POST':
         serviceman_chain = request.session['serviceman_chain']
         if 'edit_chain_id' in request.POST:
             print("Editing_member with id:", request.POST.get('edit_chain_id'))
             swap_id = int(request.POST.get('edit_chain_id'))
-        # elif 'edit_position_id' in request.POST:
-        #     print("Editing_member_position with id:", request.POST.get('edit_position_id'))
-        #     swap_position_id = int(request.POST.get('edit_position_id'))
+
         elif 'submit_new_id' in request.POST:
             old_id = request.POST.get('submit_new_id')
             swap_id = request.POST.get('swap_id')
@@ -52,12 +47,6 @@ def edit_service_members_chain_view(request, serviceman_id):
             for member in serviceman_chain:
                 if member.id == int(old_id):
                     replace_index = serviceman_chain.index(member)
-
-
-
-
-
-
             #change position to temporary and unit
             initial_member_position = request.session['initial_serviceman_chain'][replace_index].position
             initial_member_position.temp_supervisor = True
@@ -79,9 +68,6 @@ def edit_service_members_chain_view(request, serviceman_id):
             request.session.modified = True
         elif 'submit_chain_editing' in request.POST:
             print("submit_chain_editting")
-
-            # print('serviceman chain list:', request.session['serviceman_chain_id_list'])
-            a = reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id})
             return redirect(reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id}))
 
     elif request.method == 'GET':
@@ -95,17 +81,17 @@ def edit_service_members_chain_view(request, serviceman_id):
     context = {
         'serviceman_chain': serviceman_chain,
         'swap_id': swap_id,
-        # 'swap_position_id': swap_position_id
     }
     return render(request, 'reports/edit_service_members_chain.html', context)
 
 
 def reports_list_view(request, serviceman_id):
     """show reports titles list to choose"""
-    # serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name()
+    serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
     reports_list = Report.objects.all()
     context = {
-        'reports_list': reports_list
+        'reports_list': reports_list,
+        'serviceman': serviceman
     }
     return render(request, 'reports/reports_list.html', context)
 
@@ -117,22 +103,14 @@ def report_filling_view(request, report_id):
         print("Session data:")
         for k, v in request.session.items():
             print("{}:{}".format(k, v))
-        # serviceman_chain = request.session['serviceman_chain']
-        # report_filepath = report_controller.generate_report(request, serviceman_id, serviceman_chain_id_list)
-
         document_file_path = report_controller.generate_report(request)
-        #TODO pass params NOT in URL
         request.session['report_file_path'] = document_file_path
         request.session.modified = True
-        # return redirect(reverse(test_view_1))
         return redirect(reverse('reports:final_report'))
+        # messages.add_message(request, messages.INFO, "REPORT LINK")
 
     context = report_forms_util.get_report_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
-
-
-def test_view_1(request):
-    return HttpResponse("<h1>Redirect is DONE!</h1>")
 
 
 def return_report_document_view(request):
@@ -140,19 +118,27 @@ def return_report_document_view(request):
     generate final document report
     :return: report docx report
     """
-    # response = FileResponse(open(document_file_path, 'rb'), as_attachment=True, filename=document_file_path.split('\\')[-1])
 
-    # response['Content-Type'] = 'application/octet-stream'
-    # response['Content-Disposition'] = 'attachment;filename="{0}"'.format(filepath.split('\\')[-1]);
-    # response['Content-Length'] = os.path.getsize(filepath)
-    # return response;
-    return HttpResponse("<return_report_document_view> : {}".format(request.session['report_file_path']))
+    document_file_path = request.session['report_file_path']
+    response = FileResponse(open(document_file_path, 'rb'), as_attachment=True, filename=document_file_path.split('\\')[-1])
+
+    now = datetime.datetime.now()
+    download_report_file_name = 'report ' + now.strftime("%Y-%m-%d_%H-%M") + '.' + document_file_path.rsplit('.', 1)[-1]
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(download_report_file_name);
+    response['Content-Length'] = os.path.getsize(document_file_path)
+    return response
 
 
-#DOCX GENERATION
-# return HttpResponse("REPORT has been generated SUCCESSFULLY")
-#     response = FileResponse(open(filepath, 'rb'), as_attachment=True, filename=filepath.split('\\')[-1])
-#     # response['Content-Type'] = 'application/octet-stream'
-#     # response['Content-Disposition'] = 'attachment;filename="{0}"'.format(filepath.split('\\')[-1]);
-#     # response['Content-Length'] = os.path.getsize(filepath)
-#     return response;
+def member_search_view(request):
+    print("Search request, method", request.method)
+    if request.method == 'POST':
+        for k,v in request.POST.items():
+            print("{}:{}".format(k,v))
+    elif request.is_ajax():
+        print("AJAX")
+    servicemembers_list = Serviceman.objects.all()
+    context = {
+        'servicemembers_list': servicemembers_list,
+    }
+    return render(request, 'reports/test_search_user.html', context)

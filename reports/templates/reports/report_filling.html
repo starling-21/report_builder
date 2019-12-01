@@ -18,7 +18,22 @@
             {{ field }}
         </div>
     {% endfor %}
+    <br>
+    <br>
+    <input type="submit" class="btn btn-info" name="submit_form" value="Згенерувати рапорт"/>
 
-    <hr>
-    <input type="submit" class="btn btn-info" name="submit_form" value="Далі"/>
+{#    <hr>#}
+{#    {% if not messages %}#}
+{#        <input type="submit" class="btn btn-info" name="submit_form" value="Згенерувати рапорт"/>#}
+{#    {% else %}#}
+{#        <input type="submit" class="btn btn-info" name="submit_form" value="Згенерувати рапорт ще раз"/>#}
+{#        <br>#}
+{#        <br>#}
+{##}
+{#        {% for message in messages %}#}
+{#            <div class="alert alert-success" role="alert" style="width:50%;"}>#}
+{#            Рапорт згенеровано: <a href="{%  url "reports:final_report" %}" class="alert-link"><i class="far fa-file-word"></i><u> завантажити файл</u></a>#}
+{#            <div>#}
+{#        {% endfor %}#}
+{#    {% endif %}#}
 {% endblock %}

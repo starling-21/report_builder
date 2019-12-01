@@ -1,0 +1,63 @@
+{% extends 'reports/base.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-6">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="text" id="searched_data">
+{#                    <input type="submit" value="Ok" id="selection-button">#}
+                </form>
+                <input class="start-button" type="submit" value="Ok" id="selection-button">
+            </div>
+
+
+{#            <div class="col-6">#}
+{#                <form method="POST">#}
+{#                    {% csrf_token %}#}
+{#                    <select id="member-selected">#}
+{#                        {% for serviceman in servicemembers_list %}#}
+{#                            <option value="{{ serviceman.id }}">#}
+{#                                {{ serviceman }}#}
+{#                            </option>#}
+{#                        {% endfor %}#}
+{#                    </select>#}
+{#                    <input type="submit" value="Ok" id="selection-button">#}
+{#                </form>#}
+{#            </div>#}
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block js_scripts %}
+    <script type="application/javascript">
+        var csrf_token = {% csrf_token %}
+
+        $(".start-button").click(function (event) {
+            alert("clicked");
+            event.preventDefault();
+            searched_input = $('#searched_data').val();
+            $.ajax({
+                url: 'search_member',
+                method: 'POST',
+                data: {
+                    filter_category: parseInt(searched_input),
+                    user_filter: '123',
+                    csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    console.log(data)
+                },
+                error: function (error_data) {
+                    console.log("error")
+                    console.log(error_data)
+                }
+            })
+        });
+    </script>
+
+{% endblock %}

@@ -4,6 +4,16 @@
 {% include "django/forms/widgets/input.html" %}
 
 {% block content %}
+{#    {% for message in messages %}#}
+{#        <div class="alert {{ message.tags }} alert-success" role="alert">#}
+{#            <button type="button" class="close" data-dismiss="alert" aria-label="Close">#}
+{#                <span aria-hidden="true">&times;</span>#}
+{#            </button>#}
+{#            {{ message }}#}
+{#        </div>#}
+{#    {% endfor %}#}
+
+
     <p><u><i>Всі "посередники":</i></u></p>
 
     <form method="POST">{% csrf_token %}
@@ -30,7 +40,7 @@
                 {% endif %}
                 {% if not forloop.first and not forloop.last %}
                     <button type="submit" class="btn btn-light btn-sm" name="remove_chain_id"
-                            value="{{ servicemember.id }}"><span class="far fa-trash-alt"></span></button>
+                            value="{{ servicemember.id }}" onclick="return window.confirm('Are you sure?')"><span class="far fa-trash-alt"></span></button>
                 {% endif %}
 
             {% endif %}
