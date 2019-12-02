@@ -7,6 +7,7 @@ from django.shortcuts import render, redirect, reverse
 
 from reports.models import Serviceman
 from .models import Report
+import json
 
 from . import main_report_controller as report_controller
 from . import report_content_util
@@ -133,12 +134,26 @@ def return_report_document_view(request):
 def member_search_view(request):
     print("Search request, method", request.method)
     if request.method == 'POST':
-        for k,v in request.POST.items():
-            print("{}:{}".format(k,v))
+        # for k,v in request.POST.items():
+        #     print("{}:{}".format(k,v))
+        filter_param = request.POST.get('filter_param')
+        query_set = Serviceman.objects.filter(first_name__contains=filter_param)
+        service_members_list = []
+        for member in query_set:
+            service_members_list.append({'id': member.id, 'name': member.rank.__str__() + ' ' + member.get_first_last_name()})
+        if len(service_members_list) > 0:
+            result = json.dumps(service_members_list)
+            return HttpResponse(result)
+        else:
+            service_members_list.append({'id': -1, 'name': '----------'})
+            return HttpResponse(json.dumps(service_members_list))
     elif request.is_ajax():
         print("AJAX")
-    servicemembers_list = Serviceman.objects.all()
+
+    if request.method == 'GET':
+        service_members_list = Serviceman.objects.all()
+
     context = {
-        'servicemembers_list': servicemembers_list,
+        'service_members_list': service_members_list,
     }
     return render(request, 'reports/test_search_user.html', context)

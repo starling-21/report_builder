@@ -3,29 +3,50 @@
 {% block content %}
     <div class="container">
         <div class="row">
-            <div class="col-6">
+            <div class="col-4">
                 <form method="POST">
                     {% csrf_token %}
                     <input type="text" id="searched_data">
-{#                    <input type="submit" value="Ok" id="selection-button">#}
+                    <input id="search-button" type="submit" value="Ok">
                 </form>
-                <input class="start-button" type="submit" value="Ok" id="selection-button">
             </div>
 
 
-{#            <div class="col-6">#}
-{#                <form method="POST">#}
-{#                    {% csrf_token %}#}
+            <div class="col-4">
+                <form method="POST">
+                    {% csrf_token %}
+                        <div id="test_members">
+                            {% for serviceman in service_members_list %}
+                                {{ serviceman.rank }} {{ serviceman }}<br>
+                            {% endfor %}
+                        </div>
 {#                    <select id="member-selected">#}
-{#                        {% for serviceman in servicemembers_list %}#}
+{#                        {% for serviceman in service_members_list %}#}
 {#                            <option value="{{ serviceman.id }}">#}
 {#                                {{ serviceman }}#}
 {#                            </option>#}
 {#                        {% endfor %}#}
 {#                    </select>#}
 {#                    <input type="submit" value="Ok" id="selection-button">#}
-{#                </form>#}
-{#            </div>#}
+                </form>
+            </div>
+
+
+            <div class="col-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div id="test_members">
+                        <select id="member-selected">
+                            {% for serviceman in service_members_list %}
+                                <option value="{{ serviceman.id }}">
+                                    {{ serviceman.rank }} {{ serviceman }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="submit" value="Ok" id="selection-button">
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -33,31 +54,42 @@
 
 
 {% block js_scripts %}
-    <script type="application/javascript">
-        var csrf_token = {% csrf_token %}
 
-        $(".start-button").click(function (event) {
-            alert("clicked");
+    <script>
+        var csrf_token = '{{ csrf_token }}';
+        $('#search-button').click(function (event) {
             event.preventDefault();
-            searched_input = $('#searched_data').val();
+            var searched_input = $('#searched_data').val();
             $.ajax({
                 url: 'search_member',
                 method: 'POST',
                 data: {
-                    filter_category: parseInt(searched_input),
-                    user_filter: '123',
-                    csrfmiddlewaretoken: document.getElementsByName('csrfmiddlewaretoken')[0].value,
+                    csrfmiddlewaretoken: csrf_token,
+                    filter_param: searched_input
                 },
                 dataType: 'json',
                 success: function (data) {
+                    console.log("success")
                     console.log(data)
+                    {#$('#test_members').html("data")#}
+                    parse_response(data)
                 },
                 error: function (error_data) {
                     console.log("error")
                     console.log(error_data)
                 }
-            })
+            });
         });
+
+        function parse_response(data_arr) {
+            $('#test_members').html('')
+            data_arr.forEach(function (arrayItem) {
+                var x = arrayItem.id
+                var name = arrayItem.name
+                $('#test_members').append(name + '<br>')
+            });
+        }
+
     </script>
 
 {% endblock %}

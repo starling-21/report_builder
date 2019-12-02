@@ -85,6 +85,12 @@ class Serviceman(models.Model):
     def __str__(self):
         return self.first_name + " " + self.last_name
 
+    def get_last_first_name(self):
+        return self.last_name + " " + self.first_name
+
+    def get_first_last_name(self):
+        return self.first_name + " " + self.last_name
+
     def get_full_name(self):
         return self.first_name + " " + self.last_name.upper()
 
