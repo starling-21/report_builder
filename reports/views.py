@@ -1,6 +1,7 @@
 import os
 import datetime
 from django.contrib import messages
+from django.db.models import Q
 from django.http import FileResponse
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, reverse
@@ -48,11 +49,11 @@ def edit_service_members_chain_view(request, serviceman_id):
             for member in serviceman_chain:
                 if member.id == int(old_id):
                     replace_index = serviceman_chain.index(member)
-            #change position to temporary and unit
+            # change position to temporary and unit
             initial_member_position = request.session['initial_serviceman_chain'][replace_index].position
             initial_member_position.temp_supervisor = True
             initial_member_unit = request.session['initial_serviceman_chain'][replace_index].unit
-            #replace member in chain
+            # replace member in chain
             new_serviceman = Serviceman.objects.get(id=int(swap_id))
             new_serviceman.position = initial_member_position
             new_serviceman.unit = initial_member_unit
@@ -121,7 +122,8 @@ def return_report_document_view(request):
     """
 
     document_file_path = request.session['report_file_path']
-    response = FileResponse(open(document_file_path, 'rb'), as_attachment=True, filename=document_file_path.split('\\')[-1])
+    response = FileResponse(open(document_file_path, 'rb'), as_attachment=True,
+                            filename=document_file_path.split('\\')[-1])
 
     now = datetime.datetime.now()
     download_report_file_name = 'report ' + now.strftime("%Y-%m-%d_%H-%M") + '.' + document_file_path.rsplit('.', 1)[-1]
@@ -134,18 +136,29 @@ def return_report_document_view(request):
 def member_search_view(request):
     print("Search request, method", request.method)
     if request.method == 'POST':
-        # for k,v in request.POST.items():
-        #     print("{}:{}".format(k,v))
+        for k, v in request.POST.items():
+            print("{}:{}".format(k, v))
         filter_param = request.POST.get('filter_param')
-        query_set = Serviceman.objects.filter(first_name__contains=filter_param)
         service_members_list = []
-        for member in query_set:
-            service_members_list.append({'id': member.id, 'name': member.rank.__str__() + ' ' + member.get_first_last_name()})
-        if len(service_members_list) > 0:
-            result = json.dumps(service_members_list)
-            return HttpResponse(result)
+        if filter_param is not None and len(filter_param) > 0:
+            # filter_param = "-1"
+            query_set = Serviceman.objects.filter(
+                Q(first_name__icontains=filter_param) |
+                Q(last_name__icontains=filter_param) |
+                Q(rank__name__icontains=filter_param)
+                # Q(first_name__startswith=filter_param) |
+                # Q(last_name__startswith=filter_param) |
+                # Q(rank__name__startswith=filter_param)
+            )
+
+            for member in query_set:
+                service_members_list.append(
+                    {'id': member.id, 'text': member.rank.__str__() + ' ' + member.get_first_last_name()})
+            if len(service_members_list) > 0:
+                result = json.dumps(service_members_list)
+                return HttpResponse(result)
         else:
-            service_members_list.append({'id': -1, 'name': '----------'})
+            service_members_list.append({'id': -1, 'text': '----------'})
             return HttpResponse(json.dumps(service_members_list))
     elif request.is_ajax():
         print("AJAX")
