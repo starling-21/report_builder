@@ -71,7 +71,6 @@
 {% block js_scripts %}
     <script>
         $(document).ready(function () {
-
             // Initialize select2
             var csrf_token = '{{ csrf_token }}';
             $('.js-example-basic-single').select2({
@@ -98,8 +97,6 @@
                         // Transforms the top-level key of the response object from 'items' to 'results'
                         console.log("success")
                         console.log(data)
-                        {#$('#test_members').html("data")#}
-                        {#parse_response(data)#}
                         return {
                             results: data
                         };
@@ -112,50 +109,50 @@
 
     </script>
 
-    <script>
-        var csrf_token = '{{ csrf_token }}';
-        $('#search-button').click(function (event) {
-            event.preventDefault();
-            var searched_input = $('#searched_data').val();
-            $.ajax({
-                url: 'search_member',
-                method: 'POST',
-                data: {
-                    csrfmiddlewaretoken: csrf_token,
-                    filter_param: searched_input
-                },
-                dataType: 'json',
-                success: function (data) {
-                    console.log("success")
-                    console.log(data)
-                    $('#test_members').html("data")
-                    parse_response(data)
-                },
-                error: function (error_data) {
-                    console.log("error")
-                    console.log(error_data)
-                }
-            });
-        });
-
-        function parse_response(data_arr) {
-            $('#test_members').html('')
-            data_arr.forEach(function (arrayItem) {
-                var x = arrayItem.id
-                var name = arrayItem.name
-                $('#test_members').append(name + '<br>')
-            });
-
-            $('#member-selected').html('')
-            data_arr.forEach(function (arrayItem) {
-                var x = arrayItem.id
-                var name = arrayItem.name
-                $('#member-selected').append('<option value=' + x + '>' +
-                    name +
-                    '</option>')
-            });
-        }
-
-    </script>
+{#    <script>#}
+{#        var csrf_token = '{{ csrf_token }}';#}
+{#        $('#search-button').click(function (event) {#}
+{#            event.preventDefault();#}
+{#            var searched_input = $('#searched_data').val();#}
+{#            $.ajax({#}
+{#                url: 'search_member',#}
+{#                method: 'POST',#}
+{#                data: {#}
+{#                    csrfmiddlewaretoken: csrf_token,#}
+{#                    filter_param: searched_input#}
+{#                },#}
+{#                dataType: 'json',#}
+{#                success: function (data) {#}
+{#                    console.log("success")#}
+{#                    console.log(data)#}
+{#                    $('#test_members').html("data")#}
+{#                    parse_response(data)#}
+{#                },#}
+{#                error: function (error_data) {#}
+{#                    console.log("error")#}
+{#                    console.log(error_data)#}
+{#                }#}
+{#            });#}
+{#        });#}
+{##}
+{#        function parse_response(data_arr) {#}
+{#            $('#test_members').html('')#}
+{#            data_arr.forEach(function (arrayItem) {#}
+{#                var x = arrayItem.id#}
+{#                var name = arrayItem.name#}
+{#                $('#test_members').append(name + '<br>')#}
+{#            });#}
+{##}
+{#            $('#member-selected').html('')#}
+{#            data_arr.forEach(function (arrayItem) {#}
+{#                var x = arrayItem.id#}
+{#                var name = arrayItem.name#}
+{#                $('#member-selected').append('<option value=' + x + '>' +#}
+{#                    name +#}
+{#                    '</option>')#}
+{#            });#}
+{#        }#}
+{##}
+{#    </script>#}
 
 {% endblock %}

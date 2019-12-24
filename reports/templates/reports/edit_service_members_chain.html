@@ -1,33 +1,79 @@
 {% extends 'reports/base.html' %}
+{% block extra_head %}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+{% endblock %}
 
 {#TEST include#}
 {% include "django/forms/widgets/input.html" %}
 
+
+{#{% block content %}#}
+{#    <p><u><i>Все посредники:</i></u></p>#}
+{##}
+{##}
+{#    <form method="POST">{% csrf_token %}#}
+{#        <hr>#}
+{#        <hr>#}
+{#        {% for servicemember in serviceman_chain %}#}
+            {# editing chain member id, show input field for new chain member in chain members line #}
+{#            {% if swap_id == servicemember.id %}#}
+                {#  <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button> {#chain editing button#}
+{#                New servicemember:#}
+{#                <br><input name="swap_id">#}
+{#                <button type="submit" class="btn btn-light btn-sm" name="submit_new_id" value="{{ servicemember.id }}">#}
+{#                    <span class="fas fa-check-square"></span> Ok#}
+{#                </button> {#submit chain member id editing button#}
+{##}
+{#            {% else %}#}
+                {# show NORMAL CHAIN member line #}
+{#                {{ servicemember.rank.name }} {{ servicemember }}#}
+{#                <br>{{ servicemember.position }}#}
+{#                <br>#}
+{#                {% if not forloop.first %}#}
+{#                    <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id"#}
+{#                            value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button>#}
+{#                {% endif %}#}
+{#                {% if not forloop.first and not forloop.last %}#}
+{#                    <button type="submit" class="btn btn-light btn-sm" name="remove_chain_id"#}
+{#                            value="{{ servicemember.id }}" onclick="return window.confirm('Are you sure?')"><span class="far fa-trash-alt"></span></button>#}
+{#                {% endif %}#}
+{##}
+{#            {% endif %}#}
+{#            <hr>#}
+{#            <hr>#}
+{#        {% endfor %}#}
+{##}
+{##}
+{#        <input type="submit" class="btn btn-info" name="submit_chain_editing" value="Далі"/>#}
+{#    </form>#}
+{##}
+{##}
+{#{% endblock %}#}
+
+
+
 {% block content %}
-{#    {% for message in messages %}#}
-{#        <div class="alert {{ message.tags }} alert-success" role="alert">#}
-{#            <button type="button" class="close" data-dismiss="alert" aria-label="Close">#}
-{#                <span aria-hidden="true">&times;</span>#}
-{#            </button>#}
-{#            {{ message }}#}
-{#        </div>#}
-{#    {% endfor %}#}
+    <p><u><i>Всі посередники:</i></u></p>
 
-
-    <p><u><i>Всі "посередники":</i></u></p>
 
     <form method="POST">{% csrf_token %}
         <hr>
         <hr>
         {% for servicemember in serviceman_chain %}
             {# editing chain member id, show input field for new chain member in chain members line #}
-            {% if swap_id == servicemember.id %}
-                {#                <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button> {#chain editing button#}
-                New servicemember:
-                <br><input name="swap_id">
+            {% if swap_id == servicemember.id and not swap_presence %}
+                {#  <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button> {#chain editing button#}
+                Заміна старого луня ({{ servicemember.rank.name }} {{ servicemember }}) на нового:
+                <br>
+                <select class="custom-select2-1" name="swap_id">
+                    <option value=''></option>
+                </select>
                 <button type="submit" class="btn btn-light btn-sm" name="submit_new_id" value="{{ servicemember.id }}">
                     <span class="fas fa-check-square"></span> Ok
                 </button> {#submit chain member id editing button#}
+
+
 
             {% else %}
                 {# show NORMAL CHAIN member line #}
@@ -40,7 +86,7 @@
                 {% endif %}
                 {% if not forloop.first and not forloop.last %}
                     <button type="submit" class="btn btn-light btn-sm" name="remove_chain_id"
-                            value="{{ servicemember.id }}" onclick="return window.confirm('Are you sure?')"><span class="far fa-trash-alt"></span></button>
+                            value="{{ servicemember.id }}" onclick="return window.confirm('Видалити посередника?\n {{ servicemember.rank.name }} {{ servicemember }}')"><span class="far fa-trash-alt"></span></button>
                 {% endif %}
 
             {% endif %}
@@ -55,7 +101,6 @@
 
 {% endblock %}
 
-
 {#block submitting form by pressing Enter button#}
 {% block js_scripts %}
     <script type="text/javascript">
@@ -67,5 +112,43 @@
                 }
             }
         }, true);
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize select2
+            var csrf_token = '{{ csrf_token }}';
+            $('.custom-select2-1').select2({
+                placeholder: "Пошук (Імена та Прізвища з Великої літери)",
+                allowClear: true,
+                {#tags: true,#}
+                delay: 250,
+                width: '400px',
+
+                ajax: {
+                    csrfmiddlewaretoken: csrf_token,
+                    url: '/search_member',
+                    method: 'POST',
+                    dataType: 'json',
+                    // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                    data: function (params) {
+                        var query = {
+                            csrfmiddlewaretoken: csrf_token,
+                            filter_param: params.term
+                        }
+                        return query;
+                    },
+                    processResults: function (data) {
+                        // Transforms the top-level key of the response object from 'items' to 'results'
+                        //console.log("success")
+                        console.log(data)
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+        });
+
     </script>
 {% endblock %}
