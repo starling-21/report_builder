@@ -1,56 +1,16 @@
 {% extends 'reports/base.html' %}
+
+{#loads custom tags#}
+{% load common %}
+
 {% block extra_head %}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet"/>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/i18n/ru.js"></script>
 {% endblock %}
 
 {#TEST include#}
-{% include "django/forms/widgets/input.html" %}
-
-
-{#{% block content %}#}
-{#    <p><u><i>Все посредники:</i></u></p>#}
-{##}
-{##}
-{#    <form method="POST">{% csrf_token %}#}
-{#        <hr>#}
-{#        <hr>#}
-{#        {% for servicemember in serviceman_chain %}#}
-            {# editing chain member id, show input field for new chain member in chain members line #}
-{#            {% if swap_id == servicemember.id %}#}
-                {#  <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button> {#chain editing button#}
-{#                New servicemember:#}
-{#                <br><input name="swap_id">#}
-{#                <button type="submit" class="btn btn-light btn-sm" name="submit_new_id" value="{{ servicemember.id }}">#}
-{#                    <span class="fas fa-check-square"></span> Ok#}
-{#                </button> {#submit chain member id editing button#}
-{##}
-{#            {% else %}#}
-                {# show NORMAL CHAIN member line #}
-{#                {{ servicemember.rank.name }} {{ servicemember }}#}
-{#                <br>{{ servicemember.position }}#}
-{#                <br>#}
-{#                {% if not forloop.first %}#}
-{#                    <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id"#}
-{#                            value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button>#}
-{#                {% endif %}#}
-{#                {% if not forloop.first and not forloop.last %}#}
-{#                    <button type="submit" class="btn btn-light btn-sm" name="remove_chain_id"#}
-{#                            value="{{ servicemember.id }}" onclick="return window.confirm('Are you sure?')"><span class="far fa-trash-alt"></span></button>#}
-{#                {% endif %}#}
-{##}
-{#            {% endif %}#}
-{#            <hr>#}
-{#            <hr>#}
-{#        {% endfor %}#}
-{##}
-{##}
-{#        <input type="submit" class="btn btn-info" name="submit_chain_editing" value="Далі"/>#}
-{#    </form>#}
-{##}
-{##}
-{#{% endblock %}#}
-
+{#{% include "django/forms/widgets/input.html" %}#}
 
 
 {% block content %}
@@ -61,18 +21,22 @@
         <hr>
         <hr>
         {% for servicemember in serviceman_chain %}
-            {# editing chain member id, show input field for new chain member in chain members line #}
-            {% if swap_id == servicemember.id and not swap_presence %}
-                {#  <button disabled class="btn btn-light btn-sm"><span class="fas fa-edit"></span></button> {#chain editing button#}
-                Заміна старого луня ({{ servicemember.rank.name }} {{ servicemember }}) на нового:
+            {# editing chain member, show input field for new chain member in chain members line #}
+            {% if swap_id == servicemember.id and swap_presence is None %}
+                {% set swap_presence = True %}
+                Заміна посередника ({{ servicemember.rank.name }} {{ servicemember }}) на папєрєдніка:
                 <br>
-                <select class="custom-select2-1" name="swap_id">
-                    <option value=''></option>
-                </select>
+                <select name="swap_id"></select>
+{#                <select title="rank-fname-lname" name="swap_id"></select>#}
+{#                <select title="rank-lname-fname" name="swap_id"></select>#}
+{#                <select title="fname-lname" name="swap_id"></select>#}
+{#                <select title="lname-fname" name="swap_id"></select>#}
+
+
+
                 <button type="submit" class="btn btn-light btn-sm" name="submit_new_id" value="{{ servicemember.id }}">
                     <span class="fas fa-check-square"></span> Ok
                 </button> {#submit chain member id editing button#}
-
 
 
             {% else %}
@@ -82,59 +46,60 @@
                 <br>
                 {% if not forloop.first %}
                     <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id"
-                            value="{{ servicemember.id }}"><span class="fas fa-edit"></span></button>
+                            value="{{ servicemember.id }}"><span class="fas fa-edit"></span>
+                    </button>
                 {% endif %}
                 {% if not forloop.first and not forloop.last %}
                     <button type="submit" class="btn btn-light btn-sm" name="remove_chain_id"
-                            value="{{ servicemember.id }}" onclick="return window.confirm('Видалити посередника?\n {{ servicemember.rank.name }} {{ servicemember }}')"><span class="far fa-trash-alt"></span></button>
+                            value="{{ servicemember.id }}"
+                            onclick="return window.confirm('Видалити посередника?\n{{ servicemember.rank.name }} {{ servicemember }} ')">
+                        <span class="far fa-trash-alt"></span>
+                    </button>
                 {% endif %}
-
             {% endif %}
             <hr>
             <hr>
         {% endfor %}
 
-
         <input type="submit" class="btn btn-info" name="submit_chain_editing" value="Далі"/>
-    </form>
 
+    </form>
 
 {% endblock %}
 
 {#block submitting form by pressing Enter button#}
 {% block js_scripts %}
-    <script type="text/javascript">
-        window.addEventListener('keydown', function (e) {
-            if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
-                if (e.target.nodeName == 'INPUT' && e.target.type == 'text') {
-                    e.preventDefault();
-                    return false;
-                }
-            }
-        }, true);
-    </script>
-
     <script>
+
         $(document).ready(function () {
+
+            // defint dynamic url function for SELECT tag
+            //var search_name_format = '';
+            //var dynamic_url_function = function getURL() {
+            //    return '/search_member/' + search_name_format;
+            //}
+
             // Initialize select2
             var csrf_token = '{{ csrf_token }}';
-            $('.custom-select2-1').select2({
+            $('select').select2({
                 placeholder: "Пошук (Імена та Прізвища з Великої літери)",
                 allowClear: true,
-                {#tags: true,#}
+                language: "ru",
                 delay: 250,
                 width: '400px',
 
                 ajax: {
                     csrfmiddlewaretoken: csrf_token,
-                    url: '/search_member',
+                    {#url: dynamic_url_function,#}
+                    url: '/search_member/',
                     method: 'POST',
                     dataType: 'json',
                     // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
                     data: function (params) {
                         var query = {
                             csrfmiddlewaretoken: csrf_token,
-                            filter_param: params.term
+                            filter_param: params.term,
+                            name_format: $(this).attr('title')
                         }
                         return query;
                     },
@@ -147,6 +112,9 @@
                         };
                     }
                 }
+                //}).on('select2:opening', function (e) {
+                //    search_name_format = $(this).attr('title');
+                //}
             });
         });
 

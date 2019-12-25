@@ -1,7 +1,11 @@
 {% extends 'reports/base.html' %}
-{% include "django/forms/widgets/input.html" %}
+{#{% include "django/forms/widgets/input.html" %}#}
 {% block extra_head %}
     {{ report_fields_form.media }}
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/i18n/ru.js"></script>
 {% endblock %}
 
 
@@ -22,21 +26,49 @@
     <br>
     <input type="submit" class="btn btn-info" name="submit_form" value="Згенерувати рапорт"/>
 
+{% endblock %}
 
-{#    ALERTS#}
 
-{#    <hr>#}
-{#    {% if not messages %}#}
-{#        <input type="submit" class="btn btn-info" name="submit_form" value="Згенерувати рапорт"/>#}
-{#    {% else %}#}
-{#        <input type="submit" class="btn btn-info" name="submit_form" value="Згенерувати рапорт ще раз"/>#}
-{#        <br>#}
-{#        <br>#}
-{##}
-{#        {% for message in messages %}#}
-{#            <div class="alert alert-success" role="alert" style="width:50%;"}>#}
-{#            Рапорт згенеровано: <a href="{%  url "reports:final_report" %}" class="alert-link"><i class="far fa-file-word"></i><u> завантажити файл</u></a>#}
-{#            <div>#}
-{#        {% endfor %}#}
-{#    {% endif %}#}
+
+
+{% block js_scripts %}
+
+<script>
+        $(document).ready(function () {
+            // Initialize select2
+            var csrf_token = '{{ csrf_token }}';
+            $('select').select2({
+                placeholder: "Пошук (Імена та Прізвища з Великої літери)",
+                allowClear: true,
+                language: "ru",
+                delay: 250,
+                width: '400px',
+
+                ajax: {
+                    csrfmiddlewaretoken: csrf_token,
+                    url: '/search_member/',
+                    method: 'POST',
+                    dataType: 'json',
+                    // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                    data: function (params) {
+                        var query = {
+                            csrfmiddlewaretoken: csrf_token,
+                            filter_param: params.term,
+                            name_format: $(this).attr('title')
+                        }
+                        return query;
+                    },
+                    processResults: function (data) {
+                        // Transforms the top-level key of the response object from 'items' to 'results'
+                        //console.log("success")
+                        console.log(data)
+                        return {
+                            results: data
+                        };
+                    }
+                }
+            });
+        });
+
+    </script>
 {% endblock %}

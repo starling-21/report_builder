@@ -13,8 +13,8 @@
 {% endblock %}
 
 {% block content %}
-{#    <div class="container">#}
-{#        <div class="row">#}
+    <div class="container">
+        <div class="row">
 {#            <div class="col-2">#}
 {#                <form method="POST">#}
 {#                    {% csrf_token %}#}
@@ -22,8 +22,8 @@
 {#                    <input id="search-button" type="submit" value="Ok">#}
 {#                </form>#}
 {#            </div>#}
-{##}
-{##}
+
+
 {#            <div class="col-3">#}
 {#                <form method="POST">#}
 {#                    {% csrf_token %}#}
@@ -34,8 +34,8 @@
 {#                    </div>#}
 {#                </form>#}
 {#            </div>#}
-{##}
-{##}
+
+
 {#            <div class="col-7">#}
 {#                <select id="member-selected" class="selectpicker" data-live-search="true" data-width="auto">#}
 {#                    {% for serviceman in service_members_list %}#}
@@ -43,27 +43,38 @@
 {#                            {{ serviceman.rank }} {{ serviceman }}#}
 {#                        </option>#}
 {#                    {% endfor %}#}
+{#                        <option value="Internet Explorer">Internet Explorer</option>#}
+{#                        <option value="Firefox">Firefox</option>#}
+{#                        <option value="Chrome">Chrome</option>#}
+{#                        <option value="Opera">Opera</option>#}
+{#                        <option value="Safari">Safari</option>#}
+{#                        <option value="Internet Explorer 2">Internet Explorer 2</option>#}
+{#                        <option value="Firefox Okks 2">Firefox Okks 2</option>#}
+{#                        <option value="Chrome Oka 2">Chrome Oka 2</option>#}
+{#                        <option value="Opera Or Edge 2">Opera Or Edge 2</option>#}
+{#                        <option value="Safari Or 2">Safari Or 2</option>#}
 {#                </select>#}
 {#            </div>#}
-{#        </div>#}
-{#    </div>#}
-
-
-
-
-
-
-
-    <div class="container">
-
-        <div class="row">
-            <div class="col-6">
-                <select class="js-example-basic-single" name="state">
-                </select>
-            </div>
 
         </div>
     </div>
+
+
+
+
+
+
+
+{#    <div class="container">#}
+{##}
+{#        <div class="row">#}
+{#            <div class="col-6">#}
+{#                <select class="js-example-basic-single" name="state">#}
+{#                </select>#}
+{#            </div>#}
+{##}
+{#        </div>#}
+{#    </div>#}
 
 {% endblock %}
 
@@ -104,10 +115,10 @@
                 }
             });
 
-
         });
 
     </script>
+
 
 {#    <script>#}
 {#        var csrf_token = '{{ csrf_token }}';#}

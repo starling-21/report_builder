@@ -149,6 +149,27 @@ def get_raw_form_fields(parts_dict):
                 widget=forms.Textarea(attrs={"cols": 120, "rows": 4, "wrap": "hard"}),
                 initial="сімейними обставинами"
             )
+        elif field_dict['type'] == "rank_first_name_last_name":
+            form_content_dict[key] = forms.CharField(
+                label="",
+                widget=forms.Select(attrs={"title": "rank-fname-lname"}),
+            )
+        elif field_dict['type'] == "rank_last_name_first_name":
+            form_content_dict[key] = forms.CharField(
+                label="",
+                widget=forms.Select(attrs={"title": "rank-lname-fname"}),
+            )
+        elif field_dict['type'] == "first_name_last_name":
+            form_content_dict[key] = forms.CharField(
+                label="",
+                widget=forms.Select(attrs={"title": "fname-lname"}),
+            )
+        elif field_dict['type'] == "last_name_first_name":
+            form_content_dict[key] = forms.CharField(
+                label="",
+                widget=forms.Select(attrs={"title": "lname-fname"}),
+            )
+
 
         # extra field (conter for labels and input fields in form)
         form_content_dict['fields_counter'] = forms.IntegerField(
