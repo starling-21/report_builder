@@ -61,11 +61,13 @@ def get_report_merge_dict(request):
             # report body text preparation
             if tier == 0:
                 report_body_dict = compose_main_report_body_from_post_request(request.POST.copy())
+                print("report_body_dict:\n", report_body_dict)
             elif tier >= 1:
                 report_body_dict = get_secondary_report_body(serviceman_id)
             report_body_dict = append_to_dict_keys(report_body_dict, tier)
             global_merge_dict.update(report_body_dict)
-    except:
+    except Exception as e:
+        print(e)
         global_merge_dict = {'error':'report_content_util->get_report_merge_dict'}
     finally:
         return global_merge_dict
@@ -88,6 +90,9 @@ def compose_main_report_body_from_post_request(input_form_data_dict):
             report_body_text += datetime_as_day_month_year(input_form_data_dict.get(str(i)))
         except ValueError:
             report_body_text += input_form_data_dict.get(str(i))
+        except Exception as e:
+            print(e)
+            print('error compose_main_report_body_from_post_request')
     print("REPORT BODY:", report_body_dict)
     report_body_dict['body_tier'] = report_body_text
     return report_body_dict

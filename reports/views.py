@@ -132,12 +132,19 @@ def return_report_document_view(request):
 
 # def member_search_view(request, name_format=None):
 def member_search_view(request):
+    """
+    Search for servicemember and return objects json array:
+    :param request:
+    :return: default format is - [{id:'member_id', text:'name_representation'}]
+    if name_format is defined in search params - format becomes as - [{id:'name_representation', text:'name_representation'}]
+    """
     print("Search request, method", request.method)
     service_members_list = []
     if request.method == 'POST':
         for k, v in request.POST.items():
             print("{}:{}".format(k, v))
         filter_param = request.POST.get('filter_param')
+        name_format = request.POST.get('name_format')
 
         if filter_param is not None and len(filter_param) > 0:
             query_set = Serviceman.objects.filter(
@@ -147,41 +154,31 @@ def member_search_view(request):
                 |
                 Q(rank__name__icontains=filter_param)
             )
-            name_format = request.POST.get('name_format')
-            print('name format=', name_format)
-            if name_format == 'rank-fname-lname':
-                for member in query_set:
-                    member_representation = member.rank.__str__() + ' ' + member.get_first_last_name()
-                    service_members_list.append({'id': member_representation, 'text': member_representation})
-            elif name_format == 'rank-lname-fname':
-                for member in query_set:
-                    member_representation = member.rank.__str__() + ' ' + member.get_last_first_name()
-                    service_members_list.append({'id': member_representation, 'text': member_representation})
-            elif name_format == 'fname-lname':
-                for member in query_set:
-                    member_representation = member.get_first_last_name()
-                    service_members_list.append({'id': member_representation, 'text': member_representation})
-            elif name_format == 'lname-fname':
-                for member in query_set:
-                    member_representation = member.get_last_first_name()
-                    service_members_list.append({'id': member_representation, 'text': member_representation})
-            else:
-                # default representation: {id:rank_first_name_last_name}
-                for member in query_set:
-                    member_representation = member.rank.__str__() + ' ' + member.get_first_last_name()
-                    service_members_list.append({'id': member.id, 'text': member_representation})
-            return HttpResponse(json.dumps(service_members_list))
         else:
-            # service_members_list.append({'id': '', 'text': 'Пошук (Імена та Прізвища з Великої літери)'})
-            # service_members_list.append({'id': '00000', 'text': 'Нічого не знайдено'})
-
-            #return all objects
             query_set = Serviceman.objects.all()
-            for member in query_set:
-                service_members_list.append(
-                    {'id': member.id, 'text': member.rank.__str__() + ' ' + member.get_first_last_name()})
 
-            return HttpResponse(json.dumps(service_members_list))
+        if name_format == 'rank-fname-lname':
+            for member in query_set:
+                member_representation = member.rank.__str__() + ' ' + member.get_first_last_name()
+                service_members_list.append({'id': member_representation, 'text': member_representation})
+        elif name_format == 'rank-lname-fname':
+            for member in query_set:
+                member_representation = member.rank.__str__() + ' ' + member.get_last_first_name()
+                service_members_list.append({'id': member_representation, 'text': member_representation})
+        elif name_format == 'fname-lname':
+            for member in query_set:
+                member_representation = member.get_first_last_name()
+                service_members_list.append({'id': member_representation, 'text': member_representation})
+        elif name_format == 'lname-fname':
+            for member in query_set:
+                member_representation = member.get_last_first_name()
+                service_members_list.append({'id': member_representation, 'text': member_representation})
+        else:
+            # default representation: {id:rank_first_name_last_name}
+            for member in query_set:
+                member_representation = member.rank.__str__() + ' ' + member.get_first_last_name()
+                service_members_list.append({'id': member.id, 'text': member_representation})
+        return HttpResponse(json.dumps(service_members_list))
 
     context = {
         'service_members_list': service_members_list,

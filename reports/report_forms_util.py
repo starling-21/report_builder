@@ -169,6 +169,12 @@ def get_raw_form_fields(parts_dict):
                 label="",
                 widget=forms.Select(attrs={"title": "lname-fname"}),
             )
+        # elif field_dict['type'] == "new_line":
+        #     form_content_dict[key] = forms.CharField(
+        #         label="N",
+        #         widget=forms.HiddenInput(),
+        #         initial=""
+        #     )
 
 
         # extra field (conter for labels and input fields in form)

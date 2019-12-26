@@ -21,7 +21,7 @@ def generate_report(request):
     """
     report_merge_dict = {}
     report_merge_dict = report_content_util.get_report_merge_dict(request)
-    # print("GLOBAL MERGE DICT:", global_merge_dict)
+    # print("GLOBAL MERGE DICT:", report_merge_dict)
     # for k, v in report_merge_dict.items():
     #     print("{} : {}".format(k, v))
     report_filepath = document_generator.create_docx_document(report_merge_dict)

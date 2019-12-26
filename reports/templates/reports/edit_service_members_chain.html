@@ -9,9 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/i18n/ru.js"></script>
 {% endblock %}
 
-{#TEST include#}
-{#{% include "django/forms/widgets/input.html" %}#}
-
 
 {% block content %}
     <p><u><i>Всі посередники:</i></u></p>
@@ -27,13 +24,6 @@
                 Заміна посередника ({{ servicemember.rank.name }} {{ servicemember }}) на папєрєдніка:
                 <br>
                 <select name="swap_id"></select>
-{#                <select title="rank-fname-lname" name="swap_id"></select>#}
-{#                <select title="rank-lname-fname" name="swap_id"></select>#}
-{#                <select title="fname-lname" name="swap_id"></select>#}
-{#                <select title="lname-fname" name="swap_id"></select>#}
-
-
-
                 <button type="submit" class="btn btn-light btn-sm" name="submit_new_id" value="{{ servicemember.id }}">
                     <span class="fas fa-check-square"></span> Ok
                 </button> {#submit chain member id editing button#}
@@ -73,12 +63,6 @@
 
         $(document).ready(function () {
 
-            // defint dynamic url function for SELECT tag
-            //var search_name_format = '';
-            //var dynamic_url_function = function getURL() {
-            //    return '/search_member/' + search_name_format;
-            //}
-
             // Initialize select2
             var csrf_token = '{{ csrf_token }}';
             $('select').select2({
@@ -90,7 +74,6 @@
 
                 ajax: {
                     csrfmiddlewaretoken: csrf_token,
-                    {#url: dynamic_url_function,#}
                     url: '/search_member/',
                     method: 'POST',
                     dataType: 'json',
@@ -112,9 +95,6 @@
                         };
                     }
                 }
-                //}).on('select2:opening', function (e) {
-                //    search_name_format = $(this).attr('title');
-                //}
             });
         });
 
