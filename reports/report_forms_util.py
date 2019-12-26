@@ -70,6 +70,18 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
         "type": "text",
         "title": "причина переносу_2"
     }
+    {
+        "type":"rank_first_name_last_name"
+    }
+    {
+        "type":"rank_last_name_first_name"
+    }
+    {
+        "type":"first_name_last_name"
+    }
+    {
+        "type":"last_name_first_name"
+    }
     """
     parsed_dict = {}
 
