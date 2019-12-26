@@ -21,7 +21,7 @@ app_name = "reports"
 
 urlpatterns = [
 
-    path('', views.serviceman_list_view, name='index'),
+    path('', views.home_view, name='index'),
 
     path('serviceman_list', views.serviceman_list_view, name='users'),
     path('edit_chain/<int:serviceman_id>', views.edit_service_members_chain_view, name='edit_service_members_chain'),

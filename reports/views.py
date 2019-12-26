@@ -16,7 +16,9 @@ from . import report_forms_util
 
 
 # Create your views here.
-
+def home_view(request):
+    """show few report generation option for user (basic report or custom_template)"""
+    return render(request, 'reports/report_template_choose.html')
 
 def serviceman_list_view(request):
     """test view for showing users list. For choosing who generate report for"""
@@ -90,7 +92,7 @@ def edit_service_members_chain_view(request, serviceman_id):
 
 
 def reports_list_view(request, serviceman_id):
-    """show reports titles list to choose"""
+    """show reports list to choose"""
     serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
     reports_list = Report.objects.all()
     context = {
@@ -98,6 +100,11 @@ def reports_list_view(request, serviceman_id):
         'serviceman': serviceman
     }
     return render(request, 'reports/reports_list.html', context)
+
+
+def custom_reports_list_view(request):
+    """show hardcoded report templates list"""
+    pass
 
 
 def report_filling_view(request, report_id):
