@@ -82,6 +82,10 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
     {
         "type":"last_name_first_name"
     }
+    {"type":"rank_first_name_last_name"}
+    {"type":"rank_last_name_first_name"}
+    {"type":"first_name_last_name"}
+    {"type":"last_name_first_name"}
     """
     parsed_dict = {}
 
@@ -181,12 +185,8 @@ def get_raw_form_fields(parts_dict):
                 label="",
                 widget=forms.Select(attrs={"title": "lname-fname"}),
             )
-        # elif field_dict['type'] == "new_line":
-        #     form_content_dict[key] = forms.CharField(
-        #         label="N",
-        #         widget=forms.HiddenInput(),
-        #         initial=""
-        #     )
+
+
 
 
         # extra field (conter for labels and input fields in form)

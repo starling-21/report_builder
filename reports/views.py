@@ -20,6 +20,7 @@ def home_view(request):
     """show few report generation option for user (basic report or custom_template)"""
     return render(request, 'reports/report_template_choose.html')
 
+
 def serviceman_list_view(request):
     """test view for showing users list. For choosing who generate report for"""
     serviceman_list = Serviceman.objects.all()
@@ -70,7 +71,7 @@ def edit_service_members_chain_view(request, serviceman_id):
                 request.session.modified = True
             elif 'submit_chain_editing' in request.POST:
                 print("submit_chain_editting")
-                return redirect(reverse('reports:reports_list', kwargs={'serviceman_id': serviceman_id}))
+                return redirect(reverse('reports:basic_reports_list', kwargs={'serviceman_id': serviceman_id}))
         except Exception as e:
             print(e)
             return redirect(reverse('reports:edit_service_members_chain', kwargs={'serviceman_id': serviceman_id}))
@@ -91,7 +92,7 @@ def edit_service_members_chain_view(request, serviceman_id):
     return render(request, 'reports/edit_service_members_chain.html', context)
 
 
-def reports_list_view(request, serviceman_id):
+def basic_reports_list_view(request, serviceman_id):
     """show reports list to choose"""
     serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
     reports_list = Report.objects.all()
@@ -104,7 +105,11 @@ def reports_list_view(request, serviceman_id):
 
 def custom_reports_list_view(request):
     """show hardcoded report templates list"""
-    pass
+    reports_list = Report.objects.all()
+    context = {
+        'reports_list': reports_list,
+    }
+    return render(request, 'reports/reports_list.html', context)
 
 
 def report_filling_view(request, report_id):

@@ -102,6 +102,11 @@ class Serviceman(models.Model):
 
 
 class Report(models.Model):
+    REPORT_TYPES = (
+        ('regular_template', 'рапорт звичайний'),
+        ('custom_template', 'рапорт по шаблону (змінне тільки тіло рапорту)'),
+    )
+    template_type = models.CharField(max_length=1, choices=REPORT_TYPES, default='regular_template')
     title = models.CharField(max_length=255, null=True)
     body_sample = models.TextField(blank=True, null=True)
     body = models.TextField(blank=True, null=True)
