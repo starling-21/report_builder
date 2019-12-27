@@ -13,6 +13,8 @@
     <form action="" method="POST" style="margin: 4px">
     {% csrf_token %}
     <hr>
+    Раорт: {{ title }}
+    <hr>
     Зразок:  <b>{{ body_sample }}</b>
     <hr>
     {% for field in report_fields_form %}

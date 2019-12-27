@@ -103,13 +103,20 @@ class Serviceman(models.Model):
 
 class Report(models.Model):
     REPORT_TYPES = (
-        ('regular_template', 'рапорт звичайний'),
-        ('custom_template', 'рапорт по шаблону (змінне тільки тіло рапорту)'),
+        ('regular_template', 'рапорт звичайний (report body is editable)'),
+        ('custom_template', 'рапорт по шаблону (header, body, footer are editable)'),
     )
-    template_type = models.CharField(max_length=1, choices=REPORT_TYPES, default='regular_template')
+    template_type = models.CharField(max_length=255, choices=REPORT_TYPES, default='regular_template')
     title = models.CharField(max_length=255, null=True)
+
+    header_sample = models.TextField(blank=True, null=True)
+    header_template = models.TextField(blank=True, null=True)
+
     body_sample = models.TextField(blank=True, null=True)
-    body = models.TextField(blank=True, null=True)
+    body_template = models.TextField(blank=True, null=True)
+
+    footer_sample = models.TextField(blank=True, null=True)
+    footer_template = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title

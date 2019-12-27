@@ -12,13 +12,14 @@ from .forms import ServiceMembersChainEditForm
 import json
 
 
-def get_report_filling_form(report_id):
-    """parse report template, generate form fields. Return context for html template"""
+def get_report_body_filling_form(report_id):
+    """parse report body template, generate template context with form fields.
+    Return context for html template"""
     report = Report.objects.get(pk=report_id)
-    report_template_parsed_dict = parse_report_body_template(report.body)
-    report_form_fields = get_raw_form_fields(report_template_parsed_dict)
+    parsed_report_body_template_dict = parse_report_body_template(report.body_template)
+    report_body_form_fields = get_raw_django_form_fields(parsed_report_body_template_dict)
 
-    dynamicReportFillingForm = type('ReportFillingForm', (ReportFillingForm,), report_form_fields)
+    dynamicReportFillingForm = type('ReportFillingForm', (ReportFillingForm,), report_body_form_fields)
 
     context = {
         'title': report.title,
@@ -45,7 +46,7 @@ def get_report_filling_form(report_id):
 
 
 def parse_report_body_template(text, decoder=json.JSONDecoder()):
-    """Parse report body template for substution patterns
+    """Parse report body template for substitution patterns
        Split all parts into dictionaries for future form creation
 
     BODY TEMPLATE EXAMPLE:
@@ -121,7 +122,7 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
     return parsed_dict
 
 
-def get_raw_form_fields(parts_dict):
+def get_raw_django_form_fields(parts_dict):
     """iterate throught dict and prepare django form for user"""
     form_content_dict = {}
 

@@ -95,7 +95,7 @@ def edit_service_members_chain_view(request, serviceman_id):
 def basic_reports_list_view(request, serviceman_id):
     """show reports list to choose"""
     serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
-    reports_list = Report.objects.all()
+    reports_list = Report.objects.filter(template_type='regular_template')
     context = {
         'reports_list': reports_list,
         'serviceman': serviceman
@@ -105,7 +105,7 @@ def basic_reports_list_view(request, serviceman_id):
 
 def custom_reports_list_view(request):
     """show hardcoded report templates list"""
-    reports_list = Report.objects.all()
+    reports_list = Report.objects.filter(template_type='custom_template')
     context = {
         'reports_list': reports_list,
     }
@@ -120,7 +120,7 @@ def report_filling_view(request, report_id):
         request.session.modified = True
         return redirect(reverse('reports:final_report'))
 
-    context = report_forms_util.get_report_filling_form(report_id)
+    context = report_forms_util.get_report_body_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
 
 
