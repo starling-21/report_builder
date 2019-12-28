@@ -301,12 +301,6 @@ def delete_serviceman(apps, schema_editor):
 def load_reports(apps, schema_editor):
     Report = apps.get_model('reports', 'Report')
 
-    # Report(
-    #     title="",
-    #     body_sample = "",
-    #     body_template = ""
-    # ).save()
-
     Report(
         title="Перенесення терміну щорічної основної відпустки",
         body_sample="""Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
@@ -337,6 +331,7 @@ def load_reports(apps, schema_editor):
         body_sample="Доповiдаю, що з-за меж Киiвського гарнiзону прибув та приступив до виконання службових обов'язкiв.",
         body_template="Доповiдаю, що з-за меж Киiвського гарнiзону прибув та приступив до виконання службових обов'язкiв."
     ).save()
+
 
 
 def delete_reports(apps, schema_editor):

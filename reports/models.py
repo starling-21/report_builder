@@ -109,14 +109,12 @@ class Report(models.Model):
     template_type = models.CharField(max_length=255, choices=REPORT_TYPES, default='regular_template')
     title = models.CharField(max_length=255, null=True)
 
-    header_sample = models.TextField(blank=True, null=True)
-    header_template = models.TextField(blank=True, null=True)
-
     body_sample = models.TextField(blank=True, null=True)
     body_template = models.TextField(blank=True, null=True)
-
-    footer_sample = models.TextField(blank=True, null=True)
-    footer_template = models.TextField(blank=True, null=True)
+    # header_sample = models.TextField(blank=True, null=True)
+    # header_template = models.TextField(blank=True, null=True)
+    # footer_sample = models.TextField(blank=True, null=True)
+    # footer_template = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.title
