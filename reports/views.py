@@ -30,10 +30,43 @@ def serviceman_list_view(request):
     return render(request, 'reports/serviceman_list.html', context)
 
 
-def edit_service_members_chain_view(request, serviceman_id):
+def reports_list_view(request, serviceman_id):
+    """show all reports list"""
+    request.session['serviceman_id'] = serviceman_id
+    request.session.modified = True
+
+    serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
+    reports_list = Report.objects.all()
+    context = {
+        'reports_list': reports_list,
+        'serviceman': serviceman
+    }
+    return render(request, 'reports/reports_list.html', context)
+
+# def basic_reports_list_view(request, serviceman_id):
+#     """show reports list to choose"""
+#     serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
+#     reports_list = Report.objects.filter(type='regular')
+#     context = {
+#         'reports_list': reports_list,
+#         'serviceman': serviceman
+#     }
+#     return render(request, 'reports/reports_list.html', context)
+#
+#
+# def custom_reports_list_view(request):
+#     """show hardcoded report templates list"""
+#     reports_list = Report.objects.filter(type='custom')
+#     context = {
+#         'reports_list': reports_list,
+#     }
+#     return render(request, 'reports/reports_list.html', context)
+
+def edit_service_members_chain_view(request, report_id):
     """change servicemen chain if needed.
     automatically change member position and make him temporary boss on this position"""
-    swap_id = None
+
+
     if request.method == 'POST':
         try:
             serviceman_chain = request.session['serviceman_chain']
@@ -71,15 +104,21 @@ def edit_service_members_chain_view(request, serviceman_id):
                 request.session.modified = True
             elif 'submit_chain_editing' in request.POST:
                 print("submit_chain_editting")
-                return redirect(reverse('reports:basic_reports_list', kwargs={'serviceman_id': serviceman_id}))
+                # return redirect(reverse('reports:basic_reports_list', kwargs={'serviceman_id': serviceman_id}))
+                return redirect(reverse('reports:report_filling', kwargs={'report_id': report_id}))
         except Exception as e:
             print(e)
-            return redirect(reverse('reports:edit_service_members_chain', kwargs={'serviceman_id': serviceman_id}))
+            return redirect(reverse('reports:edit_service_members_chain', kwargs={'report_id': report_id}))
             # return redirect(reverse('reports:users'))
 
     elif request.method == 'GET':
+        swap_id = None
+        request.session['report_id'] = report_id
+        request.session.modified = True
+
+        serviceman_id = request.session['serviceman_id']
         serviceman = Serviceman.objects.get(id=serviceman_id)
-        serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman)
+        serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman, report_id)
         request.session['serviceman_chain'] = serviceman_chain
         request.session['initial_serviceman_chain'] = serviceman_chain
         request.session.modified = True
@@ -90,26 +129,6 @@ def edit_service_members_chain_view(request, serviceman_id):
         'swap_id': swap_id,
     }
     return render(request, 'reports/edit_service_members_chain.html', context)
-
-
-def basic_reports_list_view(request, serviceman_id):
-    """show reports list to choose"""
-    serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
-    reports_list = Report.objects.filter(template_type='regular_template')
-    context = {
-        'reports_list': reports_list,
-        'serviceman': serviceman
-    }
-    return render(request, 'reports/reports_list.html', context)
-
-
-def custom_reports_list_view(request):
-    """show hardcoded report templates list"""
-    reports_list = Report.objects.filter(template_type='custom_template')
-    context = {
-        'reports_list': reports_list,
-    }
-    return render(request, 'reports/reports_list.html', context)
 
 
 def report_filling_view(request, report_id):

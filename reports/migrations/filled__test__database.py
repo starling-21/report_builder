@@ -6,20 +6,6 @@ from django.db import migrations
 def load_ranks(apps, schema_editor):
     Rank = apps.get_model('reports', 'Rank')
 
-    # ranks_list = [
-    #     'молодший лейтенант',
-    #     'лейтенант',
-    #     'старший лейтенант',
-    #     'капітан',
-    #     'майор',
-    #     'підполковник',
-    #     'полковник',
-    # ]
-    #
-    # for rank_pair in ranks_list:
-    #     record = Rank(name=rank_pair)
-    #     record.save()
-
     ranks_list = [
         ['молодший лейтенант', 'молодшому лейтенанту', 'молодшого лейтенанта'],
         ['лейтенант', 'лейтенанту', 'лейтенанта'],
@@ -74,32 +60,31 @@ def delete_units(apps, schema_editor):
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-def load_positions(apps, schema_editor):
-    """currently not in use"""
-    Position = apps.get_model('reports', 'Position')
-    Unit = apps.get_model('reports', 'Unit')
-
-    units = Unit.objects.all()
-    main_unit = units.filter(name='військової частини А0334')[0]
-    admins_main_unit = units.filter(name='центру адміністраторів безпеки ІТС')[0]
-
-    Position(position_title='командир',
-             unit=main_unit,
-             position_tail='',
-             temp_supervisor=True
-             ).save()
-
-    Position(position_title='начальник',
-             unit=admins_main_unit,
-             position_tail='',
-             temp_supervisor=True
-             ).save()
-
-
-def delete_positions(apps, schema_editor):
-    Position = apps.get_model('reports', 'Position')
-    Position.objects.all().delete()
-
+# def load_positions(apps, schema_editor):
+#     """currently not in use"""
+#     Position = apps.get_model('reports', 'Position')
+#     Unit = apps.get_model('reports', 'Unit')
+#
+#     units = Unit.objects.all()
+#     main_unit = units.filter(name='військової частини А0334')[0]
+#     admins_main_unit = units.filter(name='центру адміністраторів безпеки ІТС')[0]
+#
+#     Position(position_title='командир',
+#              unit=main_unit,
+#              position_tail='',
+#              temp_supervisor=True
+#              ).save()
+#
+#     Position(position_title='начальник',
+#              unit=admins_main_unit,
+#              position_tail='',
+#              temp_supervisor=True
+#              ).save()
+#
+#
+# def delete_positions(apps, schema_editor):
+#     Position = apps.get_model('reports', 'Position')
+#     Position.objects.all().delete()
 
 # $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
@@ -119,16 +104,16 @@ def load_servicemans(apps, schema_editor):
     col_rank = ranks.filter(name='полковник').first()
 
     units = Unit.objects.all()
-    main_unit = units.filter(name='військової частини А0334')[0]
-    admins_main_unit = units.filter(name='центру адміністраторів безпеки ІТС')[0]
-    admins_unit_section_1 = units.filter(name='відділу адміністраторів інформаційних систем')[0]
-    admins_unit_section_2 = units.filter(name='відділу адміністраторів захищених систем')[0]
+    main_unit = units.filter(name='військової частини А0334').first()
+    admins_main_unit = units.filter(name='центру адміністраторів безпеки ІТС').first()
+    cyber_main_unit = units.filter(name='центру кібернетичної безпеки ІТС').first()
+    admins_unit_section_1 = units.filter(name='відділу адміністраторів інформаційних систем').first()
+    admins_unit_section_2 = units.filter(name='відділу адміністраторів захищених систем').first()
 
     #####################################################################################
 
     pos_main_unit_commander = Position(position_title='командир',
                                        unit=main_unit,
-                                       position_tail='',
                                        supervisor=True,
                                        temp_supervisor=False
                                        )
@@ -136,11 +121,24 @@ def load_servicemans(apps, schema_editor):
 
     pos_admins_main_unit_boss = Position(position_title='начальник',
                                          unit=admins_main_unit,
-                                         position_tail='',
                                          supervisor=True,
-                                         temp_supervisor=True
+                                         temp_supervisor=False
                                          )
     pos_admins_main_unit_boss.save()
+
+    pos_admins_main_unit_deputy = Position(position_title='начальник',
+                                         unit=admins_main_unit,
+                                         supervisor=False,
+                                         temp_supervisor=True
+                                         )
+    pos_admins_main_unit_deputy.save()
+
+    pos_cyber_main_unit_boss = Position(position_title='начальник',
+                                        unit=cyber_main_unit,
+                                        supervisor=True,
+                                        temp_supervisor=False
+                                        )
+    pos_cyber_main_unit_boss.save()
 
     pos_admins_unit_section_1_boss = Position(position_title='начальник',
                                               unit=admins_unit_section_1,
@@ -152,7 +150,6 @@ def load_servicemans(apps, schema_editor):
 
     pos_admins_unit_section_2_boss = Position(position_title='начальник',
                                               unit=admins_unit_section_2,
-                                              position_tail='',
                                               supervisor=True,
                                               temp_supervisor=False
                                               )
@@ -160,31 +157,40 @@ def load_servicemans(apps, schema_editor):
 
     pos_admins_unit_section_1_senior_officer = Position(position_title='старший офіцер',
                                                         unit=admins_unit_section_1,
-                                                        position_tail='',
                                                         temp_supervisor=False
                                                         )
     pos_admins_unit_section_1_senior_officer.save()
 
     pos_admins_unit_section_2_senior_officer = Position(position_title='старший офіцер',
                                                         unit=admins_unit_section_2,
-                                                        position_tail='',
                                                         temp_supervisor=False
                                                         )
     pos_admins_unit_section_2_senior_officer.save()
 
     pos_admins_unit_section_1_officer = Position(position_title='офіцер',
                                                  unit=admins_unit_section_1,
-                                                 position_tail='',
                                                  temp_supervisor=False
                                                  )
     pos_admins_unit_section_1_officer.save()
 
     pos_admins_unit_section_2_officer = Position(position_title='офіцер',
                                                  unit=admins_unit_section_2,
-                                                 position_tail='',
                                                  temp_supervisor=False
                                                  )
     pos_admins_unit_section_2_officer.save()
+
+    # service duty officers
+    pos_admins_unit_duty_officer = Position(position_title='Адміністратор безпеки АСУ ЗС України (НЧО-471)',
+                                            unit=admins_main_unit,
+                                            temp_supervisor=False
+                                            )
+    pos_admins_unit_duty_officer.save()
+
+    pos_cyber_unit_duty_officer = Position(position_title='Начальник зміни (НЧО-51)',
+                                           unit=cyber_main_unit,
+                                           temp_supervisor=False
+                                           )
+    pos_cyber_unit_duty_officer.save()
 
     #####################################################################################
 
@@ -290,6 +296,17 @@ def load_servicemans(apps, schema_editor):
                position=pos_admins_unit_section_2_officer
                ).save()
 
+    Serviceman(first_name='Цабуров',
+               last_name='Сергій',
+               to_first_name='Цабурову',
+               to_last_name='Сергію',
+               for_first_name='Цабурова',
+               for_last_name='Сергія',
+               rank=jun_lt_rank,
+               unit=admins_main_unit,
+               position=pos_admins_main_unit_deputy
+               ).save()
+
 
 def delete_serviceman(apps, schema_editor):
     Serviceman = apps.get_model('reports', 'Serviceman')
@@ -300,13 +317,38 @@ def delete_serviceman(apps, schema_editor):
 
 def load_reports(apps, schema_editor):
     Report = apps.get_model('reports', 'Report')
+    Position = apps.get_model('reports', 'Position')
+    Serviceman = apps.get_model('reports', 'Serviceman')
+    Unit = apps.get_model('reports', 'Unit')
+
+    units = Unit.objects.all()
+    main_unit = units.filter(name='військової частини А0334').first()
+    admins_main_unit = units.filter(name='центру адміністраторів безпеки ІТС').first()
+    cyber_main_unit = units.filter(name='центру кібернетичної безпеки ІТС').first()
+    admins_unit_section_1 = units.filter(name='відділу адміністраторів інформаційних систем').first()
+    admins_unit_section_2 = units.filter(name='відділу адміністраторів захищених систем').first()
+
+    positions = Position.objects.all()
+    pos_main_unit_commander = positions.filter(position_title='командир', unit=main_unit).first()
+
+    pos_admins_main_unit_boss = positions.filter(position_title='начальник',
+                                         unit=admins_main_unit,
+                                         supervisor=True,
+                                         temp_supervisor=False
+                                         ).first()
+
+    pos_cyber_main_unit_boss = positions.filter(position_title='начальник',
+                                        unit=cyber_main_unit,
+                                        supervisor=True,
+                                        temp_supervisor=False
+                                        ).first()
 
     Report(
         title="Перенесення терміну щорічної основної відпустки",
         body_sample="""Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за 
             2019 рік з 29 жовтня на 20 грудня 2019 року у зв’язку з сiмейними обставинами.""",
         body_template="""Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за {
-                            "type": "int"
+                "type": "int"
             } рік з {
                 "title": "з якой дати",
                 "type": "date"
@@ -321,7 +363,9 @@ def load_reports(apps, schema_editor):
                 "type": "text"
             }.
             {"type":"rank_first_name_last_name"}
-            Шановний {"type":"rank_last_name_first_name"}, для перенесення терміну щорічної основної відпустки ви маєте зробити речі, які до цього часу не міг зробити ніхто....
+            Шановний {
+                "type":"rank_last_name_first_name"
+            }, для перенесення терміну щорічної основної відпустки ви маєте зробити речі, які до цього часу не міг зробити ніхто....
             {"type":"first_name_last_name"}
             {"type":"last_name_first_name"}""",
     ).save()
@@ -332,6 +376,34 @@ def load_reports(apps, schema_editor):
         body_template="Доповiдаю, що з-за меж Киiвського гарнiзону прибув та приступив до виконання службових обов'язкiв."
     ).save()
 
+    # --------------------- CUSTOM TYPE REPORTS ---------------------
+    Report(
+        title="(ЦАБ-наряд) Заступають на чергування ЦАБ - НЧО-471 (custom_report_type)",
+        type="custom",
+        template_name="template_custom_1.docx",
+        body_sample="""Доповiдаю, завтра в ЦАБ заступають на чергування наступні люди: ...""",
+        body_template="""Доповiдаю, завтра в ЦАБ заступають на чергування наступні люди: ...
+            {
+                "type": "date"
+            }:
+            НЧО-471 - {"type":"rank_first_name_last_name"}""",
+        default_header_position=pos_main_unit_commander,
+        default_footer_position=pos_admins_main_unit_boss
+    ).save()
+
+    Report(
+        title="(ЦКБ-наряд) Заступають на чергування ЦКБ - НЧО-51 (custom_report_type)",
+        template_name="template_custom_1.docx",
+        type="custom",
+        body_sample="""Доповiдаю, завтра в ЦКБ заступають на чергування наступні люди: ...""",
+        body_template="""Доповiдаю, завтра в ЦКБ заступають на чергування наступні люди: ...
+                {
+                    "type": "date"
+                }:
+                НЧО-471 - {"type":"rank_first_name_last_name"}""",
+        default_header_position=pos_main_unit_commander,
+        default_footer_position=pos_cyber_main_unit_boss
+    ).save()
 
 
 def delete_reports(apps, schema_editor):

@@ -1,4 +1,10 @@
 py manage.py migrate
 py manage.py createsuperuser
+stg
+stg@gmail.com
+stg
+stg
+y
+
 py manage.py makemigrations reports
-py manage.py migrate reports filled
+py manage.py migrate reports filled__test__database

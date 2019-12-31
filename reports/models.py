@@ -31,7 +31,7 @@ class Unit(models.Model):
 
 class Position(models.Model):
     position_title = models.CharField(max_length=255)
-    position_tail = models.CharField(max_length=255, blank=True)
+    position_tail = models.CharField(max_length=255, default='', blank=True)
     unit = models.ForeignKey('Unit', on_delete=models.DO_NOTHING)
 
     supervisor = models.BooleanField(blank=True, null=True)
@@ -41,8 +41,8 @@ class Position(models.Model):
         if self.temp_supervisor:
             pos_result = "Тимчасово виконуючий обов'язки\n" + self.position_title.split()[0] + "а"
         else:
-            pos_result = self.position_title
-        return pos_result.capitalize() + " " + \
+            pos_result = self.position_title[0].capitalize() + self.position_title[1:]
+        return pos_result + " " + \
                self.unit.name + \
                self.position_tail
 
@@ -102,19 +102,20 @@ class Serviceman(models.Model):
 
 
 class Report(models.Model):
-    REPORT_TYPES = (
-        ('regular_template', 'рапорт звичайний (report body is editable)'),
-        ('custom_template', 'рапорт по шаблону (header, body, footer are editable)'),
-    )
-    template_type = models.CharField(max_length=255, choices=REPORT_TYPES, default='regular_template')
+    REPORT_TYPES = [
+        ('regular', 'звичайний рапорт'),
+        ('custom', 'рапорт по шаблону (custom template)'),
+    ]
+    type = models.CharField(max_length=100, choices=REPORT_TYPES, default='regular')
+    template_name = models.CharField(max_length=255, default='template_universal.docx', null=True, blank=True)
+
     title = models.CharField(max_length=255, null=True)
 
     body_sample = models.TextField(blank=True, null=True)
     body_template = models.TextField(blank=True, null=True)
-    # header_sample = models.TextField(blank=True, null=True)
-    # header_template = models.TextField(blank=True, null=True)
-    # footer_sample = models.TextField(blank=True, null=True)
-    # footer_template = models.TextField(blank=True, null=True)
+
+    default_header_position = models.ForeignKey(Position, related_name='report_header_position_set', on_delete=models.SET_NULL, null=True)
+    default_footer_position = models.ForeignKey(Position, related_name='report_footer_position_set', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):
         return self.title

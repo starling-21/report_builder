@@ -21,20 +21,20 @@ app_name = "reports"
 
 urlpatterns = [
 
-    path('', views.home_view, name='index'),
+    # path('', views.home_view, name='index'),
+    path('', views.serviceman_list_view, name='index'),
 
     path('serviceman_list', views.serviceman_list_view, name='users'),
-    path('edit_chain/<int:serviceman_id>', views.edit_service_members_chain_view, name='edit_service_members_chain'),
-    path('reports_list/basic/<int:serviceman_id>', views.basic_reports_list_view, name='basic_reports_list'),
-    path('reports_list/custom', views.custom_reports_list_view, name='custom_reports_list'),
+
+    path('reports_list/<int:serviceman_id>', views.reports_list_view, name='reports_list'),
+    # path('reports_list/basic/<int:serviceman_id>', views.basic_reports_list_view, name='basic_reports_list'),
+    # path('reports_list/custom', views.custom_reports_list_view, name='custom_reports_list'),
+
+    path('edit_chain/<int:report_id>', views.edit_service_members_chain_view, name='edit_service_members_chain'),
+
     path('report_filling/<int:report_id>', views.report_filling_view, name='report_filling'),
     path('final_report', views.return_report_document_view, name='final_report'),
 
-
-    # path('search_member', views.member_search_view__rank_fname_lname),
-
-    # path('search_member__rank_fname_lname', views.member_search_view__rank_fname_lname),
-    # path('search_member__rank_lname_fname', views.member_search_view__rank_lname_fname),
 
     re_path(r'^search_member/$', views.member_search_view),
     re_path(r'^search_member/(?P<name_format>[-\w]+)$', views.member_search_view),

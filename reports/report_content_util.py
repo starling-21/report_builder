@@ -42,7 +42,7 @@ def get_report_merge_dict(request):
         serviceman_chain = request.session['serviceman_chain']
         serviceman_id = serviceman_chain[0].id
 
-        # user_pairs_dict = get_tier_users_pairs(serviceman_id, members_chain_id_list)
+
         user_pairs_dict = convert_members_chain_to_pairs_dict(serviceman_chain)
         for tier, users in user_pairs_dict.items():
             from_user = users[0]
@@ -87,7 +87,7 @@ def compose_main_report_body_from_post_request(input_form_data_dict):
             # TODO kostul, needs refactoring
             test_date_conversion_error = datetime.strptime(input_form_data_dict.get(str(i)),
                                                            "%Y-%m-%d").date()  # DO nOt delete
-            report_body_text += datetime_as_day_month_year(input_form_data_dict.get(str(i)))
+            report_body_text += convert_datetime_as_day_month_year(input_form_data_dict.get(str(i)))
         except ValueError:
             report_body_text += input_form_data_dict.get(str(i))
         except Exception as e:
@@ -122,30 +122,21 @@ def append_to_dict_keys(dictionary, tier):
     return result
 
 
-def get_tier_users_pairs(serviceman_id, members_chain_id_list=None):
-    """
-    create dictionary of paired users lists for report.
-    :param serviceman_id:
-    :param members_chain_id_list:
-    returns {tier:[FROM_user, TO_user],....} or NONE    """
-    serviceman = Serviceman.objects.get(id=serviceman_id)
-    users_chain = []
-    if members_chain_id_list is None:
-        users_chain = get_servicemen_chain_list(serviceman)
-    else:
-        for id in members_chain_id_list:
-            users_chain.append(Serviceman.objects.get(id=id))
-
-    return convert_members_chain_to_pairs_dict(users_chain)
-    # tiers_dict = {}
-    # if len(users_chain) < 2:
-    #     return None
-    # elif len(users_chain) == 2:
-    #     tiers_dict[0] = [users_chain[0], users_chain[1]]
-    # elif len(users_chain) > 2:
-    #     for i in range(0, len(users_chain) - 1):
-    #         tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
-    # return tiers_dict
+# def get_tier_users_pairs(serviceman_id, members_chain_id_list=None):
+#     """
+#     create dictionary of paired users lists for report.
+#     :param serviceman_id:
+#     :param members_chain_id_list:
+#     returns {tier:[FROM_user, TO_user],....} or NONE    """
+#     serviceman = Serviceman.objects.get(id=serviceman_id)
+#     users_chain = []
+#     if members_chain_id_list is None:
+#         users_chain = get_servicemen_chain_list(serviceman)
+#     else:
+#         for id in members_chain_id_list:
+#             users_chain.append(Serviceman.objects.get(id=id))
+#
+#     return convert_members_chain_to_pairs_dict(users_chain)
 
 
 def convert_members_chain_to_pairs_dict(servicemen_chain_list):
@@ -164,76 +155,59 @@ def convert_members_chain_to_pairs_dict(servicemen_chain_list):
             tiers_dict[i] = [servicemen_chain_list[i], servicemen_chain_list[i + 1]]
     return tiers_dict
 
-# def get_tier_users_pairs(users_chain_id_list):
-#     """users_chain_id_list - users_chain identifiers list.
-#     returns dictionary of paired users for report tiers. {tier:[FROM_user, TO_user],....} or NONE"""
-#     users_chain = []
-#     for id in users_chain_id_list:
-#         users_chain.append(Serviceman.objects.get(id))
-#
-#     tiers_dict = {}
-#     if len(users_chain) < 2:
-#         return None
-#     elif len(users_chain) == 2:
-#         tiers_dict[0] = [users_chain[0], users_chain[1]]
-#     elif len(users_chain) > 2:
-#         for i in range(0, len(users_chain) - 1):
-#             tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
-#     return tiers_dict
 
-
-# def convert_dict_to_tier_users_pairs(users_chain_dict):
-#     """convert members chain dic to tier users pairs """
-#     tiers_dict = {}
-#     users_chain = list(users_chain_dict.values())
-#     if len(users_chain) < 2:
-#         return None
-#     elif len(users_chain) == 2:
-#         tiers_dict[0] = [users_chain[0], users_chain[1]]
-#     elif len(users_chain) > 2:
-#         for i in range(0, len(users_chain) - 1):
-#             tiers_dict[i] = [users_chain[i], users_chain[i + 1]]
-#     return tiers_dict
-
-
-def get_servicemen_chain_list(serviceman):
+def get_servicemen_chain_list(serviceman, report_id=None):
     """return service members chain from initiator too the top level supervisor
        RECURSIVE METHOD, be carefull :)
        return servicemen objects list
     """
+    report = Report.objects.get(id=report_id)
     users_list = []
-    # serviceman = Serviceman.objects.get(id=serviceman_id)
-    users_list.append(serviceman)
-    next_supervisor = get_supervisor_for(serviceman)
-    if next_supervisor is not None:
-        users_list.extend(get_servicemen_chain_list(next_supervisor))
+
+    if report.type == 'regular':
+        #TODO make this section as separate recursive function
+        users_list.append(serviceman)
+        next_supervisor = get_supervisor_for(serviceman)
+        if next_supervisor is not None:
+            users_list.extend(get_servicemen_chain_list(next_supervisor, report_id))
+    elif report.type == 'custom':
+        users_list.append(get_serviceman_or_his_deputy_by_position(report.default_footer_position))
+        users_list.append(get_serviceman_or_his_deputy_by_position(report.default_header_position))
+
     return users_list
 
 
-def get_servicemen_chain_id_list(serviceman_id):
-    """return service members chain identifiers list from initiator too the top level supervisor
-       RECURSIVE METHOD, be carefull :)
-       returns [55,21,5,1]
+def get_serviceman_or_his_deputy_by_position(position):
     """
-    users_chain_id_list = []
-    serviceman = Serviceman.objects.get(id=serviceman_id)
-    users_chain_id_list.append(serviceman_id)
-    next_supervisor = get_supervisor_for(serviceman)
-    if next_supervisor is not None:
-        users_chain_id_list.extend(get_servicemen_chain_id_list(next_supervisor.id))
-    return users_chain_id_list
+    get serviceman or his deputy by position
+    :param position:
+    :return:  if there is no deputy, return hist boss
+    """
+    default_serviceman = Serviceman.objects.get(position=position)
+    try:
+        first_priority_position = Position.objects.get(unit=position.unit, temp_supervisor=True)
+        first_priority_position.temp_supervisor = True
+        first_priority_serviceman = Serviceman.objects.filter(position=first_priority_position).first()
+        if first_priority_serviceman:
+            return first_priority_serviceman
+    except Exception as e:
+        print(e)
+
+    return default_serviceman
 
 
-# def get_servicemen_chain_dict(serviceman):
-#     """return service members chain from initiator too the top level supervisor
+# def get_servicemen_chain_id_list(serviceman_id):
+#     """return service members chain identifiers list from initiator too the top level supervisor
 #        RECURSIVE METHOD, be carefull :)
+#        returns [55,21,5,1]
 #     """
-#     users_dict = {}
-#     users_dict[serviceman.id] = serviceman
+#     users_chain_id_list = []
+#     serviceman = Serviceman.objects.get(id=serviceman_id)
+#     users_chain_id_list.append(serviceman_id)
 #     next_supervisor = get_supervisor_for(serviceman)
 #     if next_supervisor is not None:
-#         users_dict.update(get_servicemen_chain_dict(next_supervisor))
-#     return users_dict
+#         users_chain_id_list.extend(get_servicemen_chain_id_list(next_supervisor.id))
+#     return users_chain_id_list
 
 
 def get_footer_data(serviceman):
@@ -343,7 +317,7 @@ def get_current_date_line():
     return '"___"' + ' ' + monthes[month_numb] + ' ' + str(year) + ' ' + 'року'
 
 
-def datetime_as_day_month_year(date_str, with_no_year=False):
+def convert_datetime_as_day_month_year(date_str, with_no_year=False):
     """return properly formated date line for report"""
     temp_date = datetime.strptime(date_str, "%Y-%m-%d").date()
 
