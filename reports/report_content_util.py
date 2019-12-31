@@ -156,44 +156,69 @@ def convert_members_chain_to_pairs_dict(servicemen_chain_list):
     return tiers_dict
 
 
-def get_servicemen_chain_list(serviceman, report_id=None):
-    """return service members chain from initiator too the top level supervisor
-       RECURSIVE METHOD, be carefull :)
+def get_servicemen_chain_list(serviceman, report_id):
+    """return report's service members chain based on report type
        return servicemen objects list
     """
     report = Report.objects.get(id=report_id)
     users_list = []
 
     if report.type == 'regular':
+        users_list = get_full_servicemen_chain_list(serviceman)
         #TODO make this section as separate recursive function
-        users_list.append(serviceman)
-        next_supervisor = get_supervisor_for(serviceman)
-        if next_supervisor is not None:
-            users_list.extend(get_servicemen_chain_list(next_supervisor, report_id))
+        # users_list.append(serviceman)
+        # next_supervisor = get_supervisor_for(serviceman)
+        # if next_supervisor is not None:
+        #     users_list.extend(get_servicemen_chain_list(next_supervisor, report_id))
     elif report.type == 'custom':
-        users_list.append(get_serviceman_or_his_deputy_by_position(report.default_footer_position))
-        users_list.append(get_serviceman_or_his_deputy_by_position(report.default_header_position))
+        users_list.append(get_chief_or_his_deputy_by_position(report.default_footer_position))
+        users_list.append(get_chief_or_his_deputy_by_position(report.default_header_position))
 
     return users_list
 
 
-def get_serviceman_or_his_deputy_by_position(position):
+def get_full_servicemen_chain_list(serviceman):
+    """return service members chain from initiator too the top level supervisor
+       RECURSIVE METHOD, be carefull :)
+       return servicemen objects list
+    """
+    users_list = []
+    serviceman = get_temp_deputy_if_exists(serviceman)
+    users_list.append(serviceman)
+    next_supervisor = get_supervisor_for(serviceman)
+    if next_supervisor is not None:
+        users_list.extend(get_full_servicemen_chain_list(next_supervisor))
+    return users_list
+
+
+def get_chief_or_his_deputy_by_position(position):
     """
     get serviceman or his deputy by position
     :param position:
     :return:  if there is no deputy, return hist boss
     """
-    default_serviceman = Serviceman.objects.get(position=position)
-    try:
-        first_priority_position = Position.objects.get(unit=position.unit, temp_supervisor=True)
-        first_priority_position.temp_supervisor = True
-        first_priority_serviceman = Serviceman.objects.filter(position=first_priority_position).first()
-        if first_priority_serviceman:
-            return first_priority_serviceman
-    except Exception as e:
-        print(e)
+    if position.supervisor:
+        default_serviceman = Serviceman.objects.get(position=position)
+        try:
+            first_priority_position = Position.objects.get(unit=position.unit, temp_supervisor=True)
+            first_priority_position.temp_supervisor = True
+            first_priority_serviceman = Serviceman.objects.filter(position=first_priority_position).first()
+            if first_priority_serviceman:
+                return first_priority_serviceman
+        except Exception as e:
+            print(e)
 
     return default_serviceman
+
+def get_temp_deputy_if_exists(serviceman):
+    """
+    check for service member temporary deputy if he exists
+    :param serviceman:
+    :return: deputy or normal unit chief
+    """
+    if serviceman.position.supervisor == True:
+        return get_chief_or_his_deputy_by_position(serviceman.position)
+    return serviceman
 
 
 # def get_servicemen_chain_id_list(serviceman_id):
