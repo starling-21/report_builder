@@ -5,14 +5,9 @@
 
 -- serves as middleware mechanism for report's service_members chain modification
 
-INPUT DATA:
-
-1st OPTION:
-accept: request,  user id (based on incoming user_id generates service_men chain to the top supervisor)
---> returns it for user modifications //TODO chose best data representation to fill in this data into html form
 
 2nd OPTION:
-accept: request, user id, report id and service_members chain (optional)
+accept: request  django backend session store extra data (user id, report id and service_members chain)
 --> generate final data content dictionary for report's document generator
 
 
@@ -165,11 +160,6 @@ def get_servicemen_chain_list(serviceman, report_id):
 
     if report.type == 'regular':
         users_list = get_full_servicemen_chain_list(serviceman)
-        #TODO make this section as separate recursive function
-        # users_list.append(serviceman)
-        # next_supervisor = get_supervisor_for(serviceman)
-        # if next_supervisor is not None:
-        #     users_list.extend(get_servicemen_chain_list(next_supervisor, report_id))
     elif report.type == 'custom':
         users_list.append(get_chief_or_his_deputy_by_position(report.default_footer_position))
         users_list.append(get_chief_or_his_deputy_by_position(report.default_header_position))

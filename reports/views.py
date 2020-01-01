@@ -43,6 +43,7 @@ def reports_list_view(request, serviceman_id):
     }
     return render(request, 'reports/reports_list.html', context)
 
+
 # def basic_reports_list_view(request, serviceman_id):
 #     """show reports list to choose"""
 #     serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
@@ -66,7 +67,6 @@ def edit_service_members_chain_view(request, report_id):
     """change servicemen chain if needed.
     automatically change member position and make him temporary boss on this position"""
 
-
     if request.method == 'POST':
         try:
             serviceman_chain = request.session['serviceman_chain']
@@ -83,14 +83,18 @@ def edit_service_members_chain_view(request, report_id):
                     for member in serviceman_chain:
                         if member.id == int(old_id):
                             replace_index = serviceman_chain.index(member)
-                    # change position to temporary and unit
-                    initial_member_position = request.session['initial_serviceman_chain'][replace_index].position
-                    initial_member_position.temp_supervisor = True
-                    initial_member_unit = request.session['initial_serviceman_chain'][replace_index].unit
-                    # replace member in chain
+
                     new_serviceman = Serviceman.objects.get(id=int(swap_id))
-                    new_serviceman.position = initial_member_position
-                    new_serviceman.unit = initial_member_unit
+
+                    initial_member_position = request.session['initial_serviceman_chain'][replace_index].position
+                    # change position to temporary and unit
+                    if new_serviceman.position != initial_member_position:
+                        initial_member_position.temp_supervisor = True
+                        initial_member_unit = request.session['initial_serviceman_chain'][replace_index].unit
+
+                        # replace member in chain
+                        new_serviceman.position = initial_member_position
+                        new_serviceman.unit = initial_member_unit
                     serviceman_chain[replace_index] = new_serviceman
 
                     request.session['serviceman_chain'] = serviceman_chain
@@ -215,4 +219,3 @@ def member_search_view(request):
         'service_members_list': service_members_list,
     }
     return render(request, 'reports/test_search_user.html', context)
-
