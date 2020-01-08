@@ -14,25 +14,26 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,re_path
+from django.urls import path, re_path
 from . import views
 
 app_name = "reports"
 
 urlpatterns = [
 
-    # path('', views.home_view, name='index'),
-    path('', views.serviceman_list_view, name='index'),
+    # path('', views.index_view, name='index'),
+
+    path('', views.reports_list_view, name='index'),
+
+    path('reports_list', views.reports_list_view, name='reports_list'),
+    path('proceed_chosen_report/<int:report_id>', views.proceed_chosen_report_view, name='proceed_chosen_report'),
 
     path('serviceman_list', views.serviceman_list_view, name='users'),
 
-    path('reports_list/<int:serviceman_id>', views.reports_list_view, name='reports_list'),
-    # path('reports_list/basic/<int:serviceman_id>', views.basic_reports_list_view, name='basic_reports_list'),
-    # path('reports_list/custom', views.custom_reports_list_view, name='custom_reports_list'),
+    re_path(r'^edit_chain/$', views.edit_service_members_chain_view, name='edit_service_members_chain'),
+    re_path(r'^edit_chain/(?P<serviceman_id>\d+)$', views.edit_service_members_chain_view, name='edit_service_members_chain'),
 
-    path('edit_chain/<int:report_id>', views.edit_service_members_chain_view, name='edit_service_members_chain'),
-
-    path('report_filling/<int:report_id>', views.report_filling_view, name='report_filling'),
+    path('report_filling', views.report_filling_view, name='report_filling'),
     path('final_report', views.return_report_document_view, name='final_report'),
 
 

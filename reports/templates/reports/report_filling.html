@@ -11,20 +11,21 @@
 {% block content %}
 
     <form action="" method="POST" style="margin: 4px">
-    {% csrf_token %}
-    <hr>
-    Раорт: {{ title }}
-    <hr>
-    Зразок:  <b>{{ body_sample }}</b>
-    <hr>
-    {% for field in report_fields_form %}
-        <div class="report_input_form" style="display: inline-flex; margin: 4px">
-            {{ field.label }}
-            {{ field }}
-        </div>
-    {% endfor %}
-    <br>
-    <br>
+        {% csrf_token %}
+        <hr>
+        Рапорт: {{ title }}
+        <hr>
+        Зразок:  <b>{{ body_sample }}</b>
+        <hr>
+        {% for field in report_fields_form %}
+            <div style="display: inline-flex; margin: 4px">
+                {{ field.label }}
+                {{ field }}
+            </div>
+        {% endfor %}
+        <br>
+        <br>
+    </form>
     <input type="submit" class="btn btn-info" name="submit_form" value="Згенерувати рапорт"/>
 
 {% endblock %}

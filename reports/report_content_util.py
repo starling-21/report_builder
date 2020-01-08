@@ -117,23 +117,6 @@ def append_to_dict_keys(dictionary, tier):
     return result
 
 
-# def get_tier_users_pairs(serviceman_id, members_chain_id_list=None):
-#     """
-#     create dictionary of paired users lists for report.
-#     :param serviceman_id:
-#     :param members_chain_id_list:
-#     returns {tier:[FROM_user, TO_user],....} or NONE    """
-#     serviceman = Serviceman.objects.get(id=serviceman_id)
-#     users_chain = []
-#     if members_chain_id_list is None:
-#         users_chain = get_servicemen_chain_list(serviceman)
-#     else:
-#         for id in members_chain_id_list:
-#             users_chain.append(Serviceman.objects.get(id=id))
-#
-#     return convert_members_chain_to_pairs_dict(users_chain)
-
-
 def convert_members_chain_to_pairs_dict(servicemen_chain_list):
     """
     convert members list to chain member pairs
@@ -151,7 +134,7 @@ def convert_members_chain_to_pairs_dict(servicemen_chain_list):
     return tiers_dict
 
 
-def get_servicemen_chain_list(serviceman, report_id):
+def get_servicemen_chain_list(report_id, serviceman=None):
     """return report's service members chain based on report type
        return servicemen objects list
     """
@@ -209,20 +192,6 @@ def get_temp_deputy_if_exists(serviceman):
     if serviceman.position.supervisor == True:
         return get_chief_or_his_deputy_by_position(serviceman.position)
     return serviceman
-
-
-# def get_servicemen_chain_id_list(serviceman_id):
-#     """return service members chain identifiers list from initiator too the top level supervisor
-#        RECURSIVE METHOD, be carefull :)
-#        returns [55,21,5,1]
-#     """
-#     users_chain_id_list = []
-#     serviceman = Serviceman.objects.get(id=serviceman_id)
-#     users_chain_id_list.append(serviceman_id)
-#     next_supervisor = get_supervisor_for(serviceman)
-#     if next_supervisor is not None:
-#         users_chain_id_list.extend(get_servicemen_chain_id_list(next_supervisor.id))
-#     return users_chain_id_list
 
 
 def get_footer_data(serviceman):
@@ -333,7 +302,7 @@ def get_current_date_line():
 
 
 def convert_datetime_as_day_month_year(date_str, with_no_year=False):
-    """return properly formated date line for report"""
+    """return properly formatted date line to report for visual representation"""
     temp_date = datetime.strptime(date_str, "%Y-%m-%d").date()
 
     monthes = {

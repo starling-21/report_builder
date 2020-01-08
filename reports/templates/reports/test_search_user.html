@@ -80,33 +80,35 @@
 
 
 {% block js_scripts %}
-    <script>
+
+<script>
         $(document).ready(function () {
             // Initialize select2
             var csrf_token = '{{ csrf_token }}';
-            $('.js-example-basic-single').select2({
-                placeholder: "type in Name",
+            $('select').select2({
+                placeholder: "Пошук (Імена та Прізвища з Великої літери)",
                 allowClear: true,
-                tags: true,
-                width: '300px',
+                language: "ru",
+                delay: 250,
+                width: '400px',
 
                 ajax: {
                     csrfmiddlewaretoken: csrf_token,
-                    url: 'search_member',
+                    url: '/search_member/',
                     method: 'POST',
                     dataType: 'json',
                     // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
                     data: function (params) {
                         var query = {
                             csrfmiddlewaretoken: csrf_token,
-                            filter_param: params.term
+                            filter_param: params.term,
+                            name_format: $(this).attr('title')
                         }
                         return query;
                     },
-
                     processResults: function (data) {
                         // Transforms the top-level key of the response object from 'items' to 'results'
-                        console.log("success")
+                        //console.log("success")
                         console.log(data)
                         return {
                             results: data
@@ -114,56 +116,7 @@
                     }
                 }
             });
-
         });
 
     </script>
-
-
-{#    <script>#}
-{#        var csrf_token = '{{ csrf_token }}';#}
-{#        $('#search-button').click(function (event) {#}
-{#            event.preventDefault();#}
-{#            var searched_input = $('#searched_data').val();#}
-{#            $.ajax({#}
-{#                url: 'search_member',#}
-{#                method: 'POST',#}
-{#                data: {#}
-{#                    csrfmiddlewaretoken: csrf_token,#}
-{#                    filter_param: searched_input#}
-{#                },#}
-{#                dataType: 'json',#}
-{#                success: function (data) {#}
-{#                    console.log("success")#}
-{#                    console.log(data)#}
-{#                    $('#test_members').html("data")#}
-{#                    parse_response(data)#}
-{#                },#}
-{#                error: function (error_data) {#}
-{#                    console.log("error")#}
-{#                    console.log(error_data)#}
-{#                }#}
-{#            });#}
-{#        });#}
-{##}
-{#        function parse_response(data_arr) {#}
-{#            $('#test_members').html('')#}
-{#            data_arr.forEach(function (arrayItem) {#}
-{#                var x = arrayItem.id#}
-{#                var name = arrayItem.name#}
-{#                $('#test_members').append(name + '<br>')#}
-{#            });#}
-{##}
-{#            $('#member-selected').html('')#}
-{#            data_arr.forEach(function (arrayItem) {#}
-{#                var x = arrayItem.id#}
-{#                var name = arrayItem.name#}
-{#                $('#member-selected').append('<option value=' + x + '>' +#}
-{#                    name +#}
-{#                    '</option>')#}
-{#            });#}
-{#        }#}
-{##}
-{#    </script>#}
-
 {% endblock %}

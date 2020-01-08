@@ -7,7 +7,7 @@ from datetime import datetime
 from mailmerge import MailMerge
 import os
 
-# //TODO implement main methods
+
 def create_docx_document(merge_dict):
     """
     generate report document from merge dict
@@ -22,8 +22,7 @@ def create_docx_document(merge_dict):
             os.mkdir(OUTPUT_REPORTS_DIR)
         except OSError:
             print("Creation of the directory %s failed" % OUTPUT_REPORTS_DIR)
-        # else:
-            # print("Successfully created the directory %s " % OUTPUT_REPORTS_DIR)
+
     template_path = os.path.join(REPORT_TEMPLATES_DIR, template_name)
     document = MailMerge(template_path)
     # print("Merge fields at {} document: {}".format(template_name, document.get_merge_fields()))

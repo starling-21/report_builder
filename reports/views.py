@@ -16,9 +16,32 @@ from . import report_forms_util
 
 
 # Create your views here.
-def home_view(request):
+def index_view(request):
     """show few report generation option for user (basic report or custom_template)"""
-    return render(request, 'reports/report_template_choose.html')
+    return render(request, 'reports/index.html')
+
+
+def reports_list_view(request):
+    """show all reports"""
+    reports_list = Report.objects.all()
+    context = {
+        'reports_list': reports_list,
+    }
+    return render(request, 'reports/reports_list.html', context)
+
+
+def proceed_chosen_report_view(request, report_id):
+    """
+    proceed choosed report and define next step (show report filling form or users list to set up report owner )
+    """
+    request.session['report_id'] = report_id
+    request.session.modified = True
+
+    report = Report.objects.get(id=report_id)
+    if report.type == 'regular':
+        return redirect(reverse('reports:users'))
+    elif report.type == 'custom':
+        return redirect(reverse('reports:edit_service_members_chain'))
 
 
 def serviceman_list_view(request):
@@ -30,40 +53,7 @@ def serviceman_list_view(request):
     return render(request, 'reports/serviceman_list.html', context)
 
 
-def reports_list_view(request, serviceman_id):
-    """show all reports list"""
-    request.session['serviceman_id'] = serviceman_id
-    request.session.modified = True
-
-    serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
-    reports_list = Report.objects.all()
-    context = {
-        'reports_list': reports_list,
-        'serviceman': serviceman
-    }
-    return render(request, 'reports/reports_list.html', context)
-
-
-# def basic_reports_list_view(request, serviceman_id):
-#     """show reports list to choose"""
-#     serviceman = Serviceman.objects.get(id=serviceman_id).get_full_name_for()
-#     reports_list = Report.objects.filter(type='regular')
-#     context = {
-#         'reports_list': reports_list,
-#         'serviceman': serviceman
-#     }
-#     return render(request, 'reports/reports_list.html', context)
-#
-#
-# def custom_reports_list_view(request):
-#     """show hardcoded report templates list"""
-#     reports_list = Report.objects.filter(type='custom')
-#     context = {
-#         'reports_list': reports_list,
-#     }
-#     return render(request, 'reports/reports_list.html', context)
-
-def edit_service_members_chain_view(request, report_id):
+def edit_service_members_chain_view(request, serviceman_id=None):
     """change servicemen chain if needed.
     automatically change member position and make him temporary boss on this position"""
 
@@ -77,8 +67,7 @@ def edit_service_members_chain_view(request, report_id):
             elif 'submit_new_id' in request.POST:
                 old_id = request.POST.get('submit_new_id')
                 swap_id = request.POST.get('swap_id')
-                if (old_id != swap_id) and \
-                        (len(swap_id) > 0):
+                if (old_id != swap_id) and (len(swap_id) > 0):
                     print('id swap: {} -> {}'.format(old_id, swap_id))
                     for member in serviceman_chain:
                         if member.id == int(old_id):
@@ -106,23 +95,27 @@ def edit_service_members_chain_view(request, report_id):
                         serviceman_chain.remove(member)
                 request.session['serviceman_chain'] = serviceman_chain
                 request.session.modified = True
+                swap_id = None
             elif 'submit_chain_editing' in request.POST:
                 print("submit_chain_editting")
-                # return redirect(reverse('reports:basic_reports_list', kwargs={'serviceman_id': serviceman_id}))
-                return redirect(reverse('reports:report_filling', kwargs={'report_id': report_id}))
+                return redirect(reverse('reports:report_filling'))
         except Exception as e:
             print(e)
-            return redirect(reverse('reports:edit_service_members_chain', kwargs={'report_id': report_id}))
+            return redirect(reverse('reports:edit_service_members_chain', kwargs={'report_id': request.session['report_id']}))
             # return redirect(reverse('reports:users'))
 
     elif request.method == 'GET':
         swap_id = None
-        request.session['report_id'] = report_id
-        request.session.modified = True
+        report_id = request.session['report_id']
 
-        serviceman_id = request.session['serviceman_id']
-        serviceman = Serviceman.objects.get(id=serviceman_id)
-        serviceman_chain = report_content_util.get_servicemen_chain_list(serviceman, report_id)
+        if serviceman_id is None:
+            serviceman_chain = report_content_util.get_servicemen_chain_list(report_id)
+        else:
+            request.session['serviceman_id'] = serviceman_id
+            request.session.modified = True
+            serviceman = Serviceman.objects.get(id=serviceman_id)
+            serviceman_chain = report_content_util.get_servicemen_chain_list(report_id, serviceman)
+
         request.session['serviceman_chain'] = serviceman_chain
         request.session['initial_serviceman_chain'] = serviceman_chain
         request.session.modified = True
@@ -135,7 +128,7 @@ def edit_service_members_chain_view(request, report_id):
     return render(request, 'reports/edit_service_members_chain.html', context)
 
 
-def report_filling_view(request, report_id):
+def report_filling_view(request):
     """report filling form view"""
     if request.method == 'POST':
         document_file_path = report_controller.generate_report(request)
@@ -143,6 +136,7 @@ def report_filling_view(request, report_id):
         request.session.modified = True
         return redirect(reverse('reports:final_report'))
 
+    report_id = request.session['report_id']
     context = report_forms_util.get_report_body_filling_form(report_id)
     return render(request, 'reports/report_filling.html', context)
 
@@ -165,7 +159,6 @@ def return_report_document_view(request):
     return response
 
 
-# def member_search_view(request, name_format=None):
 def member_search_view(request):
     """
     Search for servicemember and return objects json array:

@@ -7,9 +7,7 @@
     {% for report in reports_list %}
         <ul>
             <li>
-{#                <a href="{% url 'reports:report_filling' report_id=report.id %}">{{ report.id }} {{ report.title}}</a>#}
-                <a href="{% url 'reports:edit_service_members_chain' report_id=report.id %}">
-                    {{ report.id }} {{ report.title}}</a>
+                <a href="{% url 'reports:proceed_chosen_report' report_id=report.id %}">{{ report.id }} {{ report.title}}</a>
             </li>
         </ul>
     {% endfor %}

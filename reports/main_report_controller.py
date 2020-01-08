@@ -7,10 +7,10 @@ handle main process for report creation
 - report content data preparations
 - report document generation
 """
-from .models import Serviceman
 
-from . import report_content_util
 from . import document_generator
+from . import report_content_util
+
 
 # def generate_report(request, serviceman_id, members_chain_id_list=None):
 def generate_report(request):
@@ -19,7 +19,6 @@ def generate_report(request):
     request: request with data for report filling
     :return: report file path
     """
-    report_merge_dict = {}
     report_merge_dict = report_content_util.get_report_merge_dict(request)
     # print("GLOBAL MERGE DICT:", report_merge_dict)
     # for k, v in report_merge_dict.items():

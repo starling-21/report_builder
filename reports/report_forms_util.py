@@ -8,7 +8,6 @@ from bootstrap_datepicker_plus import DatePickerInput
 from .models import Report
 from django import forms
 from .forms import ReportFillingForm
-from .forms import ServiceMembersChainEditForm
 import json
 
 

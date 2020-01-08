@@ -1,0 +1,6 @@
+IMPORTANT:
+READ this for normal usage
+1. this github repo contain updated docx-mailmerge version / fixed (\n) substitution.
+This library parse \n as 'new line' nor like 'line breaking'
+
+pip install git+https://github.com/ZhengMingpei/docx-mailmerge
