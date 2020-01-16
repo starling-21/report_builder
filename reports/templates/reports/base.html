@@ -4,11 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <title>Reports</title>
     <link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
-    <link rel="stylesheet" href="{% static 'fontawesome-free-5.11.2-web/css/all.css' %}" >
 
+    <link rel="stylesheet" href="{% static 'fontawesome-free-5.11.2-web/css/all.css' %}" >
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" crossorigin="anonymous" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" rel="stylesheet"/>
 
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous" integrity="sha384-xBuQ/xzmlsLoJpyjoggmTEz8OWUFM0/RC5BsqQBDX2v5cMvDHcMakNTNrHIW2I5f"></script>
@@ -16,42 +15,30 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"></script>
 
 
+{#    import local bootstrap#}
+{#    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4.0.0/dist/css/bootstrap.css' %}"/>#}
 
-    {% block extra_head %}{% endblock %}
+{#    custom css#}
+{#    <link rel="stylesheet" type="text/css" href="{% static 'custom-css/stg_1.css' %}"/>#}
+{#    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4.0.0/custom.scss' %}"/>#}
 
-    {{ form.media }}
+
+    {% block extra_head %}
+        {{ form.media }}
+    {% endblock %}
+
+
 
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd;">
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
     <div class="container">
         <a class="navbar-brand" href="/">Головна</a>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
-{#                <li class="nav-item active">#}
-{#                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>#}
-{#                </li>#}
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link" href="#">Link</a>#}
-{#                </li>#}
-{#                <li class="nav-item dropdown">#}
-{#                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"#}
-{#                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">#}
-{#                        Dropdown#}
-{#                    </a>#}
-{#                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">#}
-{#                        <a class="dropdown-item" href="#">Action</a>#}
-{#                        <a class="dropdown-item" href="#">Another action</a>#}
-{#                        <div class="dropdown-divider"></div>#}
-{#                        <a class="dropdown-item" href="#">Something else here</a>#}
-{#                    </div>#}
-{#                </li>#}
-{##}
-{#                <li class="nav-item">#}
-{#                    <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>#}
-{#                </li>#}
+
             </ul>
         </div>
 </nav>
