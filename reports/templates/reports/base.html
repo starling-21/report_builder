@@ -18,8 +18,8 @@
 {#    import local bootstrap#}
 {#    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4.0.0/dist/css/bootstrap.css' %}"/>#}
 
-{#    custom css#}
-{#    <link rel="stylesheet" type="text/css" href="{% static 'custom-css/stg_1.css' %}"/>#}
+    {#    custom css#}
+    <link rel="stylesheet" type="text/css" href="{% static 'custom-css/custom_styles.css' %}"/>
 {#    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4.0.0/custom.scss' %}"/>#}
 
 
@@ -32,15 +32,22 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
-    <div class="container">
-        <a class="navbar-brand" href="/">Головна</a>
+<nav class="navba fixed-top navbar-expand-lg navbar-dark bg-secondary">
+    <div class="container form-inline">
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+        <!-- <a class="navbar-brand text-uppercase font-weight-light" href="/">головна</a> -->
+        <a href="/" class="navbar-brand"><i class="fab fa-battle-net fa-3x text-warning"></i></a>
 
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"
+                        href="/">головна</a></li>
+                <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"
+                        href="#">(F.A.Q.)</a></li>
             </ul>
         </div>
+
+    </div>
 </nav>
 
 
@@ -54,5 +61,6 @@
 </div>
 
 {% block js_scripts %}{% endblock %}
+
 </body>
 </html>

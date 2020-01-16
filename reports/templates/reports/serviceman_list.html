@@ -1,9 +1,18 @@
 {% extends 'reports/base.html' %}
 
 {% block content %}
-    {% for serviceman in serviceman_list %}
-        <hr>
-            <a href="{% url 'reports:edit_service_members_chain' serviceman_id=serviceman.id %}">
-                {{ serviceman.id }} {{ serviceman.first_name|title }} {{ serviceman.last_name|title }}</a>
-    {% endfor %}
+    <p><h3>Оберіть від кого рапорт:</h3></p>
+    <hr>
+
+    <div class="bs-example">
+        <ul class="list-group">
+            {% for serviceman in serviceman_list %}
+                <li class="list-group-item {% cycle '' 'list-group-item-secondary'  %}">
+                    <a href="{% url 'reports:edit_service_members_chain' serviceman_id=serviceman.id %}">
+                        {{ serviceman.rank }} {{ serviceman.first_name|title }} {{ serviceman.last_name|title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
 {% endblock %}
