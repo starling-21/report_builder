@@ -11,51 +11,75 @@
 
 
 {% block content %}
-    <p><u><i>Всі посередники:</i></u></p>
-
+    <p><h3>Всі посередники:</h3></p>
+    <hr>
 
     <form method="POST">{% csrf_token %}
-        <hr>
-        <hr>
         {% for servicemember in serviceman_chain %}
-            {# editing chain member, show input field for new chain member in chain members line #}
-            {% if swap_id == servicemember.id and swap_presence is None %}
-                {% set swap_presence = True %}
-                Заміна посередника ({{ servicemember.rank.name }} {{ servicemember }}) на папєрєдніка:
-                <br>
-                <select name="swap_id"></select>
-                <button type="submit" class="btn btn-light btn-sm" name="submit_new_id" value="{{ servicemember.id }}">
-                    <span class="fas fa-check-square"></span> Ok
-                </button> {#submit chain member id editing button#}
+            <div class="row left-bordered-row bg-light rounded m-3">
+                {# editing chain member #}
+                {% if swap_id == servicemember.id and swap_presence is None %}
+                    <div class="col-12">
+                        {% set swap_presence = True %}
+                        <select name="swap_id"></select>
+                        <button type="submit" class="btn btn-secondary btn-sm" name="submit_new_id"
+                                value="{{ servicemember.id }}">
+                            замінити<i class="fas fa-exchange-alt m-1"></i>
+                        </button>
+                        {#submit chain member id editing button#}
+                    </div>
+                {# end of editing chain member #}
+                {% else %}
+                    {# member representation block #}
+                    <div class="col-11">
+                        {{ servicemember.rank.name }} {{ servicemember }}
+                        <br>{{ servicemember.position }}
+                    </div>
+                    {# end of member representation block #}
 
+                    {# edit buttons group#}
+                    <div class="col-1 d-flex justify-content-end align-items-center pr-0">
+                        {% if not forloop.first %}
+                            <button type="submit" class="btn btn-light btn-sm text-success mr-1" name="edit_chain_id"
+                                    value="{{ servicemember.id }}"><span class="fas fa-edit"></span>
+                            </button>
+                        {% endif %}
 
-            {% else %}
-                {# show NORMAL CHAIN member line #}
-                {{ servicemember.rank.name }} {{ servicemember }}
-                <br>{{ servicemember.position }}
-                <br>
-                {% if not forloop.first %}
-                    <button type="submit" class="btn btn-light btn-sm" name="edit_chain_id"
-                            value="{{ servicemember.id }}"><span class="fas fa-edit"></span>
-                    </button>
+                        {% if not forloop.first and not forloop.last %}
+                            <button type="submit" class="btn btn-light btn-sm text-danger mr-1" name="remove_chain_id"
+                                    value="{{ servicemember.id }}"
+                                    onclick="return window.confirm('Видалити посередника?\n{{ servicemember.rank.name }} {{ servicemember }} ')">
+                                <span class="far fa-trash-alt"></span>
+                            </button>
+                        {% endif %}
+                    </div>
+                    {# end of edit buttons group#}
+
                 {% endif %}
-                {% if not forloop.first and not forloop.last %}
-                    <button type="submit" class="btn btn-light btn-sm" name="remove_chain_id"
-                            value="{{ servicemember.id }}"
-                            onclick="return window.confirm('Видалити посередника?\n{{ servicemember.rank.name }} {{ servicemember }} ')">
-                        <span class="far fa-trash-alt"></span>
-                    </button>
-                {% endif %}
-            {% endif %}
-            <hr>
-            <hr>
+            </div>
+
         {% endfor %}
 
-        <input type="submit" class="btn btn-info" name="submit_chain_editing" value="Далі"/>
+        {% if swap_id is None %}
+            {# TODO change button appearance #}
+            <input type="submit" class="btn btn-bordered-primary text-light bg-secondary float-right mr-3" name="submit_chain_editing" value="Далі"/>
+
+        {% endif %}
 
     </form>
 
+
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
 
 {#block submitting form by pressing Enter button#}
 {% block js_scripts %}

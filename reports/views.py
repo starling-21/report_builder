@@ -67,8 +67,8 @@ def edit_service_members_chain_view(request, serviceman_id=None):
             elif 'submit_new_id' in request.POST:
                 old_id = request.POST.get('submit_new_id')
                 swap_id = request.POST.get('swap_id')
-                if (old_id != swap_id) and (len(swap_id) > 0):
-                    print('id swap: {} -> {}'.format(old_id, swap_id))
+                if (swap_id is not None) and (old_id != swap_id): #and (len(swap_id) > 0)
+                    # print('id swap: {} -> {}'.format(old_id, swap_id))
                     for member in serviceman_chain:
                         if member.id == int(old_id):
                             replace_index = serviceman_chain.index(member)
@@ -88,6 +88,9 @@ def edit_service_members_chain_view(request, serviceman_id=None):
 
                     request.session['serviceman_chain'] = serviceman_chain
                     request.session.modified = True
+
+                    # change swap_id for proper template rendering (show 'next' button after editing)
+                    swap_id = None
             elif 'remove_chain_id' in request.POST:
                 remove_id = request.POST.get('remove_chain_id')
                 for member in serviceman_chain:
@@ -97,7 +100,7 @@ def edit_service_members_chain_view(request, serviceman_id=None):
                 request.session.modified = True
                 swap_id = None
             elif 'submit_chain_editing' in request.POST:
-                print("submit_chain_editting")
+                # print("submit_chain_editting")
                 return redirect(reverse('reports:report_filling'))
         except Exception as e:
             print(e)
@@ -166,11 +169,9 @@ def member_search_view(request):
     :return: default format is - [{id:'member_id', text:'name_representation'}]
     if name_format is defined in search params - format becomes as - [{id:'name_representation', text:'name_representation'}]
     """
-    print("Search request, method", request.method)
+    # print("Search request, method", request.method)
     service_members_list = []
     if request.method == 'POST':
-        for k, v in request.POST.items():
-            print("{}:{}".format(k, v))
         filter_param = request.POST.get('filter_param')
         name_format = request.POST.get('name_format')
 

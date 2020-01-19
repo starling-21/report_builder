@@ -23,6 +23,8 @@ from django.db.models import Q
 from datetime import datetime
 
 
+global_merge_dict = {}
+
 def get_report_merge_dict(request):
     """
     creates user pairs dictionary for every report tier --> {tier:[footer_user, header_user]}
@@ -32,7 +34,7 @@ def get_report_merge_dict(request):
     :return: global merge dictionary
     """
     try:
-        global_merge_dict = {}
+        global global_merge_dict
 
         serviceman_chain = request.session['serviceman_chain']
         serviceman_id = serviceman_chain[0].id
@@ -45,21 +47,21 @@ def get_report_merge_dict(request):
 
             # footer preparation
             footer_dict = get_footer_data(from_user)
-            footer_dict = append_to_dict_keys(footer_dict, tier)
+            footer_dict = modify_dict_keys(footer_dict, tier)
             global_merge_dict.update(footer_dict)
 
             # header preparation
             header_dict = get_header_data(to_user)
-            header_dict = append_to_dict_keys(header_dict, tier)
+            header_dict = modify_dict_keys(header_dict, tier)
             global_merge_dict.update(header_dict)
 
             # report body text preparation
             if tier == 0:
                 report_body_dict = compose_main_report_body_from_post_request(request.POST.copy())
-                print("report_body_dict:\n", report_body_dict)
+                # print("report_body_dict:\n", report_body_dict)
             elif tier >= 1:
                 report_body_dict = get_secondary_report_body(serviceman_id)
-            report_body_dict = append_to_dict_keys(report_body_dict, tier)
+            report_body_dict = modify_dict_keys(report_body_dict, tier)
             global_merge_dict.update(report_body_dict)
     except Exception as e:
         print(e)
@@ -98,15 +100,23 @@ def get_secondary_report_body(serviceman_id):
         Клопочу по суті рапорту полковника Степана Колотило.
         :return dict {merger_key: value}
     """
+    global global_merge_dict
+
     report_body_dict = {}
     report_body_text = ""
     serviceman = Serviceman.objects.get(id=serviceman_id)
-    report_body_text += "Клопочу по суті рапорту " + serviceman.rank.for_name + " " + serviceman.get_full_name_for() + "."
+    first_body_word = 'Клопочу'
+    if 'Прошу' in global_merge_dict['body_tier_0'].split()[0]:
+        first_body_word = 'Клопочу'
+    elif 'Доповiдаю' in global_merge_dict['body_tier_0'].split()[0]:
+        first_body_word = 'Доповідаю'
+
+    report_body_text += first_body_word + " по суті рапорту " + serviceman.rank.for_name + " " + serviceman.get_full_name_for() + "."
     report_body_dict['body_tier'] = report_body_text
     return report_body_dict
 
 
-def append_to_dict_keys(dictionary, tier):
+def modify_dict_keys(dictionary, tier):
     """
     adds tier value to every key in a dictionary
     example: key=abc, tier=2 --> abc_2
@@ -179,7 +189,8 @@ def get_chief_or_his_deputy_by_position(position):
             if first_priority_serviceman:
                 return first_priority_serviceman
         except Exception as e:
-            print(e)
+            pass
+            # print(e)
 
     return default_serviceman
 

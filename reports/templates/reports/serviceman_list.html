@@ -7,9 +7,10 @@
     <div class="bs-example">
         <ul class="list-group">
             {% for serviceman in serviceman_list %}
-                <li class="list-group-item {% cycle '' 'list-group-item-secondary'  %}">
-                    <a href="{% url 'reports:edit_service_members_chain' serviceman_id=serviceman.id %}">
-                        {{ serviceman.rank }} {{ serviceman.first_name|title }} {{ serviceman.last_name|title }}</a>
+                <li class="list-group-item {% cycle 'list-group-item-secondary' '' %}">
+                    <a class="text-dark" href="{% url 'reports:edit_service_members_chain' serviceman_id=serviceman.id %}">
+                        <span><i class="fas fa-angle-right mr-3"></i></span>{{ serviceman.rank }} {{ serviceman.first_name|title }} {{ serviceman.last_name|title }} -
+                        {{ serviceman.position|lower }}</a>
                 </li>
             {% endfor %}
         </ul>
