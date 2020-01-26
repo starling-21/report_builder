@@ -44,7 +44,7 @@ class Position(models.Model):
             pos_result = self.position_title[0].capitalize() + self.position_title[1:]
         return pos_result + " " + \
                self.unit.name + \
-               self.position_tail
+               " " + self.position_tail
 
 
     def get_to_position(self):
@@ -64,7 +64,7 @@ class Position(models.Model):
 
         return pos_result.capitalize() + " " + \
                self.unit.name + " " + \
-               position_tail_str
+               " " + position_tail_str
 
 
 class Serviceman(models.Model):
@@ -114,7 +114,7 @@ class Report(models.Model):
     body_sample = models.TextField(blank=True, null=True)
     body_template = models.TextField(blank=True, null=True)
 
-    default_header_position = models.ForeignKey(Position, related_name='report_header_position_set', on_delete=models.SET_NULL, null=True)
+    default_header_position = models.ForeignKey(Position, related_name='report_header_position_set', on_delete=models.SET_NULL, blank=True, null=True)
     default_footer_position = models.ForeignKey(Position, related_name='report_footer_position_set', on_delete=models.SET_NULL, blank=True, null=True)
 
     def __str__(self):

@@ -248,16 +248,23 @@ def get_header_data(serviceman):
 
 
 def get_full_position(main_position, units_chain):
-    """complete initial main_position with units list user belongs to"""
+    """complete initial main_position with units list user belongs to
+        contains extra check if user has comples deputy position (contain unit name in between)
+    """
     full_position = main_position
     position_tail = ""
 
-    if (len(units_chain) > 0): position_tail = units_chain[len(units_chain) - 1].name
+    if (len(units_chain) > 0):
+        #extra position tail - main unit on new line
+        position_tail = units_chain[len(units_chain) - 1].name
     for i in range(0, len(units_chain) - 1):
         full_position = full_position + " " + units_chain[i].name
 
     if (position_tail is not ""):
-        full_position = full_position + "\n" + position_tail
+        if full_position.split()[-1] == 'командира':
+            full_position = full_position + " " + position_tail
+        else:
+            full_position = full_position + "\n" + position_tail
     return full_position
 
 

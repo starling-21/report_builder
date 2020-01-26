@@ -1,7 +1,6 @@
 {% extends 'reports/base.html' %}
 
 {#loads custom tags#}
-{% load common %}
 
 {% block extra_head %}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet"/>
@@ -17,10 +16,8 @@
     <form method="POST">{% csrf_token %}
         {% for servicemember in serviceman_chain %}
             <div class="row left-bordered-row bg-light rounded m-3">
-                {# editing chain member #}
-                {% if swap_id == servicemember.id and swap_presence is None %}
+                {% if swap_id == servicemember.id %}
                     <div class="col-12">
-                        {% set swap_presence = True %}
                         <select name="swap_id"></select>
                         <button type="submit" class="btn btn-secondary btn-sm" name="submit_new_id"
                                 value="{{ servicemember.id }}">
