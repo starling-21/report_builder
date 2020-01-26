@@ -22,8 +22,8 @@ from reports.models import Report
 from django.db.models import Q
 from datetime import datetime
 
-
 global_merge_dict = {}
+
 
 def get_report_merge_dict(request):
     """
@@ -38,7 +38,6 @@ def get_report_merge_dict(request):
 
         serviceman_chain = request.session['serviceman_chain']
         serviceman_id = serviceman_chain[0].id
-
 
         user_pairs_dict = convert_members_chain_to_pairs_dict(serviceman_chain)
         for tier, users in user_pairs_dict.items():
@@ -65,7 +64,7 @@ def get_report_merge_dict(request):
             global_merge_dict.update(report_body_dict)
     except Exception as e:
         print(e)
-        global_merge_dict = {'error':'report_content_util->get_report_merge_dict'}
+        global_merge_dict = {'error': 'report_content_util->get_report_merge_dict'}
     finally:
         return global_merge_dict
 
@@ -154,8 +153,11 @@ def get_servicemen_chain_list(report_id, serviceman=None):
     if report.type == 'regular':
         users_list = get_full_servicemen_chain_list(serviceman)
     elif report.type == 'custom':
-        users_list.append(get_chief_or_his_deputy_by_position(report.default_footer_position))
-        users_list.append(get_chief_or_his_deputy_by_position(report.default_header_position))
+        try:
+            users_list.append(get_chief_or_his_deputy_by_position(report.default_footer_position))
+            users_list.append(get_chief_or_his_deputy_by_position(report.default_header_position))
+        except Exception:
+            return []
 
     return users_list
 
@@ -180,19 +182,21 @@ def get_chief_or_his_deputy_by_position(position):
     :param position:
     :return:  if there is no deputy, return hist boss
     """
-    if position.supervisor:
-        default_serviceman = Serviceman.objects.get(position=position)
-        try:
+    try:
+        if position.supervisor:
+            default_serviceman = Serviceman.objects.get(position=position)
+
             first_priority_position = Position.objects.get(unit=position.unit, temp_supervisor=True)
             first_priority_position.temp_supervisor = True
             first_priority_serviceman = Serviceman.objects.filter(position=first_priority_position).first()
             if first_priority_serviceman:
                 return first_priority_serviceman
-        except Exception as e:
-            pass
-            # print(e)
+    except Exception as e:
+        print("position doesn't match")
+        pass
 
     return default_serviceman
+
 
 def get_temp_deputy_if_exists(serviceman):
     """
@@ -255,7 +259,7 @@ def get_full_position(main_position, units_chain):
     position_tail = ""
 
     if (len(units_chain) > 0):
-        #extra position tail - main unit on new line
+        # extra position tail - main unit on new line
         position_tail = units_chain[len(units_chain) - 1].name
     for i in range(0, len(units_chain) - 1):
         full_position = full_position + " " + units_chain[i].name
