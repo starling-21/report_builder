@@ -23,8 +23,6 @@ from django.db.models import Q
 from datetime import datetime
 
 
-global_merge_dict = {}
-
 def get_report_merge_dict(request):
     """
     creates user pairs dictionary for every report tier --> {tier:[footer_user, header_user]}
@@ -34,13 +32,12 @@ def get_report_merge_dict(request):
     :return: global merge dictionary
     """
     try:
-        global global_merge_dict
+        global_merge_dict = {}
 
         serviceman_chain = request.session['serviceman_chain']
         serviceman_id = serviceman_chain[0].id
 
-
-        user_pairs_dict = convert_members_chain_to_pairs_dict(serviceman_chain)
+        tiers_count, user_pairs_dict = convert_members_chain_to_pairs_dict(serviceman_chain)
         for tier, users in user_pairs_dict.items():
             from_user = users[0]
             to_user = users[1]
@@ -51,21 +48,24 @@ def get_report_merge_dict(request):
             global_merge_dict.update(footer_dict)
 
             # header preparation
-            header_dict = get_header_data(to_user)
+            if tier == (tiers_count-1):
+                header_dict = get_header_data(to_user, extra_bottom_margin=3)
+            else:
+                header_dict = get_header_data(to_user)
             header_dict = modify_dict_keys(header_dict, tier)
             global_merge_dict.update(header_dict)
 
             # report body text preparation
             if tier == 0:
                 report_body_dict = compose_main_report_body_from_post_request(request.POST.copy())
-                # print("report_body_dict:\n", report_body_dict)
             elif tier >= 1:
-                report_body_dict = get_secondary_report_body(serviceman_id)
+                report_body_dict = get_secondary_report_body(serviceman_id, global_merge_dict=global_merge_dict)
             report_body_dict = modify_dict_keys(report_body_dict, tier)
             global_merge_dict.update(report_body_dict)
     except Exception as e:
+        print("merge_dict_creation error")
         print(e)
-        global_merge_dict = {'error':'report_content_util->get_report_merge_dict'}
+        global_merge_dict = {'error': 'report_content_util->get_report_merge_dict'}
     finally:
         return global_merge_dict
 
@@ -81,7 +81,7 @@ def compose_main_report_body_from_post_request(input_form_data_dict):
     form_fields_amount = int(input_form_data_dict.get('fields_counter'))
     for i in range(0, form_fields_amount + 1):
         try:
-            # TODO kostul, needs refactoring
+            # TODO kostul for time picker, needs refactoring
             test_date_conversion_error = datetime.strptime(input_form_data_dict.get(str(i)),
                                                            "%Y-%m-%d").date()  # DO nOt delete
             report_body_text += convert_datetime_as_day_month_year(input_form_data_dict.get(str(i)))
@@ -90,18 +90,15 @@ def compose_main_report_body_from_post_request(input_form_data_dict):
         except Exception as e:
             print(e)
             print('error compose_main_report_body_from_post_request')
-    print("REPORT BODY:", report_body_dict)
     report_body_dict['body_tier'] = report_body_text
     return report_body_dict
 
 
-def get_secondary_report_body(serviceman_id):
+def get_secondary_report_body(serviceman_id, global_merge_dict=None):
     """returns report dictionary contains next body template like this:
         Клопочу по суті рапорту полковника Степана Колотило.
         :return dict {merger_key: value}
     """
-    global global_merge_dict
-
     report_body_dict = {}
     report_body_text = ""
     serviceman = Serviceman.objects.get(id=serviceman_id)
@@ -131,17 +128,21 @@ def convert_members_chain_to_pairs_dict(servicemen_chain_list):
     """
     convert members list to chain member pairs
     :param servicemen_chain_list: users objects list
-    :return: servicemen tiers chain dictionary {'report tier number':[users pair]}
+    :return: tiers counter, servicemen tiers chain dictionary {'report tier number':[users pair]}
     """
     tiers_dict = {}
+    tiers_counter = 0
     if len(servicemen_chain_list) < 2:
         return None
     elif len(servicemen_chain_list) == 2:
         tiers_dict[0] = [servicemen_chain_list[0], servicemen_chain_list[1]]
+        tiers_counter += 1
     elif len(servicemen_chain_list) > 2:
         for i in range(0, len(servicemen_chain_list) - 1):
             tiers_dict[i] = [servicemen_chain_list[i], servicemen_chain_list[i + 1]]
-    return tiers_dict
+            tiers_counter += 1
+
+    return tiers_counter, tiers_dict
 
 
 def get_servicemen_chain_list(report_id, serviceman=None):
@@ -227,13 +228,16 @@ def get_footer_data(serviceman):
     return footer_dict
 
 
-def get_header_data(serviceman):
+def get_header_data(serviceman, extra_bottom_margin=0):
     """returns header data dict for certain serviceman"""
     position = serviceman.position.get_to_position()
     unit = serviceman.unit
     units_chain = unit.get_all_parents()
     rank = serviceman.rank.to_name
     full_name = serviceman.get_full_name_to()
+    if extra_bottom_margin > 0:
+        for i in range(0, extra_bottom_margin):
+            full_name += '\n'
 
     full_position = get_full_position(position, units_chain)
 

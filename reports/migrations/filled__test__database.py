@@ -207,6 +207,8 @@ def load_servicemans(apps, schema_editor):
                last_name='Тюркін',
                to_first_name='Дмитру',
                to_last_name='Тюркіну',
+               for_first_name='Дмитра',
+               for_last_name='Тюркіна',
                rank=lt_col_rank,
                unit=admins_main_unit,
                position=pos_admins_main_unit_boss
@@ -216,6 +218,8 @@ def load_servicemans(apps, schema_editor):
                last_name='Павленко',
                to_first_name='Дмитру',
                to_last_name='Павленку',
+               for_first_name='_____',
+               for_last_name='______',
                rank=lt_col_rank,
                unit=admins_unit_section_1,
                position=pos_admins_unit_section_1_boss
