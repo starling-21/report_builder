@@ -44,7 +44,7 @@ class Position(models.Model):
             pos_result = self.position_title[0].capitalize() + self.position_title[1:]
         return pos_result + " " + \
                self.unit.name + \
-               self.position_tail
+               " " + self.position_tail
 
 
     def get_to_position(self):
@@ -64,7 +64,7 @@ class Position(models.Model):
 
         return pos_result.capitalize() + " " + \
                self.unit.name + " " + \
-               position_tail_str
+               " " + position_tail_str
 
 
 class Serviceman(models.Model):

@@ -1,7 +1,6 @@
 {% extends 'reports/base.html' %}
 
 {#loads custom tags#}
-{% load common %}
 
 {% block extra_head %}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet"/>
@@ -17,10 +16,8 @@
     <form method="POST">{% csrf_token %}
         {% for servicemember in serviceman_chain %}
             <div class="row left-bordered-row bg-light rounded m-3">
-                {# editing chain member #}
-                {% if swap_id == servicemember.id and swap_presence is None %}
+                {% if swap_id == servicemember.id %}
                     <div class="col-12">
-                        {% set swap_presence = True %}
                         <select name="swap_id"></select>
                         <button type="submit" class="btn btn-secondary btn-sm" name="submit_new_id"
                                 value="{{ servicemember.id }}">
@@ -40,17 +37,21 @@
                     {# edit buttons group#}
                     <div class="col-1 d-flex justify-content-end align-items-center pr-0">
                         {% if not forloop.first %}
-                            <button type="submit" class="btn btn-light btn-sm text-success mr-1" name="edit_chain_id"
-                                    value="{{ servicemember.id }}"><span class="fas fa-edit"></span>
-                            </button>
+                            <div data-toggle="tooltip" data-placement="top" title="редагувати">
+                                <button type="submit" class="btn btn-light btn-sm text-info mr-1" name="edit_chain_id"
+                                        value="{{ servicemember.id }}"><span class="fas fa-edit fa-2x"></span>
+                                </button>
+                            </div>
                         {% endif %}
 
                         {% if not forloop.first and not forloop.last %}
-                            <button type="submit" class="btn btn-light btn-sm text-danger mr-1" name="remove_chain_id"
-                                    value="{{ servicemember.id }}"
-                                    onclick="return window.confirm('Видалити посередника?\n{{ servicemember.rank.name }} {{ servicemember }} ')">
-                                <span class="far fa-trash-alt"></span>
-                            </button>
+                            <div data-toggle="tooltip" data-placement="top" title="видалити">
+                                <button type="submit" class="btn btn-light btn-sm text-danger mr-1" name="remove_chain_id"
+                                        value="{{ servicemember.id }}"
+                                        onclick="return window.confirm('Видалити посередника?\n{{ servicemember.rank.name }} {{ servicemember }} ')">
+                                    <span class="far fa-trash-alt fa-2x"></span>
+                                </button>
+                            </div>
                         {% endif %}
                     </div>
                     {# end of edit buttons group#}
@@ -60,10 +61,12 @@
 
         {% endfor %}
 
-        {% if swap_id is None %}
-            {# TODO change button appearance #}
-            <input type="submit" class="btn btn-bordered-primary text-light bg-secondary float-right mr-3" name="submit_chain_editing" value="Далі"/>
 
+        {% if swap_id is None %}
+            <button class="btn btn-bordered-primary bg-secondary float-right text-light m-3"
+                    type="submit" name="submit_chain_editing">
+                <span>Далі</span><i class="fas fa-angle-double-right ml-2"></i>
+            </button>
         {% endif %}
 
     </form>
