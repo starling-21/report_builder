@@ -42,9 +42,13 @@ class Position(models.Model):
             pos_result = "Тимчасово виконуючий обов'язки\n" + self.position_title.split()[0] + "а"
         else:
             pos_result = self.position_title[0].capitalize() + self.position_title[1:]
-        return pos_result + " " + \
-               self.unit.name + \
-               " " + self.position_tail
+
+        # add dash and position tail
+        pos_result += " " + self.unit.name
+        if len(self.position_tail) > 0:
+            pos_result += " - " + self.position_tail
+
+        return pos_result
 
 
     def get_to_position(self):
@@ -52,19 +56,20 @@ class Position(models.Model):
         pos_result = ""
         position_tail_str = ""
         if self.temp_supervisor:
-            pos_result = "Тимчасово виконуючому обов'язки\n" + self.position_title.split()[0] + "а" #начальник[а]
+            pos_result = "Тимчасово виконуючому обов'язки\n" + self.position_title.split()[0] + "а"  # начальник[а]
         elif self.supervisor:
-            pos_result = self.position_title.split()[0] + "у" #начальник[у]
+            pos_result = (self.position_title.split()[0] + "у").capitalize()  # начальник[у]
 
-        # "- заступник[у] начальника"
+        pos_result += " " + self.unit.name
+
+        # ' - заступник[у] начальника' adding ending
         if len(self.position_tail) > 0:
             temp_tail = self.position_tail.split()
-            temp_tail[1] = temp_tail[1] + "у"
+            temp_tail[0] = temp_tail[0] + "у"
             position_tail_str = " ".join(temp_tail)
+            pos_result += " - " + position_tail_str
 
-        return pos_result.capitalize() + " " + \
-               self.unit.name + " " + \
-               " " + position_tail_str
+        return pos_result
 
 
 class Serviceman(models.Model):
