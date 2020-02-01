@@ -137,33 +137,33 @@ def get_raw_django_form_fields(parts_dict):
             form_content_dict[key] = forms.CharField(
                 label="",
                 widget=forms.TextInput(attrs={"class": "form-control", 'size': 3}),
-                initial=2019
+                # initial=2019
             )
         elif field_dict['type'] == "date":
             form_content_dict[key] = forms.DateField(
                 label="",
                 widget=DatePickerInput(
-                    attrs={'size': 7},
+                    attrs={"class": "form-control", 'size': 7},
                     format='%Y-%m-%d',
                     options={
                         "locale": "ru",
                     },
                 ),
-                initial="2019-11-25"
+                # initial="2019-11-25"
             )
         elif field_dict['type'] == "str":
             form_content_dict[key] = forms.CharField(
                 label="",
                 help_text=field_dict['title'],
-                widget=forms.TextInput(attrs={"class": "form-control", 'size': 100}),
-                initial="сімейними обставинами"
+                widget=forms.TextInput(attrs={"class": "form-control", 'size': 80}),
+                # initial="сімейними обставинами"
             )
         elif field_dict['type'] == "text":
             form_content_dict[key] = forms.CharField(
                 label="",
                 help_text=field_dict['title'],
-                widget=forms.Textarea(attrs={"cols": 120, "rows": 4, "wrap": "hard"}),
-                initial="сімейними обставинами"
+                widget=forms.Textarea(attrs={"class": "form-control", "cols": 100, "rows": 4, "wrap": "hard"}),
+                # initial="сімейними обставинами"
             )
         elif field_dict['type'] == "rank_first_name_last_name":
             form_content_dict[key] = forms.CharField(

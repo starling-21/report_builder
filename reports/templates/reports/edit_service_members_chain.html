@@ -13,9 +13,11 @@
     <p><h3>Всі посередники:</h3></p>
     <hr>
 
+
     <form method="POST">{% csrf_token %}
+
         {% for servicemember in serviceman_chain %}
-            <div class="row left-bordered-row bg-light rounded m-3">
+            <div class="row left-bordered-row mt-3 ml-0">
                 {% if swap_id == servicemember.id %}
                     <div class="col-12">
                         <select name="swap_id"></select>
@@ -25,7 +27,7 @@
                         </button>
                         {#submit chain member id editing button#}
                     </div>
-                {# end of editing chain member #}
+                    {# end of editing chain member #}
                 {% else %}
                     {# member representation block #}
                     <div class="col-11">
@@ -38,18 +40,20 @@
                     <div class="col-1 d-flex justify-content-end align-items-center pr-0">
                         {% if not forloop.first %}
                             <div data-toggle="tooltip" data-placement="top" title="редагувати">
-                                <button type="submit" class="btn btn-light btn-sm text-info mr-1" name="edit_chain_id"
-                                        value="{{ servicemember.id }}"><span class="fas fa-edit fa-2x"></span>
+                                <button type="submit" class="btn btn-light btn-sm text-info mr-1"
+                                        name="edit_chain_id"
+                                        value="{{ servicemember.id }}"><span class="fas fa-edit fa-1x"></span>
                                 </button>
                             </div>
                         {% endif %}
 
                         {% if not forloop.first and not forloop.last %}
                             <div data-toggle="tooltip" data-placement="top" title="видалити">
-                                <button type="submit" class="btn btn-light btn-sm text-danger mr-1" name="remove_chain_id"
+                                <button type="submit" class="btn btn-light btn-sm text-danger mr-1"
+                                        name="remove_chain_id"
                                         value="{{ servicemember.id }}"
-                                        onclick="return window.confirm('Видалити посередника?\n{{ servicemember.rank.name }} {{ servicemember }} ')">
-                                    <span class="far fa-trash-alt fa-2x"></span>
+                                        onclick="return window.confirm('Видалити запис: {{ servicemember.rank.name }} {{ servicemember }}?')">
+                                    <span class="far fa-trash-alt fa-1x"></span>
                                 </button>
                             </div>
                         {% endif %}
@@ -61,9 +65,8 @@
 
         {% endfor %}
 
-
         {% if swap_id is None %}
-            <button class="btn btn-bordered-primary bg-secondary float-right text-light m-3"
+            <button class="btn btn-bordered-primary bg-secondary float-right text-light mt-3"
                     type="submit" name="submit_chain_editing">
                 <span>Далі</span><i class="fas fa-angle-double-right ml-2"></i>
             </button>
@@ -87,6 +90,10 @@
 {#block submitting form by pressing Enter button#}
 {% block js_scripts %}
     <script>
+        //init jquery tooltip for hover popup
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
 
         $(document).ready(function () {
 

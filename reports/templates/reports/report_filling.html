@@ -10,25 +10,28 @@
 
 {% block content %}
 
-    <form action="" method="POST" style="margin: 4px">
+    <form action="" method="POST" style="margin: 0px">
         {% csrf_token %}
+        <h5 class="mt-3">{{ title }}:</h5>
+{#        <hr>#}
+        <h6 class="text-muted">Зразок:  {{ body_sample }}</h6>
         <hr>
-        Рапорт: {{ title }}
-        <hr>
-        Зразок:  <b>{{ body_sample }}</b>
-        <hr>
-        {% for field in report_fields_form %}
-            <div style="display: inline-flex; margin: 4px">
-                {{ field.label }}
-                {{ field }}
-            </div>
-        {% endfor %}
         <br>
+
+        <h6><p>Поля для заповенння:</p></h6>
+        <div class="form-control">
+            {% for field in report_fields_form %}
+                <div style="display: inline-flex; margin: 4px">
+                    {{ field.label }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+        </div>
         <br>
 
         <button class="btn btn-bordered-primary bg-secondary float-right text-light"
                 type="submit" name="submit_form">
-            <span>Згенерувати рапорт</span><i class="fas fa-angle-double-right ml-2"></i>
+            <span>Завантажити рапорт</span><i class="fas fa-angle-double-right ml-2"></i>
         </button>
     </form>
 
