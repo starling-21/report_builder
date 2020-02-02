@@ -1,6 +1,6 @@
 import os
 import datetime
-from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import FileResponse
 from django.http import HttpResponse
@@ -14,6 +14,7 @@ from . import main_report_controller as report_controller
 from . import report_content_util
 from . import report_forms_util
 
+from names_translator import Transliterator
 
 # Create your views here.
 def index_view(request):
@@ -21,6 +22,7 @@ def index_view(request):
     return render(request, 'reports/index.html')
 
 
+@login_required
 def reports_list_view(request):
     """show all reports"""
     reports_list = Report.objects.all()
@@ -147,7 +149,7 @@ def report_filling_view(request):
 def return_report_document_view(request):
     """
     generate final document report
-    :return: report docx report
+    :return: report docx file
     """
 
     document_file_path = request.session['report_file_path']
@@ -155,7 +157,12 @@ def return_report_document_view(request):
                             filename=document_file_path.split('\\')[-1])
 
     now = datetime.datetime.now()
-    download_report_file_name = 'report ' + now.strftime("%Y-%m-%d_%H-%M") + '.' + document_file_path.rsplit('.', 1)[-1]
+    # serviceman = request.session['serviceman_chain'][0]
+    # report = Report.objects.get(id=request.session['report_id'])
+    # customized_report_name = serviceman.last_name + "_" + report.title
+
+    download_report_file_name = '' + now.strftime("%d-%m %H-%M") + " report" + '.' + document_file_path.rsplit('.', 1)[-1]
+
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(download_report_file_name);
     response['Content-Length'] = os.path.getsize(document_file_path)
@@ -209,7 +216,4 @@ def member_search_view(request):
                 service_members_list.append({'id': member.id, 'text': member_representation})
         return HttpResponse(json.dumps(service_members_list))
 
-    context = {
-        'service_members_list': service_members_list,
-    }
-    return render(request, 'reports/test_search_user.html', context)
+    return HttpResponse(request, "404 I'm not an Error))")

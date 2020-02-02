@@ -2,17 +2,21 @@ from django.db import models
 
 # Create your models here.
 class Rank(models.Model):
-    name = models.CharField(max_length=255)
-    to_name = models.CharField(max_length=255, blank=True, null=True)
-    for_name = models.CharField(max_length=255, blank=True, null=True)
+    name = models.CharField(max_length=255, verbose_name="військове звання (полковник, лейтенант..)")
+    to_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="військове звання, давальний відмінок (полковнику, лейтенанту..)")
+    for_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="військове звання, знахідний відмінок (полковника, лейтенанта..)")
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Військові звання__"
+        verbose_name_plural = "Військові звання"
+
 
 class Unit(models.Model):
-    name = models.CharField(max_length=255)
-    parent_unit = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=255, verbose_name="назва підрозділу в РОДОВОМУ відміноку (відділу аналізу інцидентів кібернетичної безпеки)")
+    parent_unit = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, verbose_name="вищій підрозділ (віддліл->центр->..)")
 
     def __str__(self):
         return self.name
@@ -28,14 +32,17 @@ class Unit(models.Model):
                 parents_units.extend(_r)
         return parents_units
 
+    class Meta:
+        verbose_name = "Підрозділ"
+        verbose_name_plural = "Підрозділи"
 
 class Position(models.Model):
-    position_title = models.CharField(max_length=255)
-    position_tail = models.CharField(max_length=255, default='', blank=True)
-    unit = models.ForeignKey('Unit', on_delete=models.DO_NOTHING)
+    position_title = models.CharField(max_length=255, verbose_name="посада (офіцер, старший офіцер, начальник)")
+    position_tail = models.CharField(max_length=255, default='', blank=True, verbose_name="додаткова посада. Наприклад:(заступник начальника, перший заступник командира...)  !!! назву підрозділу НЕ ВКАЗУВАТИ  !!!")
+    unit = models.ForeignKey('Unit', on_delete=models.DO_NOTHING, verbose_name="підрозділ")
 
-    supervisor = models.BooleanField(blank=True, null=True)
-    temp_supervisor = models.BooleanField(blank=True, null=True)
+    supervisor = models.BooleanField(default=False, blank=True, null=True, verbose_name="командир/начальник підрозділу")
+    temp_supervisor = models.BooleanField(default=False, blank=True, null=True, verbose_name="тимчасово виконуючий обов'язки командира/начальника")
 
     def __str__(self):
         if self.temp_supervisor:
@@ -49,7 +56,6 @@ class Position(models.Model):
             pos_result += " - " + self.position_tail
 
         return pos_result
-
 
     def get_to_position(self):
         """return comprehenced position name with unit name for current tier"""
@@ -71,21 +77,24 @@ class Position(models.Model):
 
         return pos_result
 
+    class Meta:
+        verbose_name = "Посада__"
+        verbose_name_plural = "Посади"
 
 class Serviceman(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255, verbose_name="Ім'я")
+    last_name = models.CharField(max_length=255, verbose_name="Прізвище")
 
 
-    to_first_name = models.CharField(max_length=255)
-    to_last_name = models.CharField(max_length=255)
+    to_first_name = models.CharField(max_length=255, verbose_name="Ім'я, давальний відмінок (Петру, Євгенії, Дмитру...)")
+    to_last_name = models.CharField(max_length=255, verbose_name="Прізвище, давальний відмінок (Яцуку, Куріло, Павленку...)")
 
-    for_first_name = models.CharField(max_length=255)
-    for_last_name = models.CharField(max_length=255)
+    for_first_name = models.CharField(max_length=255, verbose_name="Ім'я, знахідний відмінок (Петра, Євгенії, Дмитра...)")
+    for_last_name = models.CharField(max_length=255, verbose_name="Прізвище, знахідний відмінок (Яцука, Куріло, Павленка...)")
 
-    rank = models.ForeignKey('Rank', on_delete=models.DO_NOTHING)
-    unit = models.ForeignKey('Unit', on_delete=models.DO_NOTHING)
-    position = models.ForeignKey('Position', on_delete=models.DO_NOTHING, null=True)
+    rank = models.ForeignKey('Rank', on_delete=models.DO_NOTHING, verbose_name="військове звання")
+    unit = models.ForeignKey('Unit', on_delete=models.DO_NOTHING, verbose_name="Підрозділ")
+    position = models.ForeignKey('Position', on_delete=models.DO_NOTHING, null=True, verbose_name="Посада")
 
     def __str__(self):
         return self.first_name + " " + self.last_name
@@ -105,23 +114,30 @@ class Serviceman(models.Model):
     def get_full_name_for(self):
         return self.for_first_name.capitalize() + " " + self.for_last_name.capitalize()
 
+    class Meta:
+        verbose_name = "Військовослужбовці__"
+        verbose_name_plural = "Військовослужбовці"
 
 class Report(models.Model):
     REPORT_TYPES = [
         ('regular', 'звичайний рапорт'),
-        ('custom', 'рапорт по шаблону (custom template)'),
+        ('custom', 'рапорт по специфічному шаблону'),
     ]
-    type = models.CharField(max_length=100, choices=REPORT_TYPES, default='regular')
-    template_name = models.CharField(max_length=255, default='template_universal.docx', null=True, blank=True)
+    type = models.CharField(max_length=100, choices=REPORT_TYPES, default='regular', verbose_name="тип рапорту")
+    template_name = models.CharField(max_length=255, default='template_universal.docx', null=True, blank=True, verbose_name="назва файлу шаблону (змінюється адміністратором, див. у документації)")
 
-    title = models.CharField(max_length=255, null=True)
+    title = models.CharField(max_length=255, null=True, verbose_name="Назва рапорту")
 
-    body_sample = models.TextField(blank=True, null=True)
-    body_template = models.TextField(blank=True, null=True)
+    body_sample = models.TextField(blank=True, null=True, verbose_name="зразок тексту рапорту")
+    body_template = models.TextField(blank=True, null=True, verbose_name="шаблон рапорту (змінюється адміністратором, див. у документації)")
 
-    default_header_position = models.ForeignKey(Position, related_name='report_header_position_set', on_delete=models.SET_NULL, blank=True, null=True)
-    default_footer_position = models.ForeignKey(Position, related_name='report_footer_position_set', on_delete=models.SET_NULL, blank=True, null=True)
+    default_header_position = models.ForeignKey(Position, related_name='report_header_position_set', on_delete=models.SET_NULL, blank=True, null=True, verbose_name="посада на кого цей рапорт")
+    default_footer_position = models.ForeignKey(Position, related_name='report_footer_position_set', on_delete=models.SET_NULL, blank=True, null=True, verbose_name="посада від кого цей рапорт")
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        verbose_name = "Рапорти__"
+        verbose_name_plural = "Рапорти"
 
