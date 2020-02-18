@@ -1,20 +1,21 @@
-import os
-import datetime
+from django.shortcuts import render, redirect, reverse
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import FileResponse
 from django.http import HttpResponse
-from django.shortcuts import render, redirect, reverse
 
-from reports.models import Serviceman
-from .models import Report
 import json
+import os
+import datetime
+
+from .models import Serviceman
+from .models import Report
 
 from . import main_report_controller as report_controller
 from . import report_content_util
 from . import report_forms_util
 
-from names_translator import Transliterator
 
 # Create your views here.
 def index_view(request):
@@ -22,12 +23,17 @@ def index_view(request):
     return render(request, 'reports/index.html')
 
 
-@login_required
+# @login_required
 def reports_list_view(request):
     """show all reports"""
     reports_list = Report.objects.all()
+    paginator = Paginator(reports_list, 10)
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     context = {
-        'reports_list': reports_list,
+        # 'reports_list': page_obj,
+        'page_obj': page_obj
     }
     return render(request, 'reports/reports_list.html', context)
 
@@ -217,3 +223,22 @@ def member_search_view(request):
         return HttpResponse(json.dumps(service_members_list))
 
     return HttpResponse(request, "404 I'm not an Error))")
+
+
+def report_search_view(request):
+    """search for report by filtered param"""
+    reports_list = []
+    if request.method == 'POST':
+        filter_param = request.POST.get('filter_param')
+
+        if filter_param is not None and len(filter_param) > 0:
+            query_set = Report.objects.filter(
+                Q(title__icontains=filter_param)
+                |
+                Q(body_sample__icontains=filter_param)
+            )
+        else:
+            query_set = Report.objects.all()
+
+        for report in query_set:
+            reports_list.append()

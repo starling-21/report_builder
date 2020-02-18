@@ -40,6 +40,8 @@ urlpatterns = [
     re_path(r'^search_member/$', views.member_search_view),
     re_path(r'^search_member/(?P<name_format>[-\w]+)$', views.member_search_view),
 
+    re_path(r'^report_search', views.report_search_view)
+
 ]
 
 

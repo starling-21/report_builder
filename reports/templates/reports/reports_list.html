@@ -6,35 +6,79 @@
     <p><h3>Оберіть рапорт:</h3></p>
     <hr>
 
-{#    reports list accordion#}
-    {% for report in reports_list %}
+    {#    reports list accordion#}
+    {% for report in page_obj %}
         <div class="accordion mb-0" id="accordion-1">
 
             <div class="card border-info my-1">
                 <div class="card-header" id="heading-{{ forloop.counter0 }}">
                     <h2 class="mb-0">
-                        <button class="btn btn-link text-dark" type="button" data-toggle="collapse" data-target="#collapse-{{ forloop.counter0 }}"
+                        <button class="btn btn-link text-dark" type="button" data-toggle="collapse"
+                                data-target="#collapse-{{ forloop.counter0 }}"
                                 aria-expanded="false" aria-controls="collapseOne">
-                            <h6 >{{ report.title }}</h6>
+                                <h6>{{ report.title }}</h6>
                         </button>
                     </h2>
                 </div>
 
-                <div id="collapse-{{ forloop.counter0 }}" class="collapse collapsed" aria-labelledby="#heading-{{ forloop.counter0 }}"
+                <div id="collapse-{{ forloop.counter0 }}" class="collapse collapsed"
+                     aria-labelledby="#heading-{{ forloop.counter0 }}"
                      data-parent="#accordion-1">
                     <div class="card-body">
                         <p><u>Зразок рапорту:</u></p>
                         {{ report.body_sample }}
                         <a class="btn btn-bordered-primary text-light bg-secondary float-right my-3"
-                            href="{% url 'reports:proceed_chosen_report' report_id=report.id %}">
-                            Далі   <i class="fas fa-angle-double-right ml-1"></i>
+                           href="{% url 'reports:proceed_chosen_report' report_id=report.id %}">
+                            Далі <i class="fas fa-angle-double-right ml-1"></i>
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     {% endfor %}
-{#    end of reports list accordion#}
+    {#    end of reports list accordion#}
+
+
+    <nav aria-label="PAGES NAVIGATION">
+        {% if page_obj.has_other_pages %}
+            <ul class="pagination justify-content-center">
+                {# prev, first page #}
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1">Перша</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link" href="#">Перша</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+                {% endif %}
+
+                {# main pagination #}
+                {% for i in page_obj.paginator.page_range %}
+                    {% if i == page_obj.number %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }}</span>
+                            <span class="sr-only">(current)</span></span>
+                        </li>
+                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+{#                    {% else %}#}
+{#                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>#}
+{#                    {% endif %}#}
+                {% endfor %}
+
+
+                {# next, last page #}
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Остання</a></li>
+                {% else %}
+                    <li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">Остання</a></li>
+                {% endif %}
+
+            </ul>
+        {% endif %}
+    </nav>
 
 
 {% endblock %}

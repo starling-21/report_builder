@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Rank(models.Model):
     name = models.CharField(max_length=255, verbose_name="військове звання (полковник, лейтенант..)")
@@ -36,6 +37,7 @@ class Unit(models.Model):
         verbose_name = "Підрозділ"
         verbose_name_plural = "Підрозділи"
 
+
 class Position(models.Model):
     position_title = models.CharField(max_length=255, verbose_name="посада (офіцер, старший офіцер, начальник)")
     position_tail = models.CharField(max_length=255, default='', blank=True, verbose_name="додаткова посада. Наприклад:(заступник начальника, перший заступник командира...)  !!! назву підрозділу НЕ ВКАЗУВАТИ  !!!")
@@ -60,7 +62,6 @@ class Position(models.Model):
     def get_to_position(self):
         """return comprehenced position name with unit name for current tier"""
         pos_result = ""
-        position_tail_str = ""
         if self.temp_supervisor:
             pos_result = "Тимчасово виконуючому обов'язки\n" + self.position_title.split()[0] + "а"  # начальник[а]
         elif self.supervisor:
@@ -80,6 +81,7 @@ class Position(models.Model):
     class Meta:
         verbose_name = "Посада__"
         verbose_name_plural = "Посади"
+
 
 class Serviceman(models.Model):
     first_name = models.CharField(max_length=255, verbose_name="Ім'я")
@@ -117,6 +119,7 @@ class Serviceman(models.Model):
     class Meta:
         verbose_name = "Військовослужбовці__"
         verbose_name_plural = "Військовослужбовці"
+
 
 class Report(models.Model):
     REPORT_TYPES = [

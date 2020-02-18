@@ -2,6 +2,9 @@ body {
     padding-top: 70px;
 }
 
+
+/*report servicemen's chain*/
+
 .left-bordered-row {
     border-radius: 4px;
     border: 1px solid #c3cbc9;
@@ -9,3 +12,5 @@ body {
     border-left: 5px solid #d39e00;
     min-height: 50px;
 }
+
+/*end of report servicemen's chain*/
