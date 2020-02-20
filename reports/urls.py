@@ -25,10 +25,7 @@ urlpatterns = [
 
     path('', views.reports_list_view, name='index'),
 
-    # path('reports_list', views.reports_list_view, name='reports_list'),
     re_path(r'^reports_list/$', views.reports_list_view, name='reports_list'),
-    # re_path(r'^reports_list/filter/$', views.reports_list_filter_view, name='reports_list_filter'),
-    # re_path(r'^reports_list/(?P<filter>\w+)/$', views.reports_list_view, name='reports_list'),
 
     path('proceed_chosen_report/<int:report_id>', views.proceed_chosen_report_view, name='proceed_chosen_report'),
 

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'reports',
     'bootstrap_datepicker_plus',
     'debug_toolbar',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -113,12 +114,10 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-#debub toolbar requirements
+# debub toolbar requirements
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -128,8 +127,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
-
-#custom session engine setting
+# custom session engine setting
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
@@ -138,5 +136,8 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
 
-#test console logger for all emails
+# test console logger for all emails
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# sets Bootstrap 4 as the default styling framework for django-crispy-forms
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
