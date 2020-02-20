@@ -82,16 +82,6 @@
     </div>
 </nav>
 
-{#<p>is_authenticated: {{ user.is_authenticated }}</p>#}
-{#<ul>#}
-{#    {% if user.is_authenticated %}#}
-{#        <li>User: {{ user.get_username }}</li>#}
-{#        <li><a href="{% url 'logout' %}?next={{ request.path }}">Logout</a></li>#}
-{#    {% else %}#}
-{#        <li><a href="{% url 'login' %}?next={{ request.path }}">Login</a></li>#}
-{#    {% endif %}#}
-{#</ul>#}
-
 
 <div class="container">
     {% block content %}

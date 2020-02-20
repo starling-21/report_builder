@@ -26,15 +26,45 @@ def index_view(request):
 # @login_required
 def reports_list_view(request):
     """show all reports"""
-    reports_list = Report.objects.all()
-    paginator = Paginator(reports_list, 10)
+    if request.method == 'POST':
+        filter_param = request.POST.get('filter_param')
+        if (filter_param is not None) and (len(filter_param) > 0):
+            reports_list = Report.objects.filter(
+                Q(title__iexact=filter_param) | Q(body_sample__iexact=filter_param)
+                |
+                Q(title__icontains=filter_param) | Q(body_sample__icontains=filter_param)
+            ).order_by('id')
+        else:
+            filter_param = ""
+            reports_list = Report.objects.all().order_by('id')
 
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        # 'reports_list': page_obj,
-        'page_obj': page_obj
-    }
+        paginator = Paginator(reports_list, 5)
+        page_obj = paginator.get_page(1)
+        context = {
+            'page_obj': page_obj,
+            'filter_param': filter_param
+        }
+
+    elif request.method == 'GET':
+        filter_param = request.GET.get('filter_param')
+        if (filter_param is not None) and (len(filter_param) > 0):
+            reports_list = Report.objects.filter(
+                Q(title__iexact=filter_param) | Q(body_sample__iexact=filter_param)
+                |
+                Q(title__icontains=filter_param) | Q(body_sample__icontains=filter_param)
+            ).order_by('id')
+        else:
+            filter_param = ""
+            reports_list = Report.objects.all().order_by('id')
+
+        paginator = Paginator(reports_list, 5)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        context = {
+            'page_obj': page_obj,
+            'filter_param': filter_param
+        }
+
     return render(request, 'reports/reports_list.html', context)
 
 
@@ -75,7 +105,7 @@ def edit_service_members_chain_view(request, serviceman_id=None):
             elif 'submit_new_id' in request.POST:
                 old_id = request.POST.get('submit_new_id')
                 swap_id = request.POST.get('swap_id')
-                if (swap_id is not None) and (old_id != swap_id): #and (len(swap_id) > 0)
+                if (swap_id is not None) and (old_id != swap_id):  # and (len(swap_id) > 0)
                     # print('id swap: {} -> {}'.format(old_id, swap_id))
                     for member in serviceman_chain:
                         if member.id == int(old_id):
@@ -112,7 +142,8 @@ def edit_service_members_chain_view(request, serviceman_id=None):
                 return redirect(reverse('reports:report_filling'))
         except Exception as e:
             print(e)
-            return redirect(reverse('reports:edit_service_members_chain', kwargs={'report_id': request.session['report_id']}))
+            return redirect(
+                reverse('reports:edit_service_members_chain', kwargs={'report_id': request.session['report_id']}))
             # return redirect(reverse('reports:users'))
 
     elif request.method == 'GET':
@@ -167,7 +198,8 @@ def return_report_document_view(request):
     # report = Report.objects.get(id=request.session['report_id'])
     # customized_report_name = serviceman.last_name + "_" + report.title
 
-    download_report_file_name = '' + now.strftime("%d-%m %H-%M") + " report" + '.' + document_file_path.rsplit('.', 1)[-1]
+    download_report_file_name = '' + now.strftime("%d-%m %H-%M") + " report" + '.' + document_file_path.rsplit('.', 1)[
+        -1]
 
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(download_report_file_name);
@@ -241,4 +273,14 @@ def report_search_view(request):
             query_set = Report.objects.all()
 
         for report in query_set:
-            reports_list.append()
+            reports_list.append({
+                'id': report.id,
+                'title': report.title,
+                'body_sample': report.body_sample
+            })
+
+        data = json.dumps(reports_list)
+
+        mimetype = 'application/json'
+        return HttpResponse(data, mimetype)
+

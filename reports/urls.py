@@ -25,7 +25,11 @@ urlpatterns = [
 
     path('', views.reports_list_view, name='index'),
 
-    path('reports_list', views.reports_list_view, name='reports_list'),
+    # path('reports_list', views.reports_list_view, name='reports_list'),
+    re_path(r'^reports_list/$', views.reports_list_view, name='reports_list'),
+    # re_path(r'^reports_list/filter/$', views.reports_list_filter_view, name='reports_list_filter'),
+    # re_path(r'^reports_list/(?P<filter>\w+)/$', views.reports_list_view, name='reports_list'),
+
     path('proceed_chosen_report/<int:report_id>', views.proceed_chosen_report_view, name='proceed_chosen_report'),
 
     path('serviceman_list', views.serviceman_list_view, name='users'),
@@ -40,7 +44,7 @@ urlpatterns = [
     re_path(r'^search_member/$', views.member_search_view),
     re_path(r'^search_member/(?P<name_format>[-\w]+)$', views.member_search_view),
 
-    re_path(r'^report_search', views.report_search_view)
+    # re_path(r'^report_search', views.report_search_view, name='report_search')
 
 ]
 

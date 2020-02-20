@@ -3,8 +3,41 @@
 
 
 {% block content %}
-    <p><h3>Оберіть рапорт:</h3></p>
+    <div class="alert alert-info align-items-center my-0 pt-2 pb-0" role="alert">
+        <div class="form-group row mt-2">
+            <div class="col-12 d-flex">
+                <h4 class="mr-auto mt-1">Оберіть рапорт:</h4>
+                <form id='search' class="w-50 d-flex" method='POST' action='{% url 'reports:reports_list' %}'>
+                    {% csrf_token %}
+                    <input type="search" class="form-control mr-2" placeholder="Пошук" id="filter_param"
+                           name="filter_param">
+                    <button type="submit" class="btn btn-outline-info">Шукати</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    {#    search results message#}
+    {% if filter_param %}
+        {% if page_obj.paginator.count > 0 %}
+            <div class="alert alert-success d-flex align-items-center mb-1 py-1" role="alert">
+                по запиту: <span class="badge badge-secondary mx-1">{{ filter_param }}</span>
+                знайдено {{ page_obj.paginator.count }} записiв.
+                <a href="{% url 'reports:reports_list' %}"
+                   class="btn btn-outline-secondary mx-3 px-3 py-2">скинути фiльтр</a>
+            </div>
+        {% else %}
+            <div class="alert alert-danger d-flex align-items-center mb-1 py-1" role="alert">
+                по запиту: <span class="badge badge-info mx-2 p-2">{{ filter_param }}</span> нiчого не знайдено
+                <a href="{% url 'reports:reports_list' %}"
+                   class="btn btn-outline-secondary mx-3 px-3 py-2">скинути фiльтр</a>
+            </div>
+        {% endif %}
+    {% endif %}
     <hr>
+    {# end of search results message#}
+
 
     {#    reports list accordion#}
     {% for report in page_obj %}
@@ -16,7 +49,7 @@
                         <button class="btn btn-link text-dark" type="button" data-toggle="collapse"
                                 data-target="#collapse-{{ forloop.counter0 }}"
                                 aria-expanded="false" aria-controls="collapseOne">
-                                <h6>{{ report.title }}</h6>
+                            <h6>{{ report.title }}</h6>
                         </button>
                     </h2>
                 </div>
@@ -25,7 +58,7 @@
                      aria-labelledby="#heading-{{ forloop.counter0 }}"
                      data-parent="#accordion-1">
                     <div class="card-body">
-                        <p><u>Зразок рапорту:</u></p>
+                        {#                        <p><u>Зразок рапорту:</u></p>#}
                         {{ report.body_sample }}
                         <a class="btn btn-bordered-primary text-light bg-secondary float-right my-3"
                            href="{% url 'reports:proceed_chosen_report' report_id=report.id %}">
@@ -39,17 +72,23 @@
     {#    end of reports list accordion#}
 
 
+    {#  page navigation  #}
     <nav aria-label="PAGES NAVIGATION">
         {% if page_obj.has_other_pages %}
             <ul class="pagination justify-content-center">
                 {# prev, first page #}
                 {% if page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page=1">Перша</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+                    <li class="page-item"><a class="page-link"
+                                             href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ page_obj.previous_page_number }}">Взад</a>
+                    </li>
+                    <li class="page-item"><a class="page-link"
+                                             href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page=1">&laquo;&laquo;</a>
+                    </li>
                 {% else %}
-                    <li class="page-item disabled"><a class="page-link" href="#">Перша</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">Взад</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">&laquo;&laquo;</a></li>
                 {% endif %}
+                {# end of prev, first page #}
 
                 {# main pagination #}
                 {% for i in page_obj.paginator.page_range %}
@@ -58,28 +97,48 @@
                             <span class="page-link">{{ page_obj.number }}</span>
                             <span class="sr-only">(current)</span></span>
                         </li>
-                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
-                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+                        {#                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}#}
+                        {#                        <li class="page-item"><a class="page-link" href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ i }}">{{ i }}</a></li>#}
+                        {#                    {% endif %}#}
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link"
+                               href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ i }}">{{ i }}</a>
+                        </li>
                     {% endif %}
-{#                    {% else %}#}
-{#                        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>#}
-{#                    {% endif %}#}
                 {% endfor %}
+                {# end of main pagination #}
 
 
                 {# next, last page #}
                 {% if page_obj.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Остання</a></li>
+                    <li class="page-item"><a class="page-link"
+                                             href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ page_obj.paginator.num_pages }}">&raquo;&raquo;</a>
+                    </li>
+                    <li class="page-item"><a class="page-link"
+                                             href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ page_obj.next_page_number }}">Вперед</a>
+                    </li>
                 {% else %}
-                    <li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
-                    <li class="page-item disabled"><a class="page-link" href="#">Остання</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">&raquo;&raquo;</a></li>
+                    <li class="page-item disabled"><a class="page-link" href="#">Вперед</a></li>
                 {% endif %}
+                {# end of next, last page #}
 
             </ul>
         {% endif %}
     </nav>
-
+    {# end of page navigation #}
 
 {% endblock %}
 
+{% block js_scripts %}
+    <script>
+        $(document).ready(function () {
+            {#$("#search input").val( {{filter_param}} );#}
+            $(":button").click(function () {
+                {#alert();#}
+            });
+
+        });
+    </script>
+{% endblock %}
