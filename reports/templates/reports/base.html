@@ -38,11 +38,17 @@
 <nav class="navba fixed-top navbar-expand navbar-dark bg-secondary">
     <div class="container form-inline">
 
-        <a href="/" class="navbar-brand"><i class="fab fa-battle-net fa-3x text-warning"></i></a>
+        <a href="/" class="navbar-brand ml-3"><i class="fas fa-greater-than fa-3x text-light"></i></a>
 
         <div class="collapse navbar-collapse">
             {% if user.is_authenticated %}
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav mr-auto d-flex align-items-center">
+                    <li class="nav-item">
+                        <sapn class="nav-link text-light text-uppercase font-weight-normal px-3">
+                            <i class="fas fa-file-alt fa-2x text-danger"></i>
+                            <i class="fas fa-file-alt fa-2x text-warning"></i>
+                            <i class="fas fa-file-alt fa-2x text-light"></i>
+                        </sapn>
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"
                                             href="/">головна</a></li>
                     <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"
@@ -61,26 +67,25 @@
                     </div>
                 </div>
 
-                {# not authenticated users#}
+            {# not authenticated users#}
             {% else %}
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <sapn class="nav-link text-warning text-uppercase font-weight-normal px-3">YOU ARE
-                            WELCOME!
+                        <sapn class="nav-link text-light text-uppercase font-weight-normal px-3">
+                            <i class="fas fa-file-alt fa-2x text-danger"></i>
+                            <i class="fas fa-file-alt fa-2x text-warning"></i>
+                            <i class="fas fa-file-alt fa-2x text-light"></i>
                         </sapn>
                     </li>
                 </ul>
 
+                {# login button #}
                 <div class="ml-auto">
-                    <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">See
-                        Modal
-                    </button>
-
                     {# login button#}
-                    <a class="btn btn-outline-warning mr-2" href="{% url 'login' %}" role="button"><span
-                            class="text font-weight-normal">Увiйти</span></a>
+                    <a class="btn btn-outline-warning mr-2" href="{% url 'login' %}"><span
+                            class="text font-weight-normal"><i class="fas fa-sign-in-alt"></i></span></a>
                 </div>
+                {# end of login button #}
             {% endif %}
 
 
@@ -89,28 +94,6 @@
     </div>
 
 </nav>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-     aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ...
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <div class="container">

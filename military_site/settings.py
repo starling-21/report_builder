@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'reports',
     'bootstrap_datepicker_plus',
     'debug_toolbar',
-    'crispy_forms',
+    # 'crispy_forms',
 ]
 
 MIDDLEWARE = [

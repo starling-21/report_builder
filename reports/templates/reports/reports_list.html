@@ -3,10 +3,10 @@
 
 
 {% block content %}
-    <div class="alert alert-info align-items-center my-0 pt-2 pb-0" role="alert">
-        <div class="form-group row mt-2">
+    <div class="alert alert-info align-items-center my-0 py-0" role="alert">
+        <div class="form-group row my-1">
             <div class="col-12 d-flex">
-                <h4 class="mr-auto mt-1">Оберіть рапорт:</h4>
+                <h4 class="mr-auto mt-1"><i class="fas fa-server mr-2"></i>Оберіть рапорт:</h4>
                 <form id='search' class="w-50 d-flex" method='POST' action='{% url 'reports:reports_list' %}'>
                     {% csrf_token %}
                     <input type="search" class="form-control mr-2" placeholder="Пошук" id="filter_param"
@@ -22,20 +22,20 @@
     {% if filter_param %}
         {% if page_obj.paginator.count > 0 %}
             <div class="alert alert-success d-flex align-items-center mb-1 py-1" role="alert">
-                по запиту: <span class="badge badge-secondary mx-1">{{ filter_param }}</span>
+                по запиту: <span class="badge badge-secondary mx-2 p-1">{{ filter_param }}</span>
                 знайдено {{ page_obj.paginator.count }} записiв.
                 <a href="{% url 'reports:reports_list' %}"
-                   class="btn btn-outline-secondary mx-3 px-3 py-2">скинути фiльтр</a>
+                   class="btn ml-auto px-3 py-2"><i class="fas fa-times text-secondary"></i></a>
             </div>
         {% else %}
             <div class="alert alert-danger d-flex align-items-center mb-1 py-1" role="alert">
-                по запиту: <span class="badge badge-info mx-2 p-2">{{ filter_param }}</span> нiчого не знайдено
+                по запиту: <span class="badge badge-secondary mx-2 p-1">{{ filter_param }}</span> нiчого не знайдено
                 <a href="{% url 'reports:reports_list' %}"
-                   class="btn btn-outline-secondary mx-3 px-3 py-2">скинути фiльтр</a>
+                   class="btn ml-auto px-3 py-2"><i class="fas fa-times text-secondary"></i></a>
             </div>
         {% endif %}
     {% endif %}
-    <hr>
+    <hr class="my-2">
     {# end of search results message#}
 
 
