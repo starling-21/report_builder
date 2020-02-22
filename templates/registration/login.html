@@ -1,81 +1,38 @@
-{#{% extends 'reports/base.html' %}#}
-
-{#{% block content %}#}
-{#    <form action="" method="post">#}
-{#        <div class="form-group">#}
-{#            <label for="inputEmail">Email</label>#}
-{#            <input type="text" class="form-control" id="inputEmail" placeholder="Login" required>#}
-{#        </div>#}
-{#        <div class="form-group">#}
-{#            <label for="inputPassword">Password</label>#}
-{#            <input type="password" class="form-control" id="inputPassword" placeholder="Password" required>#}
-{#        </div>#}
-{#        <div class="checkbox">#}
-{#            <label><input type="checkbox"> Remember me</label>#}
-{#        </div>#}
-{#        <button type="submit" class="btn btn-primary">Login</button>#}
-{#    </form>#}
-{#{% endblock %}#}
-
-
-{#{% extends 'registration/base.html' %}#}
-{##}
-{#{% block content %}#}
-{#    <form action="" method="post">#}
-{#        <div class="form-group">#}
-{#            <label for="inputEmail">Email</label>#}
-{#            <input type="text" class="form-control" id="inputEmail" placeholder="Login" required>#}
-{#        </div>#}
-{#        <div class="form-group">#}
-{#            <label for="inputPassword">Password</label>#}
-{#            <input type="password" class="form-control" id="inputPassword" placeholder="Password" required>#}
-{#        </div>#}
-{#        <div class="checkbox">#}
-{#            <label><input type="checkbox"> Remember me</label>#}
-{#        </div>#}
-{#        <button type="submit" class="btn btn-primary">Login</button>#}
-{#    </form>#}
-{#{% endblock %}#}
-
-
-
-
-
-
 {% extends "reports/base.html" %}
 
 {% block content %}
+    <div class="col-4 mx-auto my-5 bg-light border p-3">
+        {% if form.errors %}
+            <p>Your username and password didn't match. Please try again.</p>
+        {% endif %}
 
-  {% if form.errors %}
-    <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
+        {% if next %}
+            {% if user.is_authenticated %}
+                <p>Your account doesn't have access to this page. To proceed,
+                    please login with an account that has access.</p>
+            {% else %}
+                <p>Для продовження необхідно авторизація.</p>
+            {% endif %}
+        {% endif %}
 
-  {% if next %}
-    {% if user.is_authenticated %}
-      <p>Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.</p>
-    {% else %}
-      <p>Please login to see this page.</p>
-    {% endif %}
-  {% endif %}
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">Логiн</label>
+                <input type="text" class="form-control" id="id_username" name="username" placeholder="Логiн" required>
+            </div>
+            <div class="form-group">
+                <label for="id_password">Пароль</label>
+                <input type="password" class="form-control" id="id_password" name="password" placeholder="Пароль"
+                       required>
+            </div>
 
-  <form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    <table>
-      <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-      </tr>
-      <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-      </tr>
-    </table>
-    <input type="submit" value="login" />
-    <input type="hidden" name="next" value="{{ next }}" />
-  </form>
+            <button class="btn btn-info w-100 align-self-baseline" type="submit">
+                <span class="fas fa-sign-in-alt mr-2"></span>Увiйти
+            </button>
 
- Assumes you setup the password_reset view in your URLconf
-  <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+            <input type="hidden" name="next" value="{{ next }}"/>
+        </form>
+    </div>
 
 {% endblock %}

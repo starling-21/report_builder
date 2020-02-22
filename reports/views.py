@@ -23,7 +23,7 @@ def index_view(request):
     return render(request, 'reports/index.html')
 
 
-# @login_required
+@login_required
 def reports_list_view(request):
     """show all reports"""
     if request.method == 'POST':
@@ -57,7 +57,7 @@ def reports_list_view(request):
             filter_param = ""
             reports_list = Report.objects.all().order_by('id')
 
-        paginator = Paginator(reports_list, 5)
+        paginator = Paginator(reports_list, 2)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         context = {
@@ -194,12 +194,8 @@ def return_report_document_view(request):
                             filename=document_file_path.split('\\')[-1])
 
     now = datetime.datetime.now()
-    # serviceman = request.session['serviceman_chain'][0]
-    # report = Report.objects.get(id=request.session['report_id'])
-    # customized_report_name = serviceman.last_name + "_" + report.title
 
-    download_report_file_name = '' + now.strftime("%d-%m %H-%M") + " report" + '.' + document_file_path.rsplit('.', 1)[
-        -1]
+    download_report_file_name = '' + now.strftime("%d-%m %H-%M") + " report" + '.' + document_file_path.rsplit('.', 1)[-1]
 
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(download_report_file_name);

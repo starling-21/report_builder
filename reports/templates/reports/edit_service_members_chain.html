@@ -3,8 +3,10 @@
 {#loads custom tags#}
 
 {% block extra_head %}
-    {#    custom jquery blib: SELECT2    #}
+    {# custom jquery blib: SELECT2    #}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet"/>
+
+    {# custom import for libs: select2 and ajax#}
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/i18n/ru.js"></script>
 {% endblock %}
@@ -21,7 +23,7 @@
 
             <div class="row left-bordered-row ml-0">
 
-                {# editing chain member#}
+                {# editing chain member representaion#}
                 {% if swap_id == servicemember.id %}
                     <div class="col-12 d-flex align-items-center">
                         <select name="swap_id"></select>
@@ -31,9 +33,9 @@
                         </button>
                         {#submit chain member id editing button#}
                     </div>
-                    {# end of editing chain member #}
+                    {# end of editing chain member representaion #}
 
-                {# member representation block #}
+                    {# member representation block #}
                 {% else %}
                     <div class="col-11">
                         {{ servicemember.rank.name }} {{ servicemember }}
@@ -43,14 +45,14 @@
 
                     {# edit buttons group#}
                     <div class="col-1 d-flex justify-content-end align-items-center pr-0">
-                        {% if not forloop.first %}
-                            <div data-toggle="tooltip" data-placement="top" title="редагувати">
-                                <button type="submit" class="btn btn-light btn-sm text-info mr-1"
-                                        name="edit_chain_id"
-                                        value="{{ servicemember.id }}"><span class="fas fa-edit fa-1x"></span>
-                                </button>
-                            </div>
-                        {% endif %}
+                        {#  {% if not forloop.first %}#}
+                        <div data-toggle="tooltip" data-placement="top" title="редагувати">
+                            <button type="submit" class="btn btn-light btn-sm text-info mr-1"
+                                    name="edit_chain_id"
+                                    value="{{ servicemember.id }}"><span class="fas fa-edit fa-1x"></span>
+                            </button>
+                        </div>
+                        {# {% endif %}#}
 
                         {% if not forloop.first and not forloop.last %}
                             <div data-toggle="tooltip" data-placement="top" title="видалити">
@@ -85,14 +87,6 @@
 
 
 {% endblock %}
-
-
-
-
-
-
-
-
 
 
 
@@ -132,13 +126,14 @@
                     processResults: function (data) {
                         // Transforms the top-level key of the response object from 'items' to 'results'
                         //console.log("success")
-                        console.log(data)
+                        //console.log(data)
                         return {
                             results: data
                         };
                     }
                 }
             });
+
         });
 
     </script>

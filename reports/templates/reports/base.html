@@ -38,58 +38,66 @@
 <nav class="navba fixed-top navbar-expand navbar-dark bg-secondary">
     <div class="container form-inline">
 
-        <a href="/" class="navbar-brand ml-3"><i class="fas fa-greater-than fa-3x text-light"></i></a>
+        <a href="/" class="navbar-brand ml-3">
+            <i class="fas fa-greater-than fa-3x text-light"></i></a>
 
-        <div class="collapse navbar-collapse">
-            {% if user.is_authenticated %}
-                <ul class="navbar-nav mr-auto d-flex align-items-center">
-                    <li class="nav-item">
-                        <sapn class="nav-link text-light text-uppercase font-weight-normal px-3">
-                            <i class="fas fa-file-alt fa-2x text-danger"></i>
-                            <i class="fas fa-file-alt fa-2x text-warning"></i>
-                            <i class="fas fa-file-alt fa-2x text-light"></i>
-                        </sapn>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"
-                                            href="/">головна</a></li>
-                    <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"
-                                            href="#">(F.A.Q.)</a></li>
-                </ul>
+            <div class="collapse navbar-collapse">
+                {% if user.is_authenticated %}
+                    <ul class="navbar-nav mr-auto d-flex align-items-center">
+                        <li class="nav-item">
+                            <a href="/">
+                                <span class="nav-link text-light text-uppercase font-weight-normal px-3">
+                                    <i class="fas fa-file-alt fa-2x text-danger"></i>
+                                    <i class="fas fa-file-alt fa-2x text-warning"></i>
+                                    <i class="fas fa-file-alt fa-2x text-light"></i>
+                                </span>
+                            </a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"
+                                                href="#">(F.A.Q.)</a></li>
+                    </ul>
 
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle align-self-baseline" type="button"
-                            id="dropdownMenuButton"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {#                        <span class="fas fa-user-circle fa-2x mr-2"></span><span>{{ user.username|upper }}</span>#}
-                        <span class="fas fa-child fa-2x mr-2"></span><span>{{ user.username|upper }}</span>
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="{% url 'logout' %}">Вийти<i class="fas fa-sign-out-alt ml-1"></i></a>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle align-self-baseline" type="button"
+                                id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            {# icon for loged in user #}
+                            {# <span class="fas fa-user-circle fa-2x mr-2"></span><span>{{ user.username|upper }}</span>#}
+                            <span class="fas fa-child fa-2x mr-2"></span><span>{{ user.username|upper }}</span>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+{#                            <a class="dropdown-item" href="{% url 'logout' %}">Вийти<i#}
+{#                            <a class="dropdown-item" href="{% url 'reports:logout/' %}">Вийти<i#}
+                            <a class="dropdown-item" href="{% url 'logout' %}?next=/">Вийти<i
+                                    class="fas fa-sign-out-alt ml-1"></i></a>
+                        </div>
                     </div>
-                </div>
-
-            {# not authenticated users#}
-            {% else %}
-                <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                        <sapn class="nav-link text-light text-uppercase font-weight-normal px-3">
-                            <i class="fas fa-file-alt fa-2x text-danger"></i>
-                            <i class="fas fa-file-alt fa-2x text-warning"></i>
-                            <i class="fas fa-file-alt fa-2x text-light"></i>
-                        </sapn>
-                    </li>
-                </ul>
-
-                {# login button #}
-                <div class="ml-auto">
-                    {# login button#}
-                    <a class="btn btn-outline-warning mr-2" href="{% url 'login' %}"><span
-                            class="text font-weight-normal"><i class="fas fa-sign-in-alt"></i></span></a>
-                </div>
-                {# end of login button #}
-            {% endif %}
 
 
-        </div>
+
+                {# not authenticated users#}
+                {% else %}
+                    <ul class="navbar-nav mr-auto">
+                        <a href="/">
+                                <span class="nav-link text-light text-uppercase font-weight-normal px-3">
+                                    <i class="fas fa-file-alt fa-2x text-danger"></i>
+                                    <i class="fas fa-file-alt fa-2x text-warning"></i>
+                                    <i class="fas fa-file-alt fa-2x text-light"></i>
+                                </span>
+                            </a>
+                    </ul>
+
+                    {# login button #}
+                    <div class="ml-auto">
+                        {# login button#}
+                        <a class="btn btn-outline-warning mr-2" href="{% url 'login' %}"><span
+                                class="text font-weight-normal"><i class="fas fa-sign-in-alt"></i></span></a>
+                    </div>
+                    {# end of login button #}
+                {% endif %}
+
+
+            </div>
 
     </div>
 
@@ -97,16 +105,10 @@
 
 
 <div class="container">
-    {% block content %}
-
-    {% endblock %}
+    {% block content %}{% endblock %}
 </div>
 
-{% block js_scripts %}
-    <script>
-        $('#exampleModalCenter').modal()
-    </script>
-{% endblock %}
+{% block js_scripts %}{% endblock %}
 
 </body>
 </html>

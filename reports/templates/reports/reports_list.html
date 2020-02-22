@@ -7,7 +7,7 @@
         <div class="form-group row my-1">
             <div class="col-12 d-flex">
                 <h4 class="mr-auto mt-1"><i class="fas fa-server mr-2"></i>Оберіть рапорт:</h4>
-                <form id='search' class="w-50 d-flex" method='POST' action='{% url 'reports:reports_list' %}'>
+                <form id='search' class="d-flex w-75" method='POST' action='{% url 'reports:reports_list' %}'>
                     {% csrf_token %}
                     <input type="search" class="form-control mr-2" placeholder="Пошук" id="filter_param"
                            name="filter_param">
@@ -39,17 +39,17 @@
     {# end of search results message#}
 
 
-    {#    reports list accordion#}
+    {# reports list accordion #}
     {% for report in page_obj %}
         <div class="accordion mb-0" id="accordion-1">
 
-            <div class="card border-info my-1">
+            <div class="card border-info my-2">
                 <div class="card-header" id="heading-{{ forloop.counter0 }}">
                     <h2 class="mb-0">
                         <button class="btn btn-link text-dark" type="button" data-toggle="collapse"
                                 data-target="#collapse-{{ forloop.counter0 }}"
                                 aria-expanded="false" aria-controls="collapseOne">
-                            <h6>{{ report.title }}</h6>
+                            <h6>{{ report.title|upper }}</h6>
                         </button>
                     </h2>
                 </div>
@@ -78,10 +78,10 @@
             <ul class="pagination justify-content-center">
                 {# prev, first page #}
                 {% if page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link"
+                    <li class="page-item"><a class="page-link text-info"
                                              href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ page_obj.previous_page_number }}">Взад</a>
                     </li>
-                    <li class="page-item"><a class="page-link"
+                    <li class="page-item"><a class="page-link text-info"
                                              href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page=1">&laquo;&laquo;</a>
                     </li>
                 {% else %}
@@ -94,15 +94,15 @@
                 {% for i in page_obj.paginator.page_range %}
                     {% if i == page_obj.number %}
                         <li class="page-item active">
-                            <span class="page-link">{{ page_obj.number }}</span>
+                            <span class="page-link text-dark bg-info">{{ page_obj.number }}</span>
                             <span class="sr-only">(current)</span></span>
                         </li>
                         {#                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}#}
-                        {#                        <li class="page-item"><a class="page-link" href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ i }}">{{ i }}</a></li>#}
+                        {#                        <li class="page-item"><a class="page-link text-info" href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ i }}">{{ i }}</a></li>#}
                         {#                    {% endif %}#}
                     {% else %}
                         <li class="page-item">
-                            <a class="page-link"
+                            <a class="page-link text-info"
                                href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ i }}">{{ i }}</a>
                         </li>
                     {% endif %}
@@ -112,10 +112,10 @@
 
                 {# next, last page #}
                 {% if page_obj.has_next %}
-                    <li class="page-item"><a class="page-link"
+                    <li class="page-item"><a class="page-link text-info"
                                              href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ page_obj.paginator.num_pages }}">&raquo;&raquo;</a>
                     </li>
-                    <li class="page-item"><a class="page-link"
+                    <li class="page-item"><a class="page-link text-info"
                                              href="?{% if filter_param %}filter_param={{ filter_param }}&{% endif %}page={{ page_obj.next_page_number }}">Вперед</a>
                     </li>
                 {% else %}
