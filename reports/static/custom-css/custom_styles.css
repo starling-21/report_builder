@@ -2,6 +2,13 @@ body {
     padding-top: 70px;
 }
 
+/* nav-bar-link-no-underline  */
+#nav-bar-link-no-underline:hover{
+    background-color: transparent;
+    text-decoration: none;
+}
+
+
 
 /*report servicemen's chain*/
 

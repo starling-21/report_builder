@@ -45,7 +45,7 @@
                 {% if user.is_authenticated %}
                     <ul class="navbar-nav mr-auto d-flex align-items-center">
                         <li class="nav-item">
-                            <a href="/">
+                            <a id="nav-bar-link-no-underline" href="{% url 'reports:index' %}">
                                 <span class="nav-link text-light text-uppercase font-weight-normal px-3">
                                     <i class="fas fa-file-alt fa-2x text-danger"></i>
                                     <i class="fas fa-file-alt fa-2x text-warning"></i>
@@ -78,7 +78,7 @@
                 {# not authenticated users#}
                 {% else %}
                     <ul class="navbar-nav mr-auto">
-                        <a href="/">
+                        <a id="nav-bar-link-no-underline" href="{% url 'reports:index' %}">
                                 <span class="nav-link text-light text-uppercase font-weight-normal px-3">
                                     <i class="fas fa-file-alt fa-2x text-danger"></i>
                                     <i class="fas fa-file-alt fa-2x text-warning"></i>

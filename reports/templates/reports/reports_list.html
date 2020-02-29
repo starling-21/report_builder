@@ -3,11 +3,11 @@
 
 
 {% block content %}
-    <div class="alert alert-info align-items-center my-0 py-0" role="alert">
+    <div class="alert alert-info align-items-center my-0 py-0 pr-2" role="alert">
         <div class="form-group row my-1">
             <div class="col-12 d-flex">
                 <h4 class="mr-auto mt-1"><i class="fas fa-server mr-2"></i>Оберіть рапорт:</h4>
-                <form id='search' class="d-flex w-75" method='POST' action='{% url 'reports:reports_list' %}'>
+                <form id='search' class="d-flex w-50" method='POST' action='{% url 'reports:reports_list' %}'>
                     {% csrf_token %}
                     <input type="search" class="form-control mr-2" placeholder="Пошук" id="filter_param"
                            name="filter_param">
@@ -23,7 +23,7 @@
         {% if page_obj.paginator.count > 0 %}
             <div class="alert alert-success d-flex align-items-center mb-1 py-1" role="alert">
                 по запиту: <span class="badge badge-secondary mx-2 p-1">{{ filter_param }}</span>
-                знайдено {{ page_obj.paginator.count }} записiв.
+                знайдено: {{ page_obj.paginator.count }}
                 <a href="{% url 'reports:reports_list' %}"
                    class="btn ml-auto px-3 py-2"><i class="fas fa-times text-secondary"></i></a>
             </div>
@@ -135,9 +135,9 @@
     <script>
         $(document).ready(function () {
             {#$("#search input").val( {{filter_param}} );#}
-            $(":button").click(function () {
-                {#alert();#}
-            });
+            {#$(":button").click(function () {#}
+            {#    alert();#}
+            {#});#}
 
         });
     </script>

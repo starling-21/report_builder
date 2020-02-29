@@ -23,7 +23,7 @@ def index_view(request):
     return render(request, 'reports/index.html')
 
 
-@login_required
+# @login_required
 def reports_list_view(request):
     """show all reports"""
     if request.method == 'POST':
@@ -84,9 +84,13 @@ def proceed_chosen_report_view(request, report_id):
 
 def serviceman_list_view(request):
     """test view for showing users list. For choosing who generate report for"""
-    serviceman_list = Serviceman.objects.all()
+    serviceman_list = Serviceman.objects.all().order_by('id')
+    paginator = Paginator(serviceman_list, 7)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     context = {
-        'serviceman_list': serviceman_list
+        'serviceman_list': page_obj
     }
     return render(request, 'reports/serviceman_list.html', context)
 
@@ -195,7 +199,8 @@ def return_report_document_view(request):
 
     now = datetime.datetime.now()
 
-    download_report_file_name = '' + now.strftime("%d-%m %H-%M") + " report" + '.' + document_file_path.rsplit('.', 1)[-1]
+    download_report_file_name = '' + now.strftime("%d-%m %H-%M") + " report" + '.' + document_file_path.rsplit('.', 1)[
+        -1]
 
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(download_report_file_name);
@@ -210,7 +215,7 @@ def member_search_view(request):
     :return: default format is - [{id:'member_id', text:'name_representation'}]
     if name_format is defined in search params - format becomes as - [{id:'name_representation', text:'name_representation'}]
     """
-    # print("Search request, method", request.method)
+    print("Search request, method", request.method)
     service_members_list = []
     if request.method == 'POST':
         filter_param = request.POST.get('filter_param')
@@ -253,30 +258,32 @@ def member_search_view(request):
     return HttpResponse(request, "404 I'm not an Error))")
 
 
-def report_search_view(request):
-    """search for report by filtered param"""
-    reports_list = []
+def members_ajax_search_view(request):
+    """search for spefific service member (duplicates member_search_view, BUT..!)"""
+    users_list = []
     if request.method == 'POST':
         filter_param = request.POST.get('filter_param')
+        print('filter_param:', filter_param)
 
         if filter_param is not None and len(filter_param) > 0:
-            query_set = Report.objects.filter(
-                Q(title__icontains=filter_param)
+            query_set = Serviceman.objects.filter(
+                Q(first_name__icontains=filter_param)
                 |
-                Q(body_sample__icontains=filter_param)
+                Q(last_name__icontains=filter_param)
+                |
+                Q(rank__name__icontains=filter_param)
             )
-        else:
-            query_set = Report.objects.all()
 
-        for report in query_set:
-            reports_list.append({
-                'id': report.id,
-                'title': report.title,
-                'body_sample': report.body_sample
-            })
+            for user in query_set:
+                users_list.append({
+                    'id': user.id,
+                    'full_name': user.rank.__str__() + " " + user.get_first_last_name(),
+                })
+        # else:
+        #     users_list.append("NOTHING FOUND!")
 
-        data = json.dumps(reports_list)
+
+        data = json.dumps(users_list)
 
         mimetype = 'application/json'
         return HttpResponse(data, mimetype)
-
