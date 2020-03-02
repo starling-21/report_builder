@@ -30,8 +30,8 @@ def reports_list_view(request):
         filter_param = request.POST.get('filter_param')
         if (filter_param is not None) and (len(filter_param) > 0):
             reports_list = Report.objects.filter(
-                Q(title__iexact=filter_param) | Q(body_sample__iexact=filter_param)
-                |
+                # Q(title__iexact=filter_param) | Q(body_sample__iexact=filter_param)
+                # |
                 Q(title__icontains=filter_param) | Q(body_sample__icontains=filter_param)
             ).order_by('id')
         else:
@@ -49,8 +49,8 @@ def reports_list_view(request):
         filter_param = request.GET.get('filter_param')
         if (filter_param is not None) and (len(filter_param) > 0):
             reports_list = Report.objects.filter(
-                Q(title__iexact=filter_param) | Q(body_sample__iexact=filter_param)
-                |
+                # Q(title__iexact=filter_param) | Q(body_sample__iexact=filter_param)
+                # |
                 Q(title__icontains=filter_param) | Q(body_sample__icontains=filter_param)
             ).order_by('id')
         else:
