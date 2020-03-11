@@ -28,39 +28,60 @@ def get_report_body_filling_form(report_id):
     return context
 
 
-def parse_report_body_template(text, decoder=json.JSONDecoder()):
-    """Parse report body template by substitution patterns (regular json format with predefined keys)
-       Split all parts into dictionaries for future processing
+# def get_service_members_chain_edit_form(service_members_chain_dict):
+#     """return html django form for service members chain editing"""
+#     form_content_dict = {}
+#
+#     for member_id, member in service_members_chain_dict.items():
+#         form_content_dict['edit_member_' + str(member_id)] = forms.CharField(
+#             # label=member,
+#             label=member.rank.name + " " + member.__str__(),
+#             widget=forms.HiddenInput()
+#         )
+#
+#     dynamicServiceMembersChainEditForm = type('ServiceMembersChainEditForm', (ServiceMembersChainEditForm,),
+#                                               form_content_dict)
+#     return dynamicServiceMembersChainEditForm
 
-       :return parsed template dictionary
+
+def parse_report_body_template(text, decoder=json.JSONDecoder()):
+    """Parse report body template for substitution patterns
+       Split all parts into dictionaries for future form creation
 
     BODY TEMPLATE EXAMPLE:
-    --------------------------------------------------------------------------------------------------------------------
-    Прошу Вашого клопотання про перенесення мені терміну щорічної основної відпустки за {"type": "int"} рік
-    з {"type": "date"} на {"type": "date"} року у зв’язку з {"type": "str"} або
-    у зв’язку з {"type": "text"}.
-    Шановний, для перенесення терміну щорічної основної відпустки ви
-    маєте зробити речі, які до цього часу не міг зробити ніхто....
-    {"type":"first_name_last_name"}
-    {"type":"last_name_first_name"}
-    {"type":"rank_first_name_last_name"}
-    {"type":"rank_last_name_first_name"}
-    --------------------------------------------------------------------------------------------------------------------
-    every part of template will be parsed (even if it's a regular text) and putted to to dictionary
-
-    IMPORTANT: (regular text automatically parsed to json like this)
+    there are few json types except regular text inside template to return
     {
         "type": "label",
         "title": "User text to print",
     }
-
-    possible template tags parser can recognize:
-
-    {"type": "int"}
-    {"type": "date"}
-    {"type": "str"}
-    {"type": "text"}
-
+    {
+        "type": "int",
+        "title": "за який рiк переноситься вiдпустка"
+    }
+    {
+        "type": "date",
+        "title": "з якой дати"
+    }
+    {
+        "type": "str",
+        "title": "причина переносу_1"
+    }
+    {
+        "type": "text",
+        "title": "причина переносу_2"
+    }
+    {
+        "type":"rank_first_name_last_name"
+    }
+    {
+        "type":"rank_last_name_first_name"
+    }
+    {
+        "type":"first_name_last_name"
+    }
+    {
+        "type":"last_name_first_name"
+    }
     {"type":"rank_first_name_last_name"}
     {"type":"rank_last_name_first_name"}
     {"type":"first_name_last_name"}
@@ -101,7 +122,7 @@ def parse_report_body_template(text, decoder=json.JSONDecoder()):
 
 
 def get_raw_django_form_fields(parts_dict):
-    """iterate throughout dict and prepare django form dictionary for django template"""
+    """iterate throught dict and prepare django form for user"""
     form_content_dict = {}
 
     for key, field_dict in parts_dict.items():
@@ -116,6 +137,7 @@ def get_raw_django_form_fields(parts_dict):
             form_content_dict[key] = forms.CharField(
                 label="",
                 widget=forms.TextInput(attrs={"class": "form-control", 'size': 3}),
+                # initial=2019
             )
         elif field_dict['type'] == "date":
             form_content_dict[key] = forms.DateField(
@@ -127,18 +149,21 @@ def get_raw_django_form_fields(parts_dict):
                         "locale": "ru",
                     },
                 ),
+                # initial="2019-11-25"
             )
         elif field_dict['type'] == "str":
             form_content_dict[key] = forms.CharField(
                 label="",
-                help_text=field_dict['title'],
+                # help_text=field_dict['title'],
                 widget=forms.TextInput(attrs={"class": "form-control", 'size': 80}),
+                # initial="сімейними обставинами"
             )
         elif field_dict['type'] == "text":
             form_content_dict[key] = forms.CharField(
                 label="",
-                help_text=field_dict['title'],
+                # help_text=field_dict['title'],
                 widget=forms.Textarea(attrs={"class": "form-control", "cols": 100, "rows": 4, "wrap": "hard"}),
+                # initial="сімейними обставинами"
             )
         elif field_dict['type'] == "rank_first_name_last_name":
             form_content_dict[key] = forms.CharField(

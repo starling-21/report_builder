@@ -339,7 +339,7 @@ def convert_datetime_as_day_month_year(date_str, with_no_year=False):
     year = temp_date.year
     if with_no_year:
         return str(day_numb) + ' ' + monthes[month_numb]
-    return str(day_numb) + ' ' + monthes[month_numb] + ' ' + str(year)
+    return str(day_numb) + ' ' + monthes[month_numb] + ' ' + str(year) + ' ' + 'року'
 
 
 def print_footer(footer_dict):

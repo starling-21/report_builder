@@ -4,3 +4,5 @@ READ this for normal usage
 This library parse \n as 'new line' nor like 'line breaking'
 
 pip install git+https://github.com/ZhengMingpei/docx-mailmerge
+
+pipenv install -e git+https://github.com/ZhengMingpei/docx-mailmerge#egg=docx-mailmerge
