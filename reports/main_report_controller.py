@@ -12,7 +12,6 @@ from . import document_generator
 from . import report_content_util
 
 
-# def generate_report(request, serviceman_id, members_chain_id_list=None):
 def generate_report(request):
     """
     Generate report file filled by merge dict based on input params

@@ -55,7 +55,7 @@ class Position(models.Model):
         # add dash and position tail
         pos_result += " " + self.unit.name
         if len(self.position_tail) > 0:
-            pos_result += " - " + self.position_tail
+            pos_result += " – " + self.position_tail
 
         return pos_result
 
@@ -74,7 +74,7 @@ class Position(models.Model):
             temp_tail = self.position_tail.split()
             temp_tail[0] = temp_tail[0] + "у"
             position_tail_str = " ".join(temp_tail)
-            pos_result += " - " + position_tail_str
+            pos_result += " – " + position_tail_str
 
         return pos_result
 

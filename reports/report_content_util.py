@@ -343,12 +343,14 @@ def convert_datetime_as_day_month_year(date_str, with_no_year=False):
 
 
 def print_footer(footer_dict):
+    """test printing method"""
     print("\n\nFROM:______ %s______" % footer_dict['footer_username_tier_'])
     for k, v in footer_dict.items():
         print("{} : {}".format(k, v))
 
 
 def print_header(headeer_dict):
+    """test printing method"""
     print("\n\nTO  :______ %s______" % headeer_dict['header_username_tier_'])
     for k, v in headeer_dict.items():
         print("{} : {}".format(k, v))
