@@ -109,7 +109,7 @@
             // Initialize select2
             var csrf_token = '{{ csrf_token }}';
             $('select').select2({
-                placeholder: "Пошук (Імена та Прізвища з Великої літери)",
+                placeholder: "пошук (звання, ім'я, прізвище)",
                 allowClear: true,
                 language: "ru",
                 delay: 250,
@@ -139,6 +139,9 @@
                     }
                 }
             });
+
+            $('select').select2('open');
+
         });
 
     </script>

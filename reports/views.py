@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, reverse
+from django.http import Http404
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -29,9 +30,10 @@ def reports_list_view(request):
     if request.method == 'POST':
         filter_param = request.POST.get('filter_param')
         if (filter_param is not None) and (len(filter_param) > 0):
+            cap_filter_param = filter_param.capitalize()
             reports_list = Report.objects.filter(
-                # Q(title__iexact=filter_param) | Q(body_sample__iexact=filter_param)
-                # |
+                Q(title__icontains=cap_filter_param) | Q(body_sample__icontains=cap_filter_param)
+                |
                 Q(title__icontains=filter_param) | Q(body_sample__icontains=filter_param)
             ).order_by('id')
         else:
@@ -48,9 +50,10 @@ def reports_list_view(request):
     elif request.method == 'GET':
         filter_param = request.GET.get('filter_param')
         if (filter_param is not None) and (len(filter_param) > 0):
+            cap_filter_param = filter_param.capitalize()
             reports_list = Report.objects.filter(
-                # Q(title__iexact=filter_param) | Q(body_sample__iexact=filter_param)
-                # |
+                Q(title__icontains=cap_filter_param) | Q(body_sample__icontains=cap_filter_param)
+                |
                 Q(title__icontains=filter_param) | Q(body_sample__icontains=filter_param)
             ).order_by('id')
         else:
@@ -147,15 +150,21 @@ def edit_service_members_chain_view(request, serviceman_id=None):
         except Exception as e:
             print(e)
             return redirect(
-                reverse('reports:edit_service_members_chain', kwargs={'report_id': request.session['report_id']}))
+                reverse('reports:edit_service_members_chain', kwargs={'report_id': request.session['report_id']})
+            )
             # return redirect(reverse('reports:users'))
 
     elif request.method == 'GET':
         swap_id = None
         report_id = request.session['report_id']
 
+        # template case (report with no initiator id)
         if serviceman_id is None:
-            serviceman_chain = report_content_util.get_servicemen_chain_list(report_id)
+            try:
+                serviceman_chain = report_content_util.get_servicemen_chain_list(report_id)
+            except Exception as e:
+                print(e)
+                raise Http404("Report settings is incorrect")
         else:
             request.session['serviceman_id'] = serviceman_id
             request.session.modified = True
@@ -198,12 +207,8 @@ def return_report_document_view(request):
                             filename=document_file_path.split('\\')[-1])
 
     now = datetime.datetime.now()
-    # serviceman = request.session['serviceman_chain'][0]
-    # report = Report.objects.get(id=request.session['report_id'])
-    # customized_report_name = serviceman.last_name + "_" + report.title
 
-    download_report_file_name = '' + now.strftime("%d-%m %H-%M") + " report" + '.' + document_file_path.rsplit('.', 1)[
-        -1]
+    download_report_file_name = "" + now.strftime("%d-%m %H-%M") + " report" + "." + document_file_path.rsplit(".", 1)[-1]
 
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(download_report_file_name);
@@ -218,19 +223,23 @@ def member_search_view(request):
     :return: default format is - [{id:'member_id', text:'name_representation'}]
     if name_format is defined in search params - format becomes as - [{id:'name_representation', text:'name_representation'}]
     """
-    print("Search request, method", request.method)
     service_members_list = []
     if request.method == 'POST':
         filter_param = request.POST.get('filter_param')
         name_format = request.POST.get('name_format')
 
         if filter_param is not None and len(filter_param) > 0:
+            cap_filter_param = filter_param.capitalize()
             query_set = Serviceman.objects.filter(
                 Q(first_name__icontains=filter_param)
                 |
                 Q(last_name__icontains=filter_param)
                 |
                 Q(rank__name__icontains=filter_param)
+                |
+                Q(first_name__icontains=cap_filter_param)
+                |
+                Q(last_name__icontains=cap_filter_param)
             )
         else:
             query_set = Serviceman.objects.all()
@@ -261,32 +270,4 @@ def member_search_view(request):
     return HttpResponse(request, "404 I'm not an Error))")
 
 
-def members_ajax_search_view(request):
-    """search for spefific service member (duplicates member_search_view, BUT..!)"""
-    users_list = []
-    if request.method == 'POST':
-        filter_param = request.POST.get('filter_param')
-        print('filter_param:', filter_param)
 
-        if filter_param is not None and len(filter_param) > 0:
-            query_set = Serviceman.objects.filter(
-                Q(first_name__icontains=filter_param)
-                |
-                Q(last_name__icontains=filter_param)
-                |
-                Q(rank__name__icontains=filter_param)
-            )
-
-            for user in query_set:
-                users_list.append({
-                    'id': user.id,
-                    'full_name': user.rank.__str__() + " " + user.get_first_last_name(),
-                })
-        # else:
-        #     users_list.append("NOTHING FOUND!")
-
-
-        data = json.dumps(users_list)
-
-        mimetype = 'application/json'
-        return HttpResponse(data, mimetype)

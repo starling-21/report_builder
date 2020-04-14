@@ -31,7 +31,7 @@ if ENV_ROLE == 'development':
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['stg.cbu.net', '127.0.0.1']
 
 # Application definition
 
@@ -86,6 +86,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #     'NAME': 'reports_db',
+    #     'USER': 'django_user',
+    #     'PASSWORD': '22364011',
+    #     'HOST': 'localhost',
+    #     'PORT': '',  # Set to empty string for default.
+    # }
 }
 
 # Password validation

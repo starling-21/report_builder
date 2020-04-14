@@ -127,7 +127,6 @@ class Report(models.Model):
         ('custom', 'рапорт по специфічному шаблону'),
     ]
     type = models.CharField(max_length=100, choices=REPORT_TYPES, default='regular', verbose_name="тип рапорту")
-    template_name = models.CharField(max_length=255, default='template_universal.docx', null=True, blank=True, verbose_name="назва файлу шаблону (змінюється адміністратором, див. у документації)")
 
     title = models.CharField(max_length=255, null=True, verbose_name="Назва рапорту")
 
