@@ -20,18 +20,21 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'kbl78%o7j9=c@z^baoi_mr4d@r)qgyrbi7@*obi(ntegkhnnq='
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-ENV_ROLE = 'development'
+# ENV_ROLE = 'development'
+ENV_ROLE = 'production'
 
-DEBUG = False
+DEBUG = int(os.environ.get("DEBUG", default=0))
 TEMPLATE_DEBUG = DEBUG
 if ENV_ROLE == 'development':
     DEBUG = True
     TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = ['stg.cbu.net', '127.0.0.1']
+# 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
+# For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 # Application definition
 

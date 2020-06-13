@@ -1,5 +1,0 @@
-EXAMPLES to properly proceed django redirects
-# return redirect("https://google.com")
-# return redirect(reverse('reports:test_view'))
-# return HttpResponseRedirect(reverse('reports:test_view'))
-#FAIL return HttpResponseRedirect(reverse(test_view_1, current_app=request.current_app))
