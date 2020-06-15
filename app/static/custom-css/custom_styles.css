@@ -1,0 +1,23 @@
+body {
+    padding-top: 70px;
+}
+
+/* nav-bar-link-no-underline  */
+#nav-bar-link-no-underline:hover{
+    background-color: transparent;
+    text-decoration: none;
+}
+
+
+
+/*report servicemen's chain*/
+
+.left-bordered-row {
+    border-radius: 4px;
+    border: 1px solid #c3cbc9;
+    border-radius-left: 0px;
+    border-left: 5px solid #d39e00;
+    min-height: 50px;
+}
+
+/*end of report servicemen's chain*/

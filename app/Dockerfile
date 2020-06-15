@@ -2,9 +2,7 @@ FROM python:3.7-slim AS base
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-
-
-#-----------------------------
+#----------------------------- python-deps
 FROM base AS python-deps
 
 ENV PIPENV_VENV_IN_PROJECT = 1
@@ -19,14 +17,13 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install pipenv
 
-
 COPY Pipfile .
 #COPY Pipfile.lock .
 RUN set -ex && pipenv install --deploy --dev
 
 
 
-#-------------------------------------
+#----------------------------- project src
 FROM base AS runtime
 #Copy virtual env from python-deps stage
 COPY --from=python-deps /.venv /.venv
