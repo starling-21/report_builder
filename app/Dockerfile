@@ -19,10 +19,9 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip install pipenv
 
-#RUN pip install pipenv
 
 COPY Pipfile .
-COPY Pipfile.lock .
+#COPY Pipfile.lock .
 RUN set -ex && pipenv install --deploy --dev
 
 
@@ -39,5 +38,6 @@ WORKDIR /usr/src/app
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
+#CMD []
 
 

@@ -1,11 +1,14 @@
 from django.db import models
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 
 
 # Create your models here.
 class Rank(models.Model):
     name = models.CharField(max_length=255, verbose_name="військове звання (полковник, лейтенант..)")
-    to_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="військове звання, давальний відмінок (полковнику, лейтенанту..)")
-    for_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="військове звання, знахідний відмінок (полковника, лейтенанта..)")
+    to_name = models.CharField(max_length=255, blank=True, null=True,
+                               verbose_name="військове звання, давальний відмінок (полковнику, лейтенанту..)")
+    for_name = models.CharField(max_length=255, blank=True, null=True,
+                                verbose_name="військове звання, знахідний відмінок (полковника, лейтенанта..)")
 
     def __str__(self):
         return self.name
@@ -16,8 +19,10 @@ class Rank(models.Model):
 
 
 class Unit(models.Model):
-    name = models.CharField(max_length=255, verbose_name="назва підрозділу в РОДОВОМУ відміноку (відділу аналізу інцидентів кібернетичної безпеки)")
-    parent_unit = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, verbose_name="вищій підрозділ (віддліл->центр->..)")
+    name = models.CharField(max_length=255,
+                            verbose_name="назва підрозділу в РОДОВОМУ відміноку (відділу аналізу інцидентів кібернетичної безпеки)")
+    parent_unit = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True,
+                                    verbose_name="вищій підрозділ (віддліл->центр->..)")
 
     def __str__(self):
         return self.name
@@ -40,11 +45,13 @@ class Unit(models.Model):
 
 class Position(models.Model):
     position_title = models.CharField(max_length=255, verbose_name="посада (офіцер, старший офіцер, начальник)")
-    position_tail = models.CharField(max_length=255, default='', blank=True, verbose_name="додаткова посада. Наприклад:(заступник начальника, перший заступник командира...)  !!! назву підрозділу НЕ ВКАЗУВАТИ  !!!")
+    position_tail = models.CharField(max_length=255, default='', blank=True,
+                                     verbose_name="додаткова посада. Наприклад:(заступник начальника, перший заступник командира...)  !!! назву підрозділу НЕ ВКАЗУВАТИ  !!!")
     unit = models.ForeignKey('Unit', on_delete=models.DO_NOTHING, verbose_name="підрозділ")
 
     supervisor = models.BooleanField(default=False, blank=True, null=True, verbose_name="командир/начальник підрозділу")
-    temp_supervisor = models.BooleanField(default=False, blank=True, null=True, verbose_name="тимчасово виконуючий обов'язки командира/начальника")
+    temp_supervisor = models.BooleanField(default=False, blank=True, null=True,
+                                          verbose_name="тимчасово виконуючий обов'язки командира/начальника")
 
     def __str__(self):
         if self.temp_supervisor:
@@ -87,12 +94,15 @@ class Serviceman(models.Model):
     first_name = models.CharField(max_length=255, verbose_name="Ім'я")
     last_name = models.CharField(max_length=255, verbose_name="Прізвище")
 
+    to_first_name = models.CharField(max_length=255,
+                                     verbose_name="Ім'я, давальний відмінок (Петру, Євгенії, Дмитру...)")
+    to_last_name = models.CharField(max_length=255,
+                                    verbose_name="Прізвище, давальний відмінок (Яцуку, Куріло, Павленку...)")
 
-    to_first_name = models.CharField(max_length=255, verbose_name="Ім'я, давальний відмінок (Петру, Євгенії, Дмитру...)")
-    to_last_name = models.CharField(max_length=255, verbose_name="Прізвище, давальний відмінок (Яцуку, Куріло, Павленку...)")
-
-    for_first_name = models.CharField(max_length=255, verbose_name="Ім'я, знахідний відмінок (Петра, Євгенії, Дмитра...)")
-    for_last_name = models.CharField(max_length=255, verbose_name="Прізвище, знахідний відмінок (Яцука, Куріло, Павленка...)")
+    for_first_name = models.CharField(max_length=255,
+                                      verbose_name="Ім'я, знахідний відмінок (Петра, Євгенії, Дмитра...)")
+    for_last_name = models.CharField(max_length=255,
+                                     verbose_name="Прізвище, знахідний відмінок (Яцука, Куріло, Павленка...)")
 
     rank = models.ForeignKey('Rank', on_delete=models.DO_NOTHING, verbose_name="військове звання")
     unit = models.ForeignKey('Unit', on_delete=models.DO_NOTHING, verbose_name="Підрозділ")
@@ -131,15 +141,27 @@ class Report(models.Model):
     title = models.CharField(max_length=255, null=True, verbose_name="Назва рапорту")
 
     body_sample = models.TextField(blank=True, null=True, verbose_name="зразок тексту рапорту")
-    body_template = models.TextField(blank=True, null=True, verbose_name="шаблон рапорту (змінюється адміністратором, див. у документації)")
+    body_template = models.TextField(blank=True, null=True,
+                                     verbose_name="шаблон рапорту (змінюється адміністратором, див. у документації)")
 
-    default_header_position = models.ForeignKey(Position, related_name='report_header_position_set', on_delete=models.SET_NULL, blank=True, null=True, verbose_name="посада на кого цей рапорт")
-    default_footer_position = models.ForeignKey(Position, related_name='report_footer_position_set', on_delete=models.SET_NULL, blank=True, null=True, verbose_name="посада від кого цей рапорт")
+    default_header_position = models.ForeignKey(Position, related_name='report_header_position_set',
+                                                on_delete=models.SET_NULL, blank=True, null=True,
+                                                verbose_name="посада на кого цей рапорт")
+    default_footer_position = models.ForeignKey(Position, related_name='report_footer_position_set',
+                                                on_delete=models.SET_NULL, blank=True, null=True,
+                                                verbose_name="посада від кого цей рапорт")
 
     def __str__(self):
         return self.title
 
+    def clean(self):
+        if self.type == self.REPORT_TYPES[1][0]:
+            if self.default_header_position is None or self.default_footer_position is None:
+                raise ValidationError(
+                    {"default_header_position": ['These field is required!'],
+                     "default_footer_position": ['These field is required!']}
+                )
+
     class Meta:
         verbose_name = "Рапорти__"
         verbose_name_plural = "Рапорти"
-
