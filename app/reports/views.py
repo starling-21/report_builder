@@ -21,10 +21,13 @@ from . import report_forms_util
 # Create your views here.
 def index_view(request):
     """show few report generation option for user (basic report or custom_template)"""
+    if request.user.is_authenticated:
+        return redirect(reverse('reports:reports_list'))
+
     return render(request, 'reports/index.html')
 
 
-# @login_required
+@login_required
 def reports_list_view(request):
     """show all reports"""
     if request.method == 'POST':
@@ -71,6 +74,7 @@ def reports_list_view(request):
     return render(request, 'reports/reports_list.html', context)
 
 
+@login_required
 def proceed_chosen_report_view(request, report_id):
     """
     proceed choosed report and define next step (show report filling form or users list to set up report owner )
@@ -85,6 +89,7 @@ def proceed_chosen_report_view(request, report_id):
         return redirect(reverse('reports:edit_service_members_chain'))
 
 
+@login_required
 def serviceman_list_view(request):
     """test view for showing users list. For choosing who generate report for"""
     serviceman_list = Serviceman.objects.all().order_by('id')
@@ -98,6 +103,7 @@ def serviceman_list_view(request):
     return render(request, 'reports/serviceman_list.html', context)
 
 
+@login_required
 def edit_service_members_chain_view(request, serviceman_id=None):
     """change servicemen chain if needed.
     automatically change member position and make him temporary boss on this position"""
@@ -183,6 +189,7 @@ def edit_service_members_chain_view(request, serviceman_id=None):
     return render(request, 'reports/edit_service_members_chain.html', context)
 
 
+@login_required
 def report_filling_view(request):
     """report filling form view"""
     if request.method == 'POST':
@@ -196,6 +203,7 @@ def report_filling_view(request):
     return render(request, 'reports/report_filling.html', context)
 
 
+@login_required
 def return_report_document_view(request):
     """
     generate final document report
@@ -216,6 +224,7 @@ def return_report_document_view(request):
     return response
 
 
+@login_required
 def member_search_view(request):
     """
     Search for servicemember and return objects json array:

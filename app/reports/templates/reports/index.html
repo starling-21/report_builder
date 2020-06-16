@@ -1,12 +1,27 @@
 {% extends 'reports/base.html' %}
 
+{% load static %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'custom-css/backgroud_styles.css' %}"/>
+{% endblock %}
+
 {% block content %}
-    <div class="w-50 p-3">
-        <div class="row">
-            <div class="col text-center">
-                <i class="fab fa-docker text-primary fa-9x"></i>
+            <div class="w-90 mx-auto" style="margin-top: 200px">
+                <div class="row">
+                    <div class="col text-center">
+                        <i class="fab fa-docker text-warning fa-9x"></i>
+                        <i class="fas fa-file-alt fa-1x text-info"></i>
+                        <i class="fas fa-file-alt fa-2x text-danger"></i>
+                        <i class="fas fa-file-alt fa-3x text-danger"></i>
+                        <i class="fas fa-file-alt fa-4x text-danger"></i>
+                        <i class="fas fa-file-alt fa-5x text-info"></i>
+                        <i class="fas fa-file-alt fa-6x text-danger"></i>
+                        <i class="fas fa-file-alt fa-7x text-danger"></i>
+                        <i class="fas fa-file-alt fa-8x text-danger"></i>
+                        <i class="fas fa-file-alt fa-9x text-info"></i>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
 {% endblock %}
