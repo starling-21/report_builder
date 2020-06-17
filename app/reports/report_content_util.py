@@ -108,7 +108,11 @@ def get_secondary_report_body(serviceman_id, global_merge_dict=None):
     elif 'Доповiдаю' in global_merge_dict['body_tier_0'].split()[0]:
         first_body_word = 'Доповідаю'
 
-    report_body_text += first_body_word + " по суті рапорту " + serviceman.rank.for_name + " " + serviceman.get_full_name_for() + "."
+    # report_body_text += first_body_word + " по суті рапорту " + serviceman.rank.for_name + " " + serviceman.get_full_name_for() + "."
+    report_body_text += first_body_word + " по суті рапорту " + \
+                        serviceman.rank.for_name + " " + \
+                        serviceman.for_first_name.capitalize() + " " + \
+                        serviceman.for_last_name.capitalize() + "."
     report_body_dict['body_tier'] = report_body_text
     return report_body_dict
 

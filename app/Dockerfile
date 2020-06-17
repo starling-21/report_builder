@@ -32,9 +32,9 @@ ENV PATH="/.venv/bin:$PATH"
 WORKDIR /usr/src/app
 #COPY . /usr/src/app
 
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
-#CMD []
+COPY docker-entrypoint.sh docker-entrypoint.sh
+RUN chmod +x docker-entrypoint.sh
+ENTRYPOINT ["./docker-entrypoint.sh"]
+
 
 

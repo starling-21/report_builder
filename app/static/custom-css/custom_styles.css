@@ -1,5 +1,13 @@
 body {
     padding-top: 70px;
+
+     width: 100vw;
+    height: 100vh;
+    background-image: url("../images/main_bg_1.jpg");
+    /* Center and scale the image nicely */
+    background-position: 100% 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 /* nav-bar-link-no-underline  */

@@ -64,9 +64,6 @@
                             <span class="page-link text-dark bg-info">{{ serviceman_list.number }}</span>
                             <span class="sr-only">(current)</span></span>
                         </li>
-                        {#                    {% elif i > serviceman_list.number|add:'-3' and i < serviceman_list.number|add:'3' %}#}
-                        {#                        <li class="page-item"><a class="page-link text-info" href="?page={{ i }}">{{ i }}</a></li>#}
-                        {#                    {% endif %}#}
                     {% else %}
                         <li class="page-item">
                             <a class="page-link text-info"
@@ -118,14 +115,13 @@
             // fill in dynamic list with filtered users
             function fillDynamicList(data) {
                 filteredUsersdList.empty();
-                // filteredList.append('<li>' + data[0].id +'</li>');
                 for (let i = 0; i < data.length; i++) {
                     if (i % 2 == 0) {
                         filteredUsersdList.append(
                             "<li class='list-group-item list-group-item-secondary'>" +
                                 "<a class='text-dark' href='" + {% url 'reports:edit_service_members_chain' %} +data[i].id + "'>" +
                                     "<span><i class='fas fa-angle-right mr-3'></i></span>" +
-                                    data[i].full_name +
+                                    data[i].text +
                                 "</a>" +
                             '</li>');
                     } else {
@@ -133,7 +129,7 @@
                             "<li class='list-group-item'>" +
                                 "<a class='text-dark' href='" + {% url 'reports:edit_service_members_chain' %} +data[i].id + "'>" +
                                     "<span><i class='fas fa-angle-right mr-3'></i></span>" +
-                                    data[i].full_name +
+                                    data[i].text +
                                 "</a>" +
                             '</li>');
                     }
@@ -170,7 +166,7 @@
                 let csrf_token = '{{ csrf_token }}';
                 $.ajax({
                     type: "POST",
-                    url: "/members_ajax_search/",
+                    url: "/search_member/",
                     dataType: 'json',
                     data: {
                         'filter_param': user_input_filter,
@@ -178,7 +174,7 @@
                     },
                     success: function (data) {
                         if (user_input_filter.length > 0) {
-                            //console.table(data);
+                            console.table(data);
                             fillDynamicList(data);
                             mainUsersBlock.hide();
                             pagesNavigator.hide();
@@ -191,7 +187,6 @@
                 });
             });
             // end of send ajax request to filter users
-
 
         });
         // end of document ready function

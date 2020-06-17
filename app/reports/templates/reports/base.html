@@ -20,7 +20,7 @@
 
 
     {#    import local bootstrap#}
-    {#    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4.0.0/dist/css/bootstrap.css' %}"/>#}
+{#    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap-4.0.0/dist/css/bootstrap.css' %}"/>#}
 
     {#    custom css#}
     <link rel="stylesheet" type="text/css" href="{% static 'custom-css/custom_styles.css' %}"/>
@@ -38,7 +38,7 @@
     <div class="container form-inline">
 
         <a href="/" class="navbar-brand ml-3">
-            <i class="fas fa-greater-than fa-3x text-light"></i></a>
+            <i class="fas fa-greater-than fa-2x text-light"></i></a>
 
             <div class="collapse navbar-collapse">
                 {% if user.is_authenticated %}
@@ -52,8 +52,8 @@
                                 </span>
                             </a>
                         </li>
-                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"
-                                                href="#">(F.A.Q.)</a></li>
+{#                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"#}
+{#                                                href="#">(F.A.Q.)</a></li>#}
                     </ul>
 
                     <div class="dropdown">
@@ -61,12 +61,9 @@
                                 id="dropdownMenuButton"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {# icon for loged in user #}
-                            {# <span class="fas fa-user-circle fa-2x mr-2"></span><span>{{ user.username|upper }}</span>#}
-                            <span class="fas fa-child fa-2x mr-2"></span><span>{{ user.username|upper }}</span>
+                             <span class="fas fa-user-circle fa-1x mr-2"></span><span>{{ user.username|upper }}</span>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-{#                            <a class="dropdown-item" href="{% url 'logout' %}">Вийти<i#}
-{#                            <a class="dropdown-item" href="{% url 'reports:logout/' %}">Вийти<i#}
                             <a class="dropdown-item" href="{% url 'logout' %}?next=/">Вийти<i
                                     class="fas fa-sign-out-alt ml-1"></i></a>
                         </div>
@@ -90,7 +87,7 @@
                     <div class="ml-auto">
                         {# login button#}
                         <a class="btn btn-outline-warning mr-2" href="{% url 'login' %}"><span
-                                class="text font-weight-normal"><i class="fas fa-sign-in-alt"></i></span></a>
+                                class="text font-weight-normal"><i class="fas fa-sign-in-alt"></i></span><span class="ml-2">Login</span></a>
                     </div>
                     {# end of login button #}
                 {% endif %}

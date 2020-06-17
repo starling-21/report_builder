@@ -11,7 +11,7 @@
 
 
 {% block content %}
-    <p><h3>Всі посередники:</h3></p>
+    <p><h3 class="text-white">Всі посередники:</h3></p>
     <hr>
 
 
@@ -19,7 +19,7 @@
 
         {% for servicemember in serviceman_chain %}
 
-            <div class="row left-bordered-row ml-0">
+            <div class="row left-bordered-row ml-0 bg-light">
 
                 {# editing chain member#}
                 {% if swap_id == servicemember.id %}
@@ -70,7 +70,7 @@
             {# adding arrow after each line#}
             {% if not forloop.last %}
 
-                <i class="ml-0 fas fa-arrow-down fa-1x"></i>
+                <i class="ml-0 fas fa-arrow-down fa-1x text-white"></i>
             {% endif %}
         {% endfor %}
 
