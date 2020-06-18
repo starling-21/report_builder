@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, re_path
+from django.views.generic import TemplateView
 
 from . import views
 
@@ -36,5 +37,7 @@ urlpatterns = [
 
     re_path(r'^search_member/$', views.member_search_view),
     re_path(r'^search_member/(?P<name_format>[-\w]+)$', views.member_search_view),
+
+    path('help/', TemplateView.as_view(template_name="reports/help.html"), name='help')
 
 ]

@@ -34,7 +34,8 @@
 </head>
 <body>
 
-<nav class="navba fixed-top navbar-expand navbar-dark bg-secondary">
+{#<nav id="opacity-3" class="fixed-top navbar-expand navbar-dark bg-secondary opacity-0 left-bordered-row">#}
+<nav class="fixed-top navbar-expand bg-secondary opacity-5">
     <div class="container form-inline">
 
         <a href="/" class="navbar-brand ml-3">
@@ -52,18 +53,20 @@
                                 </span>
                             </a>
                         </li>
-{#                        <li class="nav-item"><a class="nav-link text-light text-uppercase font-weight-bold px-3"#}
-{#                                                href="#">(F.A.Q.)</a></li>#}
+                        {% if user.username == "admin" %}
+                        <li class="nav-item"><a class="nav-link text-warning text-uppercase font-weight-bold px-3"
+                                                href={% url 'reports:help' %}>СПИСОК шаблонных ПОЛЕЙ</a></li>
+                        {% endif %}
                     </ul>
 
                     <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle align-self-baseline" type="button"
+                        <button class="btn btn-secondary dropdown-toggle align-self-baseline opacity-5" type="button"
                                 id="dropdownMenuButton"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {# icon for loged in user #}
                              <span class="fas fa-user-circle fa-1x mr-2"></span><span>{{ user.username|upper }}</span>
                         </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <div class="dropdown-menu opacity-5" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" href="{% url 'logout' %}?next=/">Вийти<i
                                     class="fas fa-sign-out-alt ml-1"></i></a>
                         </div>
