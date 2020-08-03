@@ -23,14 +23,8 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 SECRET_KEY = os.environ.get("SECRET_KEY", "not-so-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# ENV_ROLE = 'development'
-ENV_ROLE = 'production'
-
 DEBUG = int(os.environ.get("DEBUG", default=0))
-TEMPLATE_DEBUG = DEBUG
-if ENV_ROLE == 'development':
-    DEBUG = True
-    TEMPLATE_DEBUG = DEBUG
+
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
@@ -93,19 +87,6 @@ DATABASES = {
         'HOST': os.environ.get('DB_HOST', 'localhost'),
         'PORT': os.environ.get('DB_PORT', '5432'),
     }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
-
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'reports_db',
-    #     'USER': 'django_user',
-    #     'PASSWORD': '22364011',
-    #     'HOST': 'localhost',
-    #     'PORT': '',  # Set to empty string for default.
-    # }
 }
 
 # Password validation
@@ -139,10 +120,26 @@ USE_L10N = True
 
 USE_TZ = True
 
+
+
+# DEBUG_TOOLBAR section
 # debub toolbar requirements
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+
+def show_toolbar(request):
+    if request.is_ajax():
+        return False
+    return True
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
+    'SHOW_COLLAPSED': False
+}
+
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -153,10 +150,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
 # custom session engine setting
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
-# SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'

@@ -12,7 +12,6 @@ docx-mailmerge = {editable = true,git = "https://github.com/ZhengMingpei/docx-ma
 lxml = "==4.4.1"
 pytz = "==2019.3"
 sqlparse = "==0.3.0"
-#Django = "==2.2.6"
 gunicorn = "*"
 psycopg2-binary = "*"
 django = "3.0"

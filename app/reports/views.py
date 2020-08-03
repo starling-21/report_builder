@@ -111,15 +111,14 @@ def edit_service_members_chain_view(request, serviceman_id=None):
     if request.method == 'POST':
         try:
             serviceman_chain = request.session['serviceman_chain']
+            
             if 'edit_chain_id' in request.POST:
-                print("Editing_member with id:", request.POST.get('edit_chain_id'))
-                swap_id = int(request.POST.get('edit_chain_id'))
+                swap_id = int(request.POST.get('edit_chain_id'))         
 
             elif 'submit_new_id' in request.POST:
                 old_id = request.POST.get('submit_new_id')
                 swap_id = request.POST.get('swap_id')
-                if (swap_id is not None) and (old_id != swap_id):  # and (len(swap_id) > 0)
-                    # print('id swap: {} -> {}'.format(old_id, swap_id))
+                if (swap_id is not None) and (old_id != swap_id):
                     for member in serviceman_chain:
                         if member.id == int(old_id):
                             replace_index = serviceman_chain.index(member)
@@ -139,9 +138,10 @@ def edit_service_members_chain_view(request, serviceman_id=None):
 
                     request.session['serviceman_chain'] = serviceman_chain
                     request.session.modified = True
-
+                   
                     # change swap_id for proper template rendering (show 'next' button after editing)
                     swap_id = None
+
             elif 'remove_chain_id' in request.POST:
                 remove_id = request.POST.get('remove_chain_id')
                 for member in serviceman_chain:
@@ -150,38 +150,54 @@ def edit_service_members_chain_view(request, serviceman_id=None):
                 request.session['serviceman_chain'] = serviceman_chain
                 request.session.modified = True
                 swap_id = None
+
             elif 'submit_chain_editing' in request.POST:
-                # print("submit_chain_editting")
                 return redirect(reverse('reports:report_filling'))
         except Exception as e:
             print(e)
-            return redirect(
-                reverse('reports:edit_service_members_chain', kwargs={'report_id': request.session['report_id']})
-            )
-            # return redirect(reverse('reports:users'))
+            return redirect(reverse('reports:edit_service_members_chain', kwargs={'report_id': request.session['report_id']}))
+        else:
+            request.session['chain_modified'] = True
+            serviceman_chain = request.session['serviceman_chain']
 
+    #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+    #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
     elif request.method == 'GET':
         swap_id = None
-        report_id = request.session['report_id']
-
-        # template case (report with no initiator id)
+        
+        # custom report template case (report with no serviceman_id)
         if serviceman_id is None:
             try:
+                report_id = request.session['report_id']
                 serviceman_chain = report_content_util.get_servicemen_chain_list(report_id)
+                request.session['serviceman_chain'] = serviceman_chain
+                request.session['initial_serviceman_chain'] = serviceman_chain
             except Exception as e:
                 print(e)
-                raise Http404("Report settings is incorrect")
+                raise Http404("Report template settings is incorrect")
+        # regula report with serviceman_id specifyed
         else:
-            request.session['serviceman_id'] = serviceman_id
-            request.session.modified = True
-            serviceman = Serviceman.objects.get(id=serviceman_id)
-            serviceman_chain = report_content_util.get_servicemen_chain_list(report_id, serviceman)
+            #handling chain permanent state modification is user_id changed
+            if 'serviceman_id' in request.session.keys() and serviceman_id != request.session['serviceman_id']:
+                request.session['serviceman_id'] = serviceman_id
+                del request.session['chain_modified']
+            else:
+                request.session['serviceman_id'] = serviceman_id
 
-        request.session['serviceman_chain'] = serviceman_chain
-        request.session['initial_serviceman_chain'] = serviceman_chain
+            # new variable for controlling chain modification (POST --> automatically return GET vith prepopulated data)
+            try:
+                if request.session['chain_modified'] is True:
+                    serviceman_chain = request.session['serviceman_chain']
+            except KeyError:
+                #init service_men chain first time
+                serviceman = Serviceman.objects.get(id=serviceman_id)
+                serviceman_chain = report_content_util.get_servicemen_chain_list(report_id, serviceman)
+                
+                request.session['serviceman_chain'] = serviceman_chain
+                request.session['initial_serviceman_chain'] = serviceman_chain
         request.session.modified = True
 
-    serviceman_chain = request.session['serviceman_chain']
+
     context = {
         'serviceman_chain': serviceman_chain,
         'swap_id': swap_id,

@@ -44,9 +44,9 @@ class Unit(models.Model):
 
 
 class Position(models.Model):
-    position_title = models.CharField(max_length=255, verbose_name="посада (офіцер, старший офіцер, начальник)")
+    position_title = models.CharField(max_length=255, verbose_name="посада (офіцер, старший офіцер, начальник)  ___назву підрозділу НЕ ВКАЗУВАТИ___  !!!")
     position_tail = models.CharField(max_length=255, default='', blank=True,
-                                     verbose_name="додаткова посада. Наприклад:(заступник начальника, перший заступник командира...)  !!! назву підрозділу НЕ ВКАЗУВАТИ  !!!")
+                                     verbose_name="додаткова посада. Наприклад:(заступник начальника, перший заступник командира...)  !!! ___назву підрозділу НЕ ВКАЗУВАТИ___  !!!")
     unit = models.ForeignKey('Unit', on_delete=models.DO_NOTHING, verbose_name="підрозділ")
 
     supervisor = models.BooleanField(default=False, blank=True, null=True, verbose_name="командир/начальник підрозділу")
@@ -146,10 +146,10 @@ class Report(models.Model):
 
     default_header_position = models.ForeignKey(Position, related_name='report_header_position_set',
                                                 on_delete=models.SET_NULL, blank=True, null=True,
-                                                verbose_name="посада на кого цей рапорт")
+                                                verbose_name="""посада на кого цей рапорт. (ВКАЗУВАТИ ТIЛЬКИ ДЛЯ РАПОРТIВ типу: 'рапорт по специфічному шаблону')""")
     default_footer_position = models.ForeignKey(Position, related_name='report_footer_position_set',
                                                 on_delete=models.SET_NULL, blank=True, null=True,
-                                                verbose_name="посада від кого цей рапорт")
+                                                verbose_name="""посада вiд кого цей рапорт. (ВКАЗУВАТИ ТIЛЬКИ ДЛЯ РАПОРТIВ типу: 'рапорт по специфічному шаблону')""")
 
     def __str__(self):
         return self.title

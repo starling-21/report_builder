@@ -41,3 +41,6 @@ urlpatterns = [
     path('help/', TemplateView.as_view(template_name="reports/help.html"), name='help')
 
 ]
+
+
+
