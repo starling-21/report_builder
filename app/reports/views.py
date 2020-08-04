@@ -164,11 +164,12 @@ def edit_service_members_chain_view(request, serviceman_id=None):
     #* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
     elif request.method == 'GET':
         swap_id = None
+        report_id = request.session['report_id']
+
         
         # custom report template case (report with no serviceman_id)
         if serviceman_id is None:
             try:
-                report_id = request.session['report_id']
                 serviceman_chain = report_content_util.get_servicemen_chain_list(report_id)
                 request.session['serviceman_chain'] = serviceman_chain
                 request.session['initial_serviceman_chain'] = serviceman_chain

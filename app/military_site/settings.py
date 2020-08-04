@@ -26,6 +26,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "not-so-secret-key")
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
 
+
+
+
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
@@ -41,11 +44,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'reports',
     'bootstrap_datepicker_plus',
-    'debug_toolbar',
+    # 'debug_toolbar',
 ]
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -122,25 +125,6 @@ USE_TZ = True
 
 
 
-# DEBUG_TOOLBAR section
-# debub toolbar requirements
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
-
-
-def show_toolbar(request):
-    if request.is_ajax():
-        return False
-    return True
-
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': show_toolbar,
-    'SHOW_COLLAPSED': False
-}
-
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
@@ -162,3 +146,35 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # sets Bootstrap 4 as the default styling framework for django-crispy-forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+
+
+# # settings for "debug tool bar"
+# # DEBUG_TOOLBAR section
+# # debub toolbar requirements
+# if DEBUG:
+#     MIDDLEWARE += (
+#         'debug_toolbar.middleware.DebugToolbarMiddleware',
+#     )
+#     INSTALLED_APPS += (
+#         'debug_toolbar',
+#     )
+#     INTERNAL_IPS = ('127.0.0.1', )
+#     DEBUG_TOOLBAR_CONFIG = {
+#         'INTERCEPT_REDIRECTS': False,
+#     }
+
+#     INTERNAL_IPS = [
+#         '127.0.0.1',
+#     ]
+
+#     def show_toolbar(request):
+#         if request.is_ajax():
+#             return False
+#         return True
+
+#     DEBUG_TOOLBAR_CONFIG = {
+#         'SHOW_TOOLBAR_CALLBACK': show_toolbar,
+#         'SHOW_COLLAPSED': False
+#     }

@@ -29,8 +29,6 @@ python manage.py createsuperuser --noinput --username="$DJANGO_SUPERUSER_USERNAM
 
 
 # Start wsgi server
-# export DEBUG=1
 # python manage.py runserver 0.0.0.0:8000
 
-export DEBUG=something_to_satisfy_gunicord_setting_or_you_get_500_error
-gunicorn -b 0.0.0.0:8000 -w 3 --access-logfile - --log-level INFO 'military_site.wsgi:application'
+gunicorn -b 0.0.0.0:8000 -w 3 --log-level INFO 'military_site.wsgi:application'
